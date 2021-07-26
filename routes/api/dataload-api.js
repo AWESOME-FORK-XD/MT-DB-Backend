@@ -1,19 +1,17 @@
 const express = require('express');
-const _ = require('lodash');
 const {parse} = require('fast-csv');
 
 let router = express.Router({ mergeParams: true });
-const { parseQueryOptionsFromObject } = require('@apigrate/mysqlutils/lib/express/db-api');
-const {fetchManyAnd, resultToCsv, resultToAccept, resultToJsonDownload} = require('./db-api-ext');
+const {fetchManyAnd, resultToCsv, resultToJsonDownload} = require('./db-api-ext');
 
 let debug = require('debug')('medten:routes');
 
 
-/** Get all the fields for a given entity (table) */
+/** Get the available table entities (not the table names themselves, though) */
 router.get('/tables', async function (req, res, next) {
   
   res.status(200).json({
-    tables: req.app.locals.Database.available_tables()
+    tables: req.app.locals.Database.registry.filter(e=>e.entity.includes("view")?false:true).map(e=>{return e.entity; })()
   });
 
 });
@@ -254,7 +252,7 @@ async function parseData(raw, delimiter, dao){
       pk: null,
       warnings: [],
       data: []
-    }
+    };
 
     const stream = parse({delimiter: delimiter || '\t', headers: true})
     .on('headers', headers => {
@@ -306,7 +304,7 @@ router.use(function (err, req, res, next) {
     message: "Unexpected error.",
     error: errMessage
   });
-})
+});
 
 
 module.exports = router;
