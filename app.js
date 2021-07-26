@@ -2,16 +2,42 @@ require('dotenv').config();
 
 var createError = require('http-errors');
 // var compression = require('compression');
-var express = require('express');
+const express = require('express');
 // var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const helmet = require('helmet');
+const logger = require('morgan');
 const mysql = require('mysql');
 const cors = require('cors');
 const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware');
 
+const {AuthService} = require('./services/auth-service');
+
+
 
 var app = express();
+console.log("Environment initialized to: " + process.env.NODE_ENV);
+
+//Note, allow cross origin access to S3 static assets bucket cors config.
+/*
+<CORSConfiguration>
+  <CORSRule>
+    <AllowedOrigin>*</AllowedOrigin>
+    <AllowedMethod>GET</AllowedMethod>
+    <MaxAgeSeconds>3000</MaxAgeSeconds>
+  </CORSRule>
+</CORSConfiguration>
+*/
+app.use(cors());
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(express.text({ limit: "1024kb", defaultCharset: "utf-8" }));
+app.use(cookieParser());
+
+if(['test','production'].includes(process.env.NODE_ENV)){
+  app.use(awsServerlessExpressMiddleware.eventContext());
+}
 
 // Database ....................................................................
 
@@ -38,35 +64,22 @@ var connPool = mysql.createPool({
 var Database = require('./services/database')(connPool);
 app.locals.Database = Database;
 
-// Other Global App Config .....................................................
-console.log("Environment initialized to: " + process.env.NODE_ENV);
+// security ...................................................................
+// app.use(helmet.contentSecurityPolicy());
+app.use(helmet.dnsPrefetchControl());
+app.use(helmet.expectCt());
+app.use(helmet.frameguard());
+app.use(helmet.hidePoweredBy());
+app.use(helmet.hsts());
+app.use(helmet.ieNoOpen());
+app.use(helmet.noSniff());
+app.use(helmet.permittedCrossDomainPolicies());
+app.use(helmet.referrerPolicy());
+app.use(helmet.xssFilter());
 
-//Note, allow cross origin access to S3 static assets bucket cors config.
-/*
-<CORSConfiguration>
-  <CORSRule>
-    <AllowedOrigin>*</AllowedOrigin>
-    <AllowedMethod>GET</AllowedMethod>
-    <MaxAgeSeconds>3000</MaxAgeSeconds>
-  </CORSRule>
-</CORSConfiguration>
-*/
-app.use(cors());
+// Service for authentication and authorization
+app.locals.authService = new AuthService(app.locals.database);
 
-if(process.env.NODE_ENV==="dbpoc" || process.env.NODE_ENV==="production"){
-  app.use(awsServerlessExpressMiddleware.eventContext());
-}
-// app.use(compression());
-
-// view engine setup
-// app.set('views', path.join(__dirname, 'views'));
-// app.set('view engine', 'pug');
-
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(express.text({ limit: "1024kb", defaultCharset: "utf-8" }));
-app.use(cookieParser());
 
 // Routing .....................................................................
 var authRouter = require('./routes/auth');
