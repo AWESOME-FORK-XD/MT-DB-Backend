@@ -4,6 +4,59 @@
   Authors: Andres Orjuela, Derek Gau
 */
 
+--
+-- org, user, and related authorization tables.
+--
+drop table if exists t_user_org;
+drop table if exists t_user_role;
+drop table if exists t_user;
+drop table if exists t_org;
+
+CREATE TABLE `t_user_role` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) unsigned NOT NULL,
+  `role` varchar(100) NOT NULL DEFAULT '',
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `version` int(11) DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+/**
+  Users can be assigned an org
+*/
+CREATE TABLE `t_org` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(200) NOT NULL DEFAULT '',
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `version` int(11) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `t_user_org` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) unsigned NOT NULL,
+  `org_id` int(11) unsigned NOT NULL,
+  `is_default` BIT NOT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `version` int(11) DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Auth relationships
+ALTER TABLE `t_user_role`
+  ADD CONSTRAINT `fk_user_role_user` FOREIGN KEY (`user_id`) REFERENCES `t_user` (`id`);
+
+ALTER TABLE `t_user_org`
+  ADD CONSTRAINT `fk_user_org_client` FOREIGN KEY (`org_id`) REFERENCES `t_org` (`id`);
+
+ALTER TABLE `t_user_org`
+  ADD CONSTRAINT `fk_user_org_user` FOREIGN KEY (`user_id`) REFERENCES `t_user` (`id`);
+
+
+
 -- Create syntax for TABLE 't_brand'
 CREATE TABLE `t_brand` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -351,32 +404,24 @@ CREATE TABLE `t_packaging_factor` (
 
 
 -- Create syntax for TABLE 't_account'
-CREATE TABLE `t_account` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL DEFAULT '',
-  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `version` int(10) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- Create syntax for TABLE 't_user'
 CREATE TABLE `t_user` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `username` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
+  `email_verified` BIT NOT NULL,
+  `email_verification_token` varchar(255) DEFAULT NULL,
   `first_name` varchar(255) NOT NULL,
   `last_name` varchar(255) NOT NULL,
   `mobile_phone` varchar(20) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
   `status` varchar(20) DEFAULT NULL,
-  `must_reset_password` tinyint(3) NOT NULL DEFAULT '0',
+  `must_reset_password`  BIT NOT NULL,
   `bad_login_attempts` int(11) NOT NULL DEFAULT '0',
   `last_login` timestamp NULL DEFAULT NULL,
   `login_count` int(11) NOT NULL DEFAULT '0',
   `reset_password_token` varchar(255) DEFAULT NULL,
   `reset_password_token_expires` timestamp NULL DEFAULT NULL,
-  `default_account_id` int(11) unsigned DEFAULT NULL,
+  `timezone` varchar(100) DEFAULT '',
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `version` int(11) NOT NULL DEFAULT '0',
@@ -384,7 +429,8 @@ CREATE TABLE `t_user` (
   UNIQUE KEY `username_UNIQUE` (`username`),
   UNIQUE KEY `email_UNIQUE` (`email`),
   FULLTEXT KEY `username` (`username`,`first_name`,`last_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 
 -- Create syntax for TABLE 't_api_key'. Keys can be long-lived, or they can be generated on user login for temporary access.
 CREATE TABLE `t_api_key` (
