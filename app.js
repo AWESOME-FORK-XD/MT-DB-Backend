@@ -13,8 +13,6 @@ const awsServerlessExpressMiddleware = require('aws-serverless-express/middlewar
 
 const {AuthService} = require('./services/auth-service');
 
-
-
 var app = express();
 console.log("Environment initialized to: " + process.env.NODE_ENV);
 
