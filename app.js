@@ -58,9 +58,10 @@ var connPool = mysql.createPool({
 	}
 });
 
-//Makes a DAO factory, named 'Database' available globally.
+// Makes a DAO factory for getting data access objects (to interact with database).
 let {DaoFactory} = require('./services/database');
 var daoFactory = new DaoFactory(connPool);
+// globally available.
 app.locals.database = daoFactory;
 
 // security ...................................................................
