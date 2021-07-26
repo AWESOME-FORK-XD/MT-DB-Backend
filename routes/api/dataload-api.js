@@ -11,7 +11,7 @@ let debug = require('debug')('medten:routes');
 router.get('/tables', async function (req, res, next) {
   
   res.status(200).json({
-    tables: req.app.locals.Database.registry.filter(e=>e.entity.includes("view")?false:true).map(e=>{return e.entity; })()
+    tables: req.app.locals.database.registry.filter(e=>e.entity.includes("view")?false:true).map(e=>{return e.entity; })()
   });
 
 });
@@ -222,7 +222,7 @@ router.get('/:entity/download', validateDao, async function (req, res, next) {
  * @param {*} next 
  */
 async function validateDao(req, res, next){
-  let dao = req.app.locals.Database.getDao(req.params.entity);
+  let dao = req.app.locals.database.getDao(req.params.entity);
   if(!dao){
     res.status(400).json({message: "There is no support for that type of data."});
     return;

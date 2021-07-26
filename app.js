@@ -59,8 +59,9 @@ var connPool = mysql.createPool({
 });
 
 //Makes a DAO factory, named 'Database' available globally.
-var Database = require('./services/database')(connPool);
-app.locals.Database = Database;
+let {DaoFactory} = require('./services/database');
+var daoFactory = new DaoFactory(connPool);
+app.locals.database = daoFactory;
 
 // security ...................................................................
 // app.use(helmet.contentSecurityPolicy());
@@ -76,7 +77,7 @@ app.use(helmet.referrerPolicy());
 app.use(helmet.xssFilter());
 
 // Service for authentication and authorization
-app.locals.authService = new AuthService(app.locals.database);
+app.locals.authService = new AuthService(daoFactory);
 
 
 // Routing .....................................................................

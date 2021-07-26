@@ -50,7 +50,7 @@ router.get('/', async function (req, res, next) {
   let q = parseQueryOptions(req, ALLOWED_SEARCH_PARAMETERS, ['+family_code', '+id'], 1000);
 
   let dbInstructions = {
-    dao: req.app.locals.Database.getDao('family_view'),
+    dao: req.app.locals.database.getDao('family_view'),
     query_options: q.query_options,
     with_total: true,
   };
@@ -88,7 +88,7 @@ router.post('/search', async function (req, res, next) {
     filter_definitions: SEARCH_FILTERS,
     exclude_columns_on_output: null,
     search_payload: payload,
-    dao: req.app.locals.Database.getDao('family_view'),
+    dao: req.app.locals.database.getDao('family_view'),
     sql: null,
     sql_count: null
   };
@@ -108,7 +108,7 @@ router.post('/search/download', async function (req, res, next) {
     filter_definitions: SEARCH_FILTERS,
     exclude_columns_on_output: null,
     search_payload: payload,
-    dao: req.app.locals.Database.getDao('family_view'),
+    dao: req.app.locals.database.getDao('family_view'),
     sql: null,
     sql_count: null
   };
@@ -122,7 +122,7 @@ router.post('/search/download', async function (req, res, next) {
 router.get('/:family_id', function (req, res, next) {
 
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('family_view'),
+    dao: req.app.locals.database.getDao('family_view'),
     id: req.params.family_id
   }
   next();
@@ -135,7 +135,7 @@ router.post('/', function (req, res, next) {
 
   let entity = req.body;
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('family'),
+    dao: req.app.locals.database.getDao('family'),
     toSave: entity
   }
   next();
@@ -148,7 +148,7 @@ router.put('/:family_id', function (req, res, next) {
 
   let entity = req.body;
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('family'),
+    dao: req.app.locals.database.getDao('family'),
     toUpdate: entity
   }
   next();

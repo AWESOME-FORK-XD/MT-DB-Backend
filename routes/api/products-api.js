@@ -83,7 +83,7 @@ router.get('/', async function (req, res, next) {
   let q = parseQueryOptions(req, ALLOWED_SEARCH_PARAMETERS, ['+name_en', '+id'], 1000);
   
   let dbInstructions = {
-    dao: req.app.locals.Database.getDao('product_view'),
+    dao: req.app.locals.database.getDao('product_view'),
     query_options: q.query_options,
     with_total: true,
   };
@@ -122,7 +122,7 @@ router.post('/search', async function (req, res, next) {
     filter_definitions: SEARCH_FILTERS,
     exclude_columns_on_output: ['product_name_formula', 'product_description_formula'],
     search_payload: payload,
-    dao: req.app.locals.Database.getDao('product_view'),
+    dao: req.app.locals.database.getDao('product_view'),
     sql: null,
     sql_count: null
   };
@@ -149,7 +149,7 @@ router.get('/search/download', async function (req, res, next) {
       filter_definitions: SEARCH_FILTERS,
       exclude_columns_on_output: ['product_name_formula', 'product_description_formula'],
       search_payload: payload,
-      dao: req.app.locals.Database.getDao('product_view'),
+      dao: req.app.locals.database.getDao('product_view'),
       sql: null,
       sql_count: null
     };
@@ -175,7 +175,7 @@ router.post('/search/download', async function (req, res, next) {
       filter_definitions: SEARCH_FILTERS,
       exclude_columns_on_output: ['product_name_formula', 'product_description_formula'],
       search_payload: payload,
-      dao: req.app.locals.Database.getDao('product_view'),
+      dao: req.app.locals.database.getDao('product_view'),
       sql: null,
       sql_count: null
     };
@@ -193,7 +193,7 @@ router.post('/search/download', async function (req, res, next) {
 /** Gets an array of all distinct SKUs across all products. Used for validation. A SKU should be globally unique. */
 router.get('/skus', async function (req, res, next) {
   debug(`Getting distinct SKUs...`);
-  let ProductView = req.app.locals.Database.getDao('product_view');
+  let ProductView = req.app.locals.database.getDao('product_view');
   let qresult = await ProductView.callDb(`SELECT DISTINCT(sku) as sku FROM ${ProductView.table} WHERE sku <> '' and sku is not null ORDER BY sku ASC`);
   res.status(200).json(qresult.map(r=>{return r.sku;}));
 });
@@ -201,7 +201,7 @@ router.get('/skus', async function (req, res, next) {
 /** Gets an array of all distinct OEMs across all products. Used for validation. A SKU should be globally unique. */
 router.get('/oems', async function (req, res, next) {
   debug(`Getting distinct SKUs...`);
-  let Product = req.app.locals.Database.getDao('product');
+  let Product = req.app.locals.database.getDao('product');
   let qresult = await Product.callDb(`SELECT id, oem FROM ${Product.table} WHERE oem <> '' and oem is not null GROUP BY id, oem ORDER BY oem ASC`);
   res.status(200).json({total: qresult.length, product_oems: qresult});
 });
@@ -212,7 +212,7 @@ router.get('/oems', async function (req, res, next) {
 router.get('/:product_id', function (req, res, next) {
 
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('product_view'),
+    dao: req.app.locals.database.getDao('product_view'),
     id: req.params.product_id
   }
   next();
@@ -225,7 +225,7 @@ router.post('/', function (req, res, next) {
 
   let entity = req.body;
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('product'),
+    dao: req.app.locals.database.getDao('product'),
     toSave: entity
   }
   next();
@@ -237,14 +237,14 @@ router.post('/', function (req, res, next) {
 router.put('/:product_id', async function (req, res, next) {
 
   let entity = req.body;
-  let productDao = req.app.locals.Database.getDao('product');
+  let productDao = req.app.locals.database.getDao('product');
   
   let existing = await productDao.get(entity.id);
 
   //If new category is or is underneath one of the major categories, err.
   if(entity.category_id && entity.category_id != existing.category_id){
     debug(`A product category change has been detected...`);
-    let categoryDao = req.app.locals.Database.getDao('category');
+    let categoryDao = req.app.locals.database.getDao('category');
 
     let sourceCategory = await topCategoryFor(categoryDao, existing.category_id);
     let targetCategory = await topCategoryFor(categoryDao, entity.category_id);
@@ -257,10 +257,10 @@ router.put('/:product_id', async function (req, res, next) {
     //Delete category-dependent data.
     //Filter Options
     debug(`...deleting old filter options.`)
-    await req.app.locals.Database.getDao('product_filter_option').deleteMatching({product_id: existing.product_id});
+    await req.app.locals.database.getDao('product_filter_option').deleteMatching({product_id: existing.product_id});
     //Custom attributes
     debug(`...deleting old custom attributes.`)
-    await req.app.locals.Database.getDao('product_custom_attribute').deleteMatching({product_id: existing.product_id});
+    await req.app.locals.database.getDao('product_custom_attribute').deleteMatching({product_id: existing.product_id});
 
   }
 
@@ -308,7 +308,7 @@ async function topCategoryFor(categoryDao, categoryId){
 router.delete('/:product_id', function (req, res, next) {
 
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('product'),
+    dao: req.app.locals.database.getDao('product'),
     id: req.params.product_id
   }
   next();
@@ -319,7 +319,7 @@ router.delete('/:product_id', function (req, res, next) {
 // Get all product certificates
 router.get('/:product_id/certificates', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('product_certificate'),
+    dao: req.app.locals.database.getDao('product_certificate'),
     query: {product_id: req.params.product_id},
     //query_options: q.query_options
   }
@@ -330,7 +330,7 @@ router.get('/:product_id/certificates', function (req, res, next) {
 router.post('/:product_id/certificates', function (req, res, next) {
   
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('product_certificate'),
+    dao: req.app.locals.database.getDao('product_certificate'),
     toSave: req.body, //assuming an array
     query: {product_id: req.params.product_id},
     comparison: function(v){ return v.certificate_id; }
@@ -341,7 +341,7 @@ router.post('/:product_id/certificates', function (req, res, next) {
 /** Get all custom attribute values for a product. */
 router.get('/:product_id/custom_attributes', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('product_custom_attribute_view'),
+    dao: req.app.locals.database.getDao('product_custom_attribute_view'),
     query: {product_id: req.params.product_id},
     //query_options: q.query_options
   }
@@ -351,7 +351,7 @@ router.get('/:product_id/custom_attributes', function (req, res, next) {
 /** Save all product custom attributes. */
 router.post('/:product_id/custom_attributes', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('product_custom_attribute'),
+    dao: req.app.locals.database.getDao('product_custom_attribute'),
     toSave: req.body, //assuming an array of objects
     query: {product_id: req.params.product_id},
     comparison: function(obj){ return `${obj.custom_attribute_id}|${obj.value_en}|${obj.value_zh}`; }
@@ -363,7 +363,7 @@ router.post('/:product_id/custom_attributes', function (req, res, next) {
 // Get all product equipment connections
 router.get('/:product_id/equipment', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('product_equipment_view'),
+    dao: req.app.locals.database.getDao('product_equipment_view'),
     query: {product_id: req.params.product_id},
     //query_options: q.query_options
   }
@@ -373,7 +373,7 @@ router.get('/:product_id/equipment', function (req, res, next) {
 /** Save all product equipment connections. */
 router.post('/:product_id/equipment', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('product_equipment'),
+    dao: req.app.locals.database.getDao('product_equipment'),
     toSave: req.body, //assuming an array
     query: {product_id: req.params.product_id},
     comparison: function(obj){ return obj.equipment_id; }
@@ -385,7 +385,7 @@ router.post('/:product_id/equipment', function (req, res, next) {
 // Get all product family connections
 router.get('/:product_id/families', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('product_family'),
+    dao: req.app.locals.database.getDao('product_family'),
     query: {product_id: req.params.product_id},
     //query_options: q.query_options
   }
@@ -395,7 +395,7 @@ router.get('/:product_id/families', function (req, res, next) {
 /** Save all product family connections. */
 router.post('/:product_id/families', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('product_family'),
+    dao: req.app.locals.database.getDao('product_family'),
     toSave: req.body, //assuming an array
     query: {product_id: req.params.product_id},
     comparison: function(obj){ return obj.family_id; }
@@ -405,7 +405,7 @@ router.post('/:product_id/families', function (req, res, next) {
 
 router.get('/:product_id/filter_options', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('product_filter_option_view'),
+    dao: req.app.locals.database.getDao('product_filter_option_view'),
     query: {product_id: req.params.product_id},
     //query_options: q.query_options
   }
@@ -415,7 +415,7 @@ router.get('/:product_id/filter_options', function (req, res, next) {
 /** Save all product filter options. */
 router.post('/:product_id/filter_options', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('product_filter_option'),
+    dao: req.app.locals.database.getDao('product_filter_option'),
     toSave: req.body, //assuming an array
     query: {product_id: req.params.product_id},
     comparison: function(obj){ return `${obj.filter_option_id}|${obj.product_id}|${obj.priority_order}`; }
@@ -426,7 +426,7 @@ router.post('/:product_id/filter_options', function (req, res, next) {
 // Get all product family connections
 router.get('/:product_id/images', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('product_image_view'),
+    dao: req.app.locals.database.getDao('product_image_view'),
     query: {product_id: req.params.product_id},
     //query_options: q.query_options
   }
@@ -436,7 +436,7 @@ router.get('/:product_id/images', function (req, res, next) {
 /** Save all product images. */
 router.post('/:product_id/images', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('product_image'),
+    dao: req.app.locals.database.getDao('product_image'),
     toSave: req.body, //assuming an array of objects
     query: {product_id: req.params.product_id},
     comparison: function(obj){ return `${obj.image_link}|${obj.image_type_id}|${obj.priority_order}`; }
@@ -448,7 +448,7 @@ router.post('/:product_id/images', function (req, res, next) {
 // Get all product marketing regions
 router.get('/:product_id/marketing_regions', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('product_marketing_region_view'),
+    dao: req.app.locals.database.getDao('product_marketing_region_view'),
     query: {product_id: req.params.product_id},
     //query_options: q.query_options
   }
@@ -458,7 +458,7 @@ router.get('/:product_id/marketing_regions', function (req, res, next) {
 /** Save all product marketing regions. */
 router.post('/:product_id/marketing_regions', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('product_marketing_region'),
+    dao: req.app.locals.database.getDao('product_marketing_region'),
     toSave: req.body, //assuming an array of objects
     query: {product_id: req.params.product_id},
     comparison: function(obj){ return `${obj.marketing_region_id}`; }
@@ -469,7 +469,7 @@ router.post('/:product_id/marketing_regions', function (req, res, next) {
 // Get all product oem references
 router.get('/:product_id/oem_references', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('product_oem_reference_view'),
+    dao: req.app.locals.database.getDao('product_oem_reference_view'),
     query: {product_id: req.params.product_id},
     //query_options: q.query_options
   }
@@ -479,7 +479,7 @@ router.get('/:product_id/oem_references', function (req, res, next) {
 /** Save all product oem references */
 router.post('/:product_id/oem_references', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('product_oem_reference'),
+    dao: req.app.locals.database.getDao('product_oem_reference'),
     toSave: req.body, //assuming an array of objects
     query: {product_id: req.params.product_id},
     comparison: function(obj){ return `${obj.brand_id}|${obj.name}`; }
@@ -491,7 +491,7 @@ router.post('/:product_id/oem_references', function (req, res, next) {
 /** Get all set values for a product. */
 router.get('/:product_id/sets', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('product_set_view'),
+    dao: req.app.locals.database.getDao('product_set_view'),
     query: {parent_product_id: req.params.product_id},
     //query_options: q.query_options
   }
@@ -501,7 +501,7 @@ router.get('/:product_id/sets', function (req, res, next) {
 /** Save all product sets values. */
 router.post('/:product_id/sets', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('product_set'),
+    dao: req.app.locals.database.getDao('product_set'),
     toSave: req.body, //assuming an array of objects
     query: {parent_product_id: req.params.product_id},
     comparison: function(obj){ return `${obj.child_product_id}|${obj.quantity}`; }
@@ -513,7 +513,7 @@ router.post('/:product_id/sets', function (req, res, next) {
 /** Get product supplier values. */
 router.get('/:product_id/suppliers', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('product_supplier'),
+    dao: req.app.locals.database.getDao('product_supplier'),
     query: {product_id: req.params.product_id},
     //query_options: q.query_options
   }
@@ -524,7 +524,7 @@ router.get('/:product_id/suppliers', function (req, res, next) {
 /** Save all product supplier values. */
 router.post('/:product_id/suppliers', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('product_supplier'),
+    dao: req.app.locals.database.getDao('product_supplier'),
     toSave: req.body, //assuming an array of objects
     query: {product_id: req.params.product_id},
     comparison: function(obj){ return `${obj.supplier_id}|${obj.supplier_price}`; }

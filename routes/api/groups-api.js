@@ -20,7 +20,7 @@ router.get('/', async function (req, res, next) {
   let q = parseQueryOptions(req, ALLOWED_SEARCH_PARAMETERS, ['+group_code', '+id'], 1000);
   
   let dbInstructions = {
-    dao: req.app.locals.Database.getDao('group'),
+    dao: req.app.locals.database.getDao('group'),
     query_options: q.query_options,
     with_total: true,
   };
@@ -58,7 +58,7 @@ router.post('/search', async function (req, res, next) {
     filter_definitions: null,
     exclude_columns_on_output: null,
     search_payload: payload,
-    dao: req.app.locals.Database.getDao('group'),
+    dao: req.app.locals.database.getDao('group'),
     sql: null,
     sql_count: null
   };
@@ -79,7 +79,7 @@ router.post('/search/download', async function (req, res, next) {
     filter_definitions: null,
     exclude_columns_on_output: null,
     search_payload: payload,
-    dao: req.app.locals.Database.getDao('group'),
+    dao: req.app.locals.database.getDao('group'),
     sql: null,
     sql_count: null
   };
@@ -93,7 +93,7 @@ router.post('/search/download', async function (req, res, next) {
 router.get('/:group_id', function (req, res, next) {
 
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('group'),
+    dao: req.app.locals.database.getDao('group'),
     id: req.params.group_id
   }
   next();
@@ -106,7 +106,7 @@ router.post('/', function (req, res, next) {
 
   let entity = req.body;
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('group'),
+    dao: req.app.locals.database.getDao('group'),
     toSave: entity
   }
   next();
@@ -119,7 +119,7 @@ router.put('/:group_id', function (req, res, next) {
 
   let entity = req.body;
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('group'),
+    dao: req.app.locals.database.getDao('group'),
     toUpdate: entity
   }
   next();
@@ -130,7 +130,7 @@ router.put('/:group_id', function (req, res, next) {
 // Get all group equipment
 router.get('/:group_id/equipment', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('equipment_group_view'),
+    dao: req.app.locals.database.getDao('equipment_group_view'),
     query: {group_id: req.params.group_id},
     //query_options: {limit: 100, orderBy: ["+"]}
   }
@@ -148,7 +148,7 @@ router.post('/:group_id/equipment', function (req, res, next) {
   });
 
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.getDao('equipment_group'),
+    dao: req.app.locals.database.getDao('equipment_group'),
     toSave: req.body, //assuming an array
     query: {group_id: req.params.group_id},
     comparison: function(v){ return v.equipment_id; }
