@@ -40,7 +40,7 @@ router.get('/', async function (req, res, next) {
   let q = parseQueryOptions(req, ALLOWED_SEARCH_PARAMETERS, ['+model', '+id'], 1000);
   
   let dbInstructions = {
-    dao: req.app.locals.Database.EquipmentView(),
+    dao: req.app.locals.Database.getDao('equipment_view'),
     query_options: q.query_options,
     with_total: true,
   };
@@ -78,7 +78,7 @@ router.post('/search', async function (req, res, next) {
     filter_definitions: SEARCH_FILTERS,
     exclude_columns_on_output: null,
     search_payload: payload,
-    dao: req.app.locals.Database.EquipmentView(),
+    dao: req.app.locals.Database.getDao('equipment_view'),
     sql: null,
     sql_count: null
   };
@@ -99,7 +99,7 @@ router.post('/search/download', async function (req, res, next) {
     filter_definitions: SEARCH_FILTERS,
     exclude_columns_on_output: null,
     search_payload: payload,
-    dao: req.app.locals.Database.EquipmentView(),
+    dao: req.app.locals.Database.getDao('equipment_view'),
     sql: null,
     sql_count: null
   };
@@ -113,7 +113,7 @@ router.post('/search/download', async function (req, res, next) {
 router.get('/:equipment_id', function (req, res, next) {
 
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.EquipmentView(),
+    dao: req.app.locals.Database.getDao('equipment_view'),
     id: req.params.equipment_id
   }
   next();
@@ -126,7 +126,7 @@ router.post('/', function (req, res, next) {
 
   let entity = req.body;
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.Equipment(),
+    dao: req.app.locals.Database.getDao('equipment'),
     toSave: entity
   }
   next();
@@ -139,7 +139,7 @@ router.put('/:equipment_id', function (req, res, next) {
 
   let entity = req.body;
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.Equipment(),
+    dao: req.app.locals.Database.getDao('equipment'),
     toUpdate: entity
   }
   next();
@@ -150,7 +150,7 @@ router.put('/:equipment_id', function (req, res, next) {
 // Get all equipment available regions
 router.get('/:equipment_id/available_regions', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.EquipmentAvailableRegionView(),
+    dao: req.app.locals.Database.getDao('equipment_available_region_view'),
     query: {equipment_id: req.params.equipment_id},
     //query_options: q.query_options
   }
@@ -161,7 +161,7 @@ router.get('/:equipment_id/available_regions', function (req, res, next) {
 /** Save all equipment available regions. */
 router.post('/:equipment_id/available_regions', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.EquipmentAvailableRegion(),
+    dao: req.app.locals.Database.getDao('equipment_available_region'),
     toSave: req.body, //assuming an array of objects
     query: {equipment_id: req.params.equipment_id},
     comparison: function(obj){ return `${obj.available_region_id}`; }
@@ -173,7 +173,7 @@ router.post('/:equipment_id/available_regions', function (req, res, next) {
 // Get all equipment available regions
 router.get('/:equipment_id/images', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.EquipmentImage(),
+    dao: req.app.locals.Database.getDao('equipment_image'),
     query: {equipment_id: req.params.equipment_id},
     //query_options: q.query_options
   }
@@ -184,7 +184,7 @@ router.get('/:equipment_id/images', function (req, res, next) {
 /** Save all equipment available regions. */
 router.post('/:equipment_id/images', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.EquipmentImage(),
+    dao: req.app.locals.Database.getDao('equipment_image'),
     toSave: req.body, //assuming an array of objects
     query: {equipment_id: req.params.equipment_id},
     comparison: function(obj){ return `${obj.image_link}`; }
