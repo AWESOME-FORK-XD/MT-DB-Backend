@@ -70,7 +70,7 @@ app.use(cookieParser());
 
 // Routing .....................................................................
 var authRouter = require('./routes/auth');
-let {initAuthorizationCache, authorizer} = require('./routes/api/authorizer');
+let {initAuthorizationCache, authorizer} = require('./routes/middleware/authorizer');
 initAuthorizationCache(app, {check_interval_ms: 5*60*1000});
 
 var productsApiRouter = require('./routes/api/products-api');
