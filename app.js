@@ -21,11 +21,21 @@ var connPool = mysql.createPool({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
-  dateStrings: true
+  dateStrings: true,
+  typeCast: function castField( field, useDefaultTypeCasting ) {
+		if ( ( field.type === "BIT" ) && ( field.length === 1 ) ) {
+			var bytes = field.buffer();
+			// A Buffer in Node represents a collection of 8-bit unsigned integers.
+			// Therefore, our single "bit field" comes back as the bits '0000 0001',
+			// which is equivalent to the number 1.
+			return( bytes[ 0 ] === 1 );
+		}
+		return( useDefaultTypeCasting() );
+	}
 });
 
 //Makes a DAO factory, named 'Database' available globally.
-var Database = require('./database')(connPool);
+var Database = require('./services/database')(connPool);
 app.locals.Database = Database;
 
 // Other Global App Config .....................................................

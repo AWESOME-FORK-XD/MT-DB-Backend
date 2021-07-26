@@ -21,10 +21,10 @@ module.exports = function (pool) {
   var factory = {};
 
   // administrative tables
-  factory.Account               = ()=>{ return create_dao('t_account', 'account', standard_opts, null); };
-  factory.User                  = ()=>{ return create_dao('t_user', 'user', standard_opts, null); };
-  factory.UserRole              = ()=>{ return create_dao('t_user_role', 'user_role', standard_opts, null); };
-  factory.ApiKey                = ()=>{ return create_dao('t_api_key', 'api_key', standard_opts, null); };
+  factory.Org                    = ()=>{ return create_dao('t_org', 'org', standard_opts, null); };
+  factory.User                   = ()=>{ return create_dao('t_user', 'user', standard_opts, null); };
+  factory.UserOrg                = ()=>{ return create_dao('t_user_org', 'user_org', standard_opts, null); };
+  factory.UserRole               = ()=>{ return create_dao('t_user_role', 'user_role', standard_opts, null); };
   
 
   // product data tables
