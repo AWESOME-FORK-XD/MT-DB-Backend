@@ -8,7 +8,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const mysql = require('mysql');
 const cors = require('cors');
-const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
+const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware');
 
 
 var app = express();
@@ -54,7 +54,7 @@ console.log("Environment initialized to: " + process.env.NODE_ENV);
 app.use(cors());
 
 if(process.env.NODE_ENV==="dbpoc" || process.env.NODE_ENV==="production"){
-  app.use(awsServerlessExpressMiddleware.eventContext())
+  app.use(awsServerlessExpressMiddleware.eventContext());
 }
 // app.use(compression());
 
