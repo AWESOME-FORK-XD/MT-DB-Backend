@@ -13,7 +13,6 @@
     "use-production": "cp .env.production.local .env",
     "package-production": "npm run use-production && sam package --profile medten --template-file sam-backend.yaml --output-template-file pkg-dbbackend.yaml --s3-bucket med10-staging",
     "deploy-production": "aws cloudformation deploy --profile medten --template-file pkg-dbbackend.yaml --stack-name dbbackend",
-    "start": "node ./bin/www",
     "startmon": "nodemon ./bin/www"
   },
   "dependencies": {

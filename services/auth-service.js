@@ -21,13 +21,16 @@ const ALLOWED_USER_PROPERTIES = [
   'last_name',
   'email',
   'mobile_phone',
-  'status','roles',
+  'status',
+  'roles',
   'last_login',
   'default_account_id',
   'email_verified',
   'reset_password_token',
   'must_reset_password',
-  'timezone'
+  'timezone',
+  'login_count',
+  'bad_login_attempts'
 ];
 /**
  * An Authorization service providing login, logout, password-reset, and email verification functions.

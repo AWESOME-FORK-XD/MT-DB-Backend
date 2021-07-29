@@ -83,8 +83,6 @@ app.locals.authService = new AuthService(daoFactory);
 
 // Routing .....................................................................
 var authRouter = require('./routes/auth');
-let {initAuthorizationCache, authorizer} = require('./routes/middleware/authorizer');
-initAuthorizationCache(app, {check_interval_ms: 5*60*1000});
 
 var productsApiRouter = require('./routes/api/products-api');
 var familiesApiRouter = require('./routes/api/families-api');
@@ -96,7 +94,8 @@ var dataloadApiRouter = require('./routes/api/dataload-api');
 app.use('/auth', authRouter);
 
 // api related
-// app.use(authorizer);
+const authenticated = require('./routes/middleware/authenticated');
+app.use(authenticated());
 app.use('/api/v1/products', productsApiRouter);
 app.use('/api/v1/families', familiesApiRouter);
 app.use('/api/v1/equipment', equipmentApiRouter);
