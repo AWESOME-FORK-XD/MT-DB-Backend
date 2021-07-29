@@ -1,9 +1,9 @@
 var express = require('express');
 var router = express.Router({ mergeParams: true });
 var _ = require('lodash');
-let { fetchMany, parseQueryOptions, fetchById, updateById} = require('@apigrate/mysqlutils/lib/express/db-api');
+let { fetchMany, parseQueryOptions, fetchById, updateById} = require('@apigrate/dao/lib/express/db-api');
 const { fetchManySqlAnd, resultToJson } = require('./db-api-ext');
-const { CriteriaHelper } = require('@apigrate/mysqlutils/lib/criteria-helper');
+const { CriteriaHelper } = require('@apigrate/dao/lib/criteria-helper');
 
 router.get('/available_regions', function (req, res, next) {
   let  q = parseQueryOptions(req, ['name_en','id'], ['+name_en','+id'], 1000);
