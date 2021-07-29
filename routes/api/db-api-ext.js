@@ -59,7 +59,7 @@ exports.fetchManyAnd = async function(req, res, next) {
           return;
         }
       }
-      let multipleEntities = await dbi.dao.find(dbi.query, dbi.query_options);
+      let multipleEntities = await dbi.dao.filter(dbi.query, dbi.query_options);
       result[dbi.dao.plural] = multipleEntities;
 
       res.locals.result = result;
@@ -92,7 +92,7 @@ exports.fetchManyAnd = async function(req, res, next) {
   } catch (ex) {
     next(ex);
   }
-}
+};
 
 
 
@@ -154,7 +154,7 @@ exports.fetchManySqlAnd = async function(req, res, next){
   } catch (ex) {
     next(ex);
   }
-}
+};
 
 let resultToCsv = async function(req, res, next){
   try{
@@ -203,7 +203,7 @@ let resultToJson = async function(req, res, next){
     next(ex);
   }
 };
-exports.resultToJson = resultToJson
+exports.resultToJson = resultToJson;
 
 /** 
  * @deprecated 
@@ -261,4 +261,4 @@ exports.resultToAccept = async function(req, res, next){
   }catch(ex){
     next(ex);
   }
-}
+};

@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router({ mergeParams: true });
 var _ = require('lodash');
-let { fetchById, fetchMany, parseQueryOptions, parseQueryOptionsFromObject, create, updateById } = require('@apigrate/mysqlutils/lib/express/db-api');
+let { fetchById, fetchMany, parseQueryOptions, parseQueryOptionsFromObject, create, updateById } = require('@apigrate/dao/lib/express/db-api');
 const { fetchManyAnd, fetchManySqlAnd, resultToCsv, resultToAccept, resultToJsonDownload} = require('./db-api-ext');
 const {parseAdvancedSearchRequest} = require('./common');
 

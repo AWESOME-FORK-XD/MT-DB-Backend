@@ -1,4 +1,4 @@
-const {Dao} = require('@apigrate/mysqlutils');
+const {Dao} = require('@apigrate/dao');
 /**
  * Provides access to the backend database by giving access to individual data 
  * access objects (DAOs) that facade each database table or view.

@@ -2,7 +2,7 @@
  * Mix-ins/functions used across various APIs.
  */
 
-const {CriteriaHelper} = require('@apigrate/mysqlutils');
+const {CriteriaHelper} = require('@apigrate/dao');
 const _ = require('lodash');
 
 /**

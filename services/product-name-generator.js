@@ -13,7 +13,7 @@ class ProductNameGenerator {
   async _getFamily(family_id){
     let family = this.families.find(f=>{return f.id == family_id;});
     if(family) return family;
-    family = await this.db.FamilyView().get(family_id);
+    family = await this.db.getDao("family_view").get(family_id);
     if(family){
       this.families.push(family);
     }
@@ -27,7 +27,7 @@ class ProductNameGenerator {
     try{
       if(!forName && !forDescription) return;
 
-      let product = await this.db.ProductView().get(product_id);
+      let product = await this.db.getDao("product_view").get(product_id);
       if(!product){
         debug(`Product ${product_id} not found.`);
         return;
@@ -62,7 +62,7 @@ class ProductNameGenerator {
 
 
       //Filter options needed?
-      context.filter_options = await this.db.ProductFilterOptionView().find({product_id: product_id});
+      context.filter_options = await this.db.getDao("product_filter_option_view").filter({product_id: product_id});
 
       if(forName){
         debug(`Generating name for product ${product_id}...`);
@@ -80,7 +80,7 @@ class ProductNameGenerator {
         debug(`  description_zh: ${product.description_zh}`);
       }
 
-      await this.db.Product().update(product);
+      await this.db.getDao("product").update(product);
       
     }catch(ex){
       console.error(ex);

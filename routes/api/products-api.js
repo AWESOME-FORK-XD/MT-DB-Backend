@@ -1,8 +1,6 @@
 const express = require('express');
 const router = express.Router({ mergeParams: true });
-const _ = require('lodash');
-const { deleteById, fetchById, fetchCount, fetchMany, parseQueryOptions, parseQueryOptionsFromObject, updateById, create, saveAll } = require('@apigrate/mysqlutils/lib/express/db-api');
-const { CriteriaHelper } = require('@apigrate/mysqlutils');
+const { deleteById, fetchById,  fetchMany, parseQueryOptions, updateById, create, saveAll } = require('@apigrate/dao/lib/express/db-api');
 const { fetchManySqlAnd, resultToCsv, resultToJsonDownload, resultToAccept} = require('./db-api-ext');
 const debug = require('debug')('medten:routes');
 const {parseAdvancedSearchRequest} = require('./common');
@@ -134,7 +132,7 @@ router.post('/search', async function (req, res, next) {
 
 router.get('/search/download', async function (req, res, next) {
   if(!req.query.token){
-    //TODO: handle in authorizer.
+    //TODO: handle in authenticated.
     res.status(403).end();
   }
   if(!req.query.payload){
@@ -214,7 +212,7 @@ router.get('/:product_id', function (req, res, next) {
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('product_view'),
     id: req.params.product_id
-  }
+  };
   next();
 
 }, fetchById);
@@ -227,7 +225,7 @@ router.post('/', function (req, res, next) {
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('product'),
     toSave: entity
-  }
+  };
   next();
 
 }, create);
@@ -256,10 +254,10 @@ router.put('/:product_id', async function (req, res, next) {
 
     //Delete category-dependent data.
     //Filter Options
-    debug(`...deleting old filter options.`)
+    debug(`...deleting old filter options.`);
     await req.app.locals.database.getDao('product_filter_option').deleteMatching({product_id: existing.product_id});
     //Custom attributes
-    debug(`...deleting old custom attributes.`)
+    debug(`...deleting old custom attributes.`);
     await req.app.locals.database.getDao('product_custom_attribute').deleteMatching({product_id: existing.product_id});
 
   }
@@ -267,7 +265,7 @@ router.put('/:product_id', async function (req, res, next) {
   res.locals.dbInstructions = {
     dao: productDao,
     toUpdate: entity
-  }
+  };
   next();
 
 }, updateById);
@@ -297,7 +295,7 @@ async function topCategoryFor(categoryDao, categoryId){
       return category;
     }
     count++;
-  }while(count <= maxDepth)
+  }while(count <= maxDepth);
 
   debug(`Max depth reached, returning highest ancestor found.`);
   return category;
@@ -310,7 +308,7 @@ router.delete('/:product_id', function (req, res, next) {
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('product'),
     id: req.params.product_id
-  }
+  };
   next();
 
 }, deleteById);
@@ -322,7 +320,7 @@ router.get('/:product_id/certificates', function (req, res, next) {
     dao: req.app.locals.database.getDao('product_certificate'),
     query: {product_id: req.params.product_id},
     //query_options: q.query_options
-  }
+  };
   next();
 }, fetchMany);
 
@@ -344,7 +342,7 @@ router.get('/:product_id/custom_attributes', function (req, res, next) {
     dao: req.app.locals.database.getDao('product_custom_attribute_view'),
     query: {product_id: req.params.product_id},
     //query_options: q.query_options
-  }
+  };
   next();
 }, fetchMany);
 
@@ -366,7 +364,7 @@ router.get('/:product_id/equipment', function (req, res, next) {
     dao: req.app.locals.database.getDao('product_equipment_view'),
     query: {product_id: req.params.product_id},
     //query_options: q.query_options
-  }
+  };
   next();
 }, fetchMany);
 
@@ -388,7 +386,7 @@ router.get('/:product_id/families', function (req, res, next) {
     dao: req.app.locals.database.getDao('product_family'),
     query: {product_id: req.params.product_id},
     //query_options: q.query_options
-  }
+  };
   next();
 }, fetchMany);
 
@@ -408,7 +406,7 @@ router.get('/:product_id/filter_options', function (req, res, next) {
     dao: req.app.locals.database.getDao('product_filter_option_view'),
     query: {product_id: req.params.product_id},
     //query_options: q.query_options
-  }
+  };
   next();
 }, fetchMany);
 
@@ -429,7 +427,7 @@ router.get('/:product_id/images', function (req, res, next) {
     dao: req.app.locals.database.getDao('product_image_view'),
     query: {product_id: req.params.product_id},
     //query_options: q.query_options
-  }
+  };
   next();
 }, fetchMany);
 
@@ -451,7 +449,7 @@ router.get('/:product_id/marketing_regions', function (req, res, next) {
     dao: req.app.locals.database.getDao('product_marketing_region_view'),
     query: {product_id: req.params.product_id},
     //query_options: q.query_options
-  }
+  };
   next();
 }, fetchMany);
 
@@ -472,7 +470,7 @@ router.get('/:product_id/oem_references', function (req, res, next) {
     dao: req.app.locals.database.getDao('product_oem_reference_view'),
     query: {product_id: req.params.product_id},
     //query_options: q.query_options
-  }
+  };
   next();
 }, fetchMany);
 
@@ -494,7 +492,7 @@ router.get('/:product_id/sets', function (req, res, next) {
     dao: req.app.locals.database.getDao('product_set_view'),
     query: {parent_product_id: req.params.product_id},
     //query_options: q.query_options
-  }
+  };
   next();
 }, fetchMany);
 
@@ -516,7 +514,7 @@ router.get('/:product_id/suppliers', function (req, res, next) {
     dao: req.app.locals.database.getDao('product_supplier'),
     query: {product_id: req.params.product_id},
     //query_options: q.query_options
-  }
+  };
   next();
 }, fetchMany);
 
@@ -542,8 +540,8 @@ router.use(function (err, req, res, next) {
   res.status(500).json({
     message: "Unexpected error.",
     error: errMessage
-  })
-})
+  });
+});
 
 
 module.exports = router;
