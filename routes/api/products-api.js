@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router({ mergeParams: true });
-const { deleteById, fetchById,  fetchMany, parseQueryOptions, updateById, create, saveAll } = require('@apigrate/dao/lib/express/db-api');
+const { create, deleteById, fetchById, fetchMany, parseQueryOptions, resultToJson, saveAll, updateById } = require('@apigrate/dao/lib/express/db-api');
 const { fetchManySqlAnd, resultToCsv, resultToJsonDownload, resultToAccept} = require('./db-api-ext');
 const debug = require('debug')('medten:routes');
 const {parseAdvancedSearchRequest} = require('./common');
@@ -90,7 +90,7 @@ router.get('/', async function (req, res, next) {
   res.locals.dbInstructions = dbInstructions;
   next();
   
-}, fetchMany);
+}, fetchMany, resultToJson);
 
 /** 
  * Query for products using an advanced search.
@@ -215,7 +215,7 @@ router.get('/:product_id', function (req, res, next) {
   };
   next();
 
-}, fetchById);
+}, fetchById, resultToJson);
 
 
 /** Create a product */
@@ -268,7 +268,7 @@ router.put('/:product_id', async function (req, res, next) {
   };
   next();
 
-}, updateById);
+}, updateById, resultToJson);
 
 /**
  * Returns the top-level category for a given subcategory id.
@@ -322,7 +322,7 @@ router.get('/:product_id/certificates', function (req, res, next) {
     //query_options: q.query_options
   };
   next();
-}, fetchMany);
+}, fetchMany, resultToJson);
 
 /** Saves product certificates */
 router.post('/:product_id/certificates', function (req, res, next) {
@@ -344,7 +344,7 @@ router.get('/:product_id/custom_attributes', function (req, res, next) {
     //query_options: q.query_options
   };
   next();
-}, fetchMany);
+}, fetchMany, resultToJson);
 
 /** Save all product custom attributes. */
 router.post('/:product_id/custom_attributes', function (req, res, next) {
@@ -366,7 +366,7 @@ router.get('/:product_id/equipment', function (req, res, next) {
     //query_options: q.query_options
   };
   next();
-}, fetchMany);
+}, fetchMany, resultToJson);
 
 /** Save all product equipment connections. */
 router.post('/:product_id/equipment', function (req, res, next) {
@@ -388,7 +388,7 @@ router.get('/:product_id/families', function (req, res, next) {
     //query_options: q.query_options
   };
   next();
-}, fetchMany);
+}, fetchMany, resultToJson);
 
 /** Save all product family connections. */
 router.post('/:product_id/families', function (req, res, next) {
@@ -408,7 +408,7 @@ router.get('/:product_id/filter_options', function (req, res, next) {
     //query_options: q.query_options
   };
   next();
-}, fetchMany);
+}, fetchMany, resultToJson);
 
 /** Save all product filter options. */
 router.post('/:product_id/filter_options', function (req, res, next) {
@@ -429,7 +429,7 @@ router.get('/:product_id/images', function (req, res, next) {
     //query_options: q.query_options
   };
   next();
-}, fetchMany);
+}, fetchMany, resultToJson);
 
 /** Save all product images. */
 router.post('/:product_id/images', function (req, res, next) {
@@ -451,7 +451,7 @@ router.get('/:product_id/marketing_regions', function (req, res, next) {
     //query_options: q.query_options
   };
   next();
-}, fetchMany);
+}, fetchMany, resultToJson);
 
 /** Save all product marketing regions. */
 router.post('/:product_id/marketing_regions', function (req, res, next) {
@@ -472,7 +472,7 @@ router.get('/:product_id/oem_references', function (req, res, next) {
     //query_options: q.query_options
   };
   next();
-}, fetchMany);
+}, fetchMany, resultToJson);
 
 /** Save all product oem references */
 router.post('/:product_id/oem_references', function (req, res, next) {
@@ -494,7 +494,7 @@ router.get('/:product_id/sets', function (req, res, next) {
     //query_options: q.query_options
   };
   next();
-}, fetchMany);
+}, fetchMany, resultToJson);
 
 /** Save all product sets values. */
 router.post('/:product_id/sets', function (req, res, next) {
@@ -516,7 +516,7 @@ router.get('/:product_id/suppliers', function (req, res, next) {
     //query_options: q.query_options
   };
   next();
-}, fetchMany);
+}, fetchMany, resultToJson);
 
 
 /** Save all product supplier values. */
