@@ -26,7 +26,7 @@ console.log("Environment initialized to: " + process.env.NODE_ENV);
   </CORSRule>
 </CORSConfiguration>
 */
-app.use(cors());
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -36,6 +36,7 @@ app.use(cookieParser());
 if(['test','production'].includes(process.env.NODE_ENV)){
   app.use(awsServerlessExpressMiddleware.eventContext());
 }
+app.use(cors());
 
 // Database ....................................................................
 
