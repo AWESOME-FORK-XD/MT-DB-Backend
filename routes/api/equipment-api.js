@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router({ mergeParams: true });
 var _ = require('lodash');
-let { fetchById, fetchMany, parseQueryOptions, create, updateById, saveAll } = require('@apigrate/dao/lib/express/db-api');
+let { create, fetchById, fetchMany, parseQueryOptions, resultToJson, saveAll, updateById } = require('@apigrate/dao/lib/express/db-api');
 const { fetchManySqlAnd, resultToAccept, resultToJsonDownload} = require('./db-api-ext');
 const {parseAdvancedSearchRequest} = require('./common');
 
@@ -49,7 +49,7 @@ router.get('/', async function (req, res, next) {
   res.locals.dbInstructions = dbInstructions;
   next();
   
-}, fetchMany);
+}, fetchMany, resultToJson);
 
 
 /** 
@@ -118,7 +118,7 @@ router.get('/:equipment_id', function (req, res, next) {
   }
   next();
 
-}, fetchById);
+}, fetchById, resultToJson);
 
 
 /** Create equipment */
@@ -144,7 +144,7 @@ router.put('/:equipment_id', function (req, res, next) {
   }
   next();
 
-}, updateById);
+}, updateById, resultToJson);
 
 
 // Get all equipment available regions
@@ -155,7 +155,7 @@ router.get('/:equipment_id/available_regions', function (req, res, next) {
     //query_options: q.query_options
   }
   next();
-}, fetchMany);
+}, fetchMany, resultToJson);
 
 
 /** Save all equipment available regions. */
@@ -175,10 +175,9 @@ router.get('/:equipment_id/images', function (req, res, next) {
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('equipment_image'),
     query: {equipment_id: req.params.equipment_id},
-    //query_options: q.query_options
-  }
+  };
   next();
-}, fetchMany);
+}, fetchMany, resultToJson);
 
 
 /** Save all equipment available regions. */

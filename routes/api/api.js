@@ -1,40 +1,40 @@
 var express = require('express');
 var router = express.Router({ mergeParams: true });
-var _ = require('lodash');
-let { fetchMany, parseQueryOptions, fetchById, updateById} = require('@apigrate/dao/lib/express/db-api');
-const { fetchManySqlAnd, resultToJson } = require('./db-api-ext');
+let { fetchMany, parseQueryOptions, fetchById, updateById, resultToJson} = require('@apigrate/dao/lib/express/db-api');
+const { fetchManySqlAnd } = require('./db-api-ext');
 const { CriteriaHelper } = require('@apigrate/dao/lib/criteria-helper');
 
-router.get('/available_regions', function (req, res, next) {
-  let  q = parseQueryOptions(req, ['name_en','id'], ['+name_en','+id'], 1000);
-  res.locals.dbInstructions = {
-    dao: req.app.locals.database.getDao('available_region'),
-    query: q.query,
-    query_options: q.query_options
-  }
-  next();
-}, fetchMany);
+router.get('/available_regions', 
+  parseQueryOptions(['name_en','id'], ['+name_en','+id'], 1000),
+  function (req, res, next) {
+    res.locals.dbInstructions = {
+      dao: req.app.locals.database.getDao('available_region'),
+      query: res.locals.modified_query,
+      query_options: res.locals.query_options
+    };
+    next();
+  }, fetchMany, resultToJson);
 
-router.get('/brands', function (req, res, next) {
-  let  q = parseQueryOptions(req, ['name_en','name_zh','id'], ['+name_en','+id'], 1000);
-  res.locals.dbInstructions = {
-    dao: req.app.locals.database.getDao('brand'),
-    query: q.query,
-    query_options: q.query_options
-  }
-  next();
-}, fetchMany);
+router.get('/brands', 
+  parseQueryOptions(['name_en','name_zh','id'], ['+name_en','+id'], 1000),
+  function (req, res, next) {
+    res.locals.dbInstructions = {
+      dao: req.app.locals.database.getDao('brand'),
+      query: res.locals.modified_query,
+      query_options: res.locals.query_options
+    };
+    next();
+  }, fetchMany, resultToJson);
 
 /** Get a brand by id */
 router.get('/brands/:brand_id', function (req, res, next) {
-
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('brand'),
     id: req.params.brand_id
-  }
+  };
   next();
 
-}, fetchById);
+}, fetchById, resultToJson);
 
 /** Update a brand */
 router.put('/brands/:brand_id', function (req, res, next) {
@@ -43,61 +43,62 @@ router.put('/brands/:brand_id', function (req, res, next) {
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('brand'),
     toUpdate: entity
-  }
+  };
   next();
 
-}, updateById);
+}, updateById, resultToJson);
 
 
-router.get('/categories', function (req, res, next) {
-  let  q = parseQueryOptions(req, ['name_en','id'], ["+parent_id","+id"], 1000);
-  res.locals.dbInstructions = {
-    dao: req.app.locals.database.getDao('category_view'),
-    query: q.query,
-    query_options: q.query_options
-  }
-  next();
-}, fetchMany);
+router.get('/categories', parseQueryOptions(['name_en','id'], ["+parent_id","+id"], 1000),
+  function (req, res, next) {
+    res.locals.dbInstructions = {
+      dao: req.app.locals.database.getDao('category_view'),
+      query: res.locals.modified_query,
+      query_options: res.locals.query_options
+    };
+    next();
+  }, fetchMany, resultToJson);
 
-router.get('/certificates', function (req, res, next) {
-  let  q = parseQueryOptions(req, ['name_en','id'], ['+name_en','+id'], 1000);
-  res.locals.dbInstructions = {
-    dao: req.app.locals.database.getDao('certificate'),
-    query: q.query,
-    query_options: q.query_options
-  }
-  next();
-}, fetchMany);
+router.get('/certificates', parseQueryOptions(['name_en','id'], ['+name_en','+id'], 1000), 
+  function (req, res, next) {
+  
+    res.locals.dbInstructions = {
+      dao: req.app.locals.database.getDao('certificate'),
+      query: res.locals.modified_query,
+      query_options: res.locals.query_options
+    };
+    next();
+  }, fetchMany, resultToJson);
 
-router.get('/custom_attributes', function (req, res, next) {
-  let  q = parseQueryOptions(req, ['category_id','name_en','name_zh'], ['+category_id','+name_en'], 1000);
-  res.locals.dbInstructions = {
-    dao: req.app.locals.database.getDao('custom_attribute'),
-    query: q.query,
-    query_options: q.query_options
-  }
-  next();
-}, fetchMany);
+router.get('/custom_attributes', parseQueryOptions(['category_id','name_en','name_zh'], ['+category_id','+name_en'], 1000),
+  function (req, res, next) {
+    res.locals.dbInstructions = {
+      dao: req.app.locals.database.getDao('custom_attribute'),
+      query: res.locals.modified_query,
+      query_options: res.locals.query_options
+    };
+    next();
+  }, fetchMany, resultToJson);
 
-router.get('/equipment_groups', function (req, res, next) {
-  let  q = parseQueryOptions(req, ['id','equipment_id','model','group_id','group_code', 'created','updated'], ['+model','+group_code'], 1000);
-  res.locals.dbInstructions = {
-    dao: req.app.locals.database.getDao('equipment_group_view'),
-    query: q.query,
-    query_options: q.query_options
-  }
-  next();
-}, fetchMany);
+router.get('/equipment_groups', parseQueryOptions(['id','equipment_id','model','group_id','group_code', 'created','updated'], ['+model','+group_code'], 1000),
+  function (req, res, next) {
+    res.locals.dbInstructions = {
+      dao: req.app.locals.database.getDao('equipment_group_view'),
+      query: res.locals.modified_query,
+      query_options: res.locals.query_options
+    };
+    next();
+  }, fetchMany, resultToJson);
 
-router.get('/equipment_types', function (req, res, next) {
-  let  q = parseQueryOptions(req, ['id','name_en','name_zh'], ['+name_en','+name_zh'], 1000);
-  res.locals.dbInstructions = {
-    dao: req.app.locals.database.getDao('equipment_type'),
-    query: q.query,
-    query_options: q.query_options
-  }
-  next();
-}, fetchMany);
+router.get('/equipment_types', parseQueryOptions(['id','name_en','name_zh'], ['+name_en','+name_zh'], 1000),
+    function (req, res, next) {
+    res.locals.dbInstructions = {
+      dao: req.app.locals.database.getDao('equipment_type'),
+      query: res.locals.modified_query,
+      query_options: res.locals.query_options
+    };
+    next();
+  }, fetchMany, resultToJson);
 
 router.get('/equipment_models', function (req, res, next) {
   let criteria = new CriteriaHelper();
@@ -105,7 +106,7 @@ router.get('/equipment_models', function (req, res, next) {
     criteria.and('model', 'LIKE', `%${req.query.model_search}%`);
   }
   if(req.query.brand_id){
-    criteria.and('brand_id', '=',  req.query.brand_id)
+    criteria.and('brand_id', '=',  req.query.brand_id);
   } 
   
   let where= ``;
@@ -134,111 +135,111 @@ router.get('/equipment_models', function (req, res, next) {
   next();
 }, fetchManySqlAnd, resultToJson);
 
-router.get('/filter_option_views', function (req, res, next) {
-  let  q = parseQueryOptions(req, ['category_id','filter_id','filter_option_id','filter_en','filter_zh','option_en','option_zh'], ['+filter_id','+filter_option_id'],  1000);
-  res.locals.dbInstructions = {
-    dao: req.app.locals.database.getDao('filter_option_view'),
-    query: q.query,
-    query_options: q.query_options
-  }
-  next();
-}, fetchMany);
+router.get('/filter_option_views', parseQueryOptions(['category_id','filter_id','filter_option_id','filter_en','filter_zh','option_en','option_zh'], ['+filter_id','+filter_option_id'],  1000),
+  function (req, res, next) {
+    res.locals.dbInstructions = {
+      dao: req.app.locals.database.getDao('filter_option_view'),
+      query: res.locals.modified_query,
+      query_options: res.locals.query_options
+    };
+    next();
+  }, fetchMany, resultToJson);
 
-router.get('/filters', function (req, res, next) {
-  let  q = parseQueryOptions(req, ['category_id','name_en','name_zh','id'], ['+name_en','+category_id','+id'], 1000);
-  res.locals.dbInstructions = {
-    dao: req.app.locals.database.getDao('filter'),
-    query: q.query,
-    query_options: q.query_options
-  }
-  next();
-}, fetchMany);
+router.get('/filters', parseQueryOptions(['category_id','name_en','name_zh','id'], ['+name_en','+category_id','+id'], 1000), 
+  function (req, res, next) {
+    res.locals.dbInstructions = {
+      dao: req.app.locals.database.getDao('filter'),
+      query: res.locals.modified_query,
+      query_options: res.locals.query_options
+    };
+    next();
+  }, fetchMany, resultToJson);
 
-router.get('/filters/options', function (req, res, next) {
-  let  q = parseQueryOptions(req, ['filter_id','option_en','option_zh','id'], ['filter_id','+option_en','+id'], 1000);
-  res.locals.dbInstructions = {
-    dao: req.app.locals.database.getDao('filter_option'),
-    query: q.query,
-    query_options: q.query_options
-  }
-  next();
-}, fetchMany);
-
-
-router.get('/groups', function (req, res, next) {
-  let  q = parseQueryOptions(req, ['id','group_code','created','updated'], ['+group_code','+id'], 1000);
-  res.locals.dbInstructions = {
-    dao: req.app.locals.database.getDao('group'),
-    query: q.query,
-    query_options: q.query_options
-  }
-  next();
-}, fetchMany);
+router.get('/filters/options', parseQueryOptions(['filter_id','option_en','option_zh','id'], ['filter_id','+option_en','+id'], 1000),
+  function (req, res, next) {
+    res.locals.dbInstructions = {
+      dao: req.app.locals.database.getDao('filter_option'),
+      query: res.locals.modified_query,
+      query_options: res.locals.query_options
+    };
+    next();
+  }, fetchMany, resultToJson);
 
 
-router.get('/image_types', function (req, res, next) {
-  let  q = parseQueryOptions(req, ['name','id'], ['+name','+id'], 1000);
-  res.locals.dbInstructions = {
-    dao: req.app.locals.database.getDao('image_type'),
-    query: q.query,
-    query_options: q.query_options
-  }
-  next();
-}, fetchMany);
+router.get('/groups', 
+  parseQueryOptions(['id','group_code','created','updated'], ['+group_code','+id'], 1000), 
+  function (req, res, next) {
+    res.locals.dbInstructions = {
+      dao: req.app.locals.database.getDao('group'),
+      query: res.locals.modified_query,
+      query_options: res.locals.query_options
+    };
+    next();
+  }, fetchMany, resultToJson);
+
+router.get('/image_types', parseQueryOptions(['name','id'], ['+name','+id'], 1000),
+  function (req, res, next) {
+    res.locals.dbInstructions = {
+      dao: req.app.locals.database.getDao('image_type'),
+      query: res.locals.modified_query,
+      query_options: res.locals.query_options
+    };
+    next();
+  }, fetchMany, resultToJson);
 
 
-router.get('/lifecycles', function (req, res, next) {
-  let  q = parseQueryOptions(req, ['name_en','id'], ['+name_en','+id'], 1000);
-  res.locals.dbInstructions = {
-    dao: req.app.locals.database.getDao('lifecycle'),
-    query: q.query,
-    query_options: q.query_options
-  }
-  next();
-}, fetchMany);
+router.get('/lifecycles', parseQueryOptions(['name_en','id'], ['+name_en','+id'], 1000),
+  function (req, res, next) {
+    res.locals.dbInstructions = {
+      dao: req.app.locals.database.getDao('lifecycle'),
+      query: res.locals.modified_query,
+      query_options: res.locals.query_options
+    };
+    next();
+  }, fetchMany, resultToJson);
 
 
-router.get('/marketing_regions', function (req, res, next) {
-  let  q = parseQueryOptions(req, ['name_en','id'], ['+name_en','+id'], 1000);
-  res.locals.dbInstructions = {
-    dao: req.app.locals.database.getDao('marketing_region'),
-    query: q.query,
-    query_options: q.query_options
-  }
-  next();
-}, fetchMany);
+router.get('/marketing_regions', parseQueryOptions(['name_en','id'], ['+name_en','+id'], 1000), 
+  function (req, res, next) {
+    res.locals.dbInstructions = {
+      dao: req.app.locals.database.getDao('marketing_region'),
+      query: res.locals.modified_query,
+      query_options: res.locals.query_options
+    };
+    next();
+  }, fetchMany, resultToJson);
 
 
-router.get('/packaging_factors', function (req, res, next) {
-  let  q = parseQueryOptions(req, ['name','value','id'], ['+name','+id'], 1000);
-  res.locals.dbInstructions = {
-    dao: req.app.locals.database.getDao('packaging_factor'),
-    query: q.query,
-    query_options: q.query_options
-  }
-  next();
-}, fetchMany);
+router.get('/packaging_factors', parseQueryOptions(['name','value','id'], ['+name','+id'], 1000),
+  function (req, res, next) {
+    res.locals.dbInstructions = {
+      dao: req.app.locals.database.getDao('packaging_factor'),
+      query: res.locals.modified_query,
+      query_options: res.locals.query_options
+    };
+    next();
+  }, fetchMany, resultToJson);
 
 
-router.get('/product-types', function (req, res, next) {
-  let  q = parseQueryOptions(req, ['name_en','id'], ['+name_en','+id'], 1000);
-  res.locals.dbInstructions = {
-    dao: req.app.locals.database.getDao('product_type'),
-    query: q.query,
-    query_options: q.query_options
-  }
-  next();
-}, fetchMany);
+router.get('/product-types', parseQueryOptions(['name_en','id'], ['+name_en','+id'], 1000),
+  function (req, res, next) {
+    res.locals.dbInstructions = {
+      dao: req.app.locals.database.getDao('product_type'),
+      query: res.locals.modified_query,
+      query_options: res.locals.query_options
+    };
+    next();
+  }, fetchMany, resultToJson);
 
-router.get('/suppliers', function (req, res, next) {
-  let  q = parseQueryOptions(req, ['name_en','name_zh','id'], ['+name_en','+id'], 1000);
-  res.locals.dbInstructions = {
-    dao: req.app.locals.database.getDao('supplier'),
-    query: q.query,
-    query_options: q.query_options
-  }
-  next();
-}, fetchMany);
+router.get('/suppliers', parseQueryOptions(['name_en','name_zh','id'], ['+name_en','+id'], 1000), 
+  function (req, res, next) {
+    res.locals.dbInstructions = {
+      dao: req.app.locals.database.getDao('supplier'),
+      query: res.locals.modified_query,
+      query_options: res.locals.query_options
+    };
+    next();
+  }, fetchMany, resultToJson);
 
 
 //Default error handling
@@ -251,8 +252,8 @@ router.use(function (err, req, res, next) {
   res.status(500).json({
     message: "Unexpected error.",
     error: errMessage
-  })
-})
+  });
+});
 
 
 module.exports = router;

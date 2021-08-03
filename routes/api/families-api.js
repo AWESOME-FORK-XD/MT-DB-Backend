@@ -1,8 +1,8 @@
 var express = require('express');
 var router = express.Router({ mergeParams: true });
 var _ = require('lodash');
-let { fetchById, fetchMany, parseQueryOptions, parseQueryOptionsFromObject, create, updateById } = require('@apigrate/dao/lib/express/db-api');
-const { fetchManyAnd, fetchManySqlAnd, resultToCsv, resultToAccept, resultToJsonDownload} = require('./db-api-ext');
+let { create,  fetchById, fetchMany, parseQueryOptions, parseQueryOptionsFromObject, resultToJson, updateById } = require('@apigrate/dao/lib/express/db-api');
+const {  fetchManySqlAnd,  resultToAccept, resultToJsonDownload} = require('./db-api-ext');
 const {parseAdvancedSearchRequest} = require('./common');
 
 const ALLOWED_SEARCH_PARAMETERS = [
@@ -45,21 +45,17 @@ const SEARCH_FILTERS = {
 };
 
 /** Query for families */
-router.get('/', async function (req, res, next) {
-
-  let q = parseQueryOptions(req, ALLOWED_SEARCH_PARAMETERS, ['+family_code', '+id'], 1000);
-
-  let dbInstructions = {
-    dao: req.app.locals.database.getDao('family_view'),
-    query_options: q.query_options,
-    with_total: true,
-  };
-  
-  dbInstructions.query = q.query;
-  res.locals.dbInstructions = dbInstructions;
-  next();
-  
-}, fetchMany);
+router.get('/', parseQueryOptions(ALLOWED_SEARCH_PARAMETERS, ['+family_code', '+id'], 1000), 
+  function (req, res, next) {
+    res.locals.dbInstructions = {
+      dao: req.app.locals.database.getDao('family_view'),
+      query: res.locals.modified_query,
+      query_options: res.locals.query_options,
+      with_total: true,
+    };
+    next();
+    
+  }, fetchMany, resultToJson);
 
 
 /** 
@@ -124,10 +120,10 @@ router.get('/:family_id', function (req, res, next) {
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('family_view'),
     id: req.params.family_id
-  }
+  };
   next();
 
-}, fetchById);
+}, fetchById, resultToJson);
 
 
 /** Create a family */
@@ -150,10 +146,10 @@ router.put('/:family_id', function (req, res, next) {
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('family'),
     toUpdate: entity
-  }
+  };
   next();
 
-}, updateById);
+}, updateById, resultToJson);
 
 
 //Default error handling
@@ -166,8 +162,8 @@ router.use(function (err, req, res, next) {
   res.status(500).json({
     message: "Unexpected error.",
     error: errMessage
-  })
-})
+  });
+});
 
 
 module.exports = router;

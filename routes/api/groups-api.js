@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router({ mergeParams: true });
-var _ = require('lodash');
-let { fetchById, fetchMany, parseQueryOptions, create, updateById, saveAll } = require('@apigrate/dao/lib/express/db-api');
+let { create, fetchById, fetchMany, parseQueryOptions, resultToJson, saveAll, updateById} = require('@apigrate/dao/lib/express/db-api');
 const { fetchManySqlAnd, resultToAccept, resultToJsonDownload} = require('./db-api-ext');
 const {parseAdvancedSearchRequest} = require('./common');
 
@@ -15,21 +14,18 @@ const ALLOWED_SEARCH_PARAMETERS = [
 ];
 
 /** Query for group */
-router.get('/', async function (req, res, next) {
-
-  let q = parseQueryOptions(req, ALLOWED_SEARCH_PARAMETERS, ['+group_code', '+id'], 1000);
-  
-  let dbInstructions = {
-    dao: req.app.locals.database.getDao('group'),
-    query_options: q.query_options,
-    with_total: true,
-  };
-  
-  dbInstructions.query = q.query;
-  res.locals.dbInstructions = dbInstructions;
-  next();
-  
-}, fetchMany);
+router.get('/', parseQueryOptions(ALLOWED_SEARCH_PARAMETERS, ['+group_code', '+id'], 1000), 
+  function (req, res, next) {
+    res.locals.dbInstructions = {
+      dao: req.app.locals.database.getDao('group'),
+      query: res.locals.modified_query,
+      query_options: res.locals.query_options,
+      with_total: true,
+    };
+    
+    next();
+    
+  }, fetchMany, resultToJson);
 
 
 /** 
@@ -95,10 +91,10 @@ router.get('/:group_id', function (req, res, next) {
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('group'),
     id: req.params.group_id
-  }
+  };
   next();
 
-}, fetchById);
+}, fetchById, resultToJson);
 
 
 /** Create group */
@@ -108,7 +104,7 @@ router.post('/', function (req, res, next) {
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('group'),
     toSave: entity
-  }
+  };
   next();
 
 }, create);
@@ -121,10 +117,10 @@ router.put('/:group_id', function (req, res, next) {
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('group'),
     toUpdate: entity
-  }
+  };
   next();
 
-}, updateById);
+}, updateById, resultToJson);
 
 
 // Get all group equipment
@@ -133,9 +129,9 @@ router.get('/:group_id/equipment', function (req, res, next) {
     dao: req.app.locals.database.getDao('equipment_group_view'),
     query: {group_id: req.params.group_id},
     //query_options: {limit: 100, orderBy: ["+"]}
-  }
+  };
   next();
-}, fetchMany);
+}, fetchMany, resultToJson);
 
 /** Saves group equipment */
 router.post('/:group_id/equipment', function (req, res, next) {
