@@ -271,11 +271,11 @@ let parseAdvancedSearchRequest = async function (req, res, next){
     res.locals.dbInstructions.sql = {
       statement: fullQuery,
       parms: criteria.parms,
-    }
+    };
     res.locals.dbInstructions.sql_count = {
       statement: fullCountQuery,
       parms: criteria.parms,
-    }
+    };
 
     next(); 
   } catch (ex){
@@ -285,5 +285,5 @@ let parseAdvancedSearchRequest = async function (req, res, next){
       error: ex.message
     });
   }
-}
+};
 exports.parseAdvancedSearchRequest = parseAdvancedSearchRequest;

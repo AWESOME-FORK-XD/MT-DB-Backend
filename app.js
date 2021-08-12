@@ -96,13 +96,13 @@ app.use('/auth', authRouter);
 
 // api related
 const authenticated = require('./routes/middleware/authenticated');
-app.use(authenticated());
+
 app.use('/api/v1/products', productsApiRouter);
 app.use('/api/v1/families', familiesApiRouter);
 app.use('/api/v1/equipment', equipmentApiRouter);
 app.use('/api/v1/groups', groupsApiRouter);
 app.use('/api/v1', apiRouter);
-app.use('/api/v1/dataload', dataloadApiRouter);
+app.use('/api/v1/dataload', authenticated(), dataloadApiRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -4,6 +4,7 @@ const { create, deleteById, fetchById, fetchMany, parseQueryOptions, resultToJso
 const { fetchManySqlAnd, resultToCsv, resultToJsonDownload, resultToAccept} = require('./db-api-ext');
 const debug = require('debug')('medten:routes');
 const {parseAdvancedSearchRequest} = require('./common');
+const authenticated = require('../middleware/authenticated');
 
 const ALLOWED_SEARCH_PARAMETERS = [ 
   'id', 
@@ -130,11 +131,7 @@ router.post('/search', async function (req, res, next) {
 }, parseAdvancedSearchRequest, fetchManySqlAnd, resultToAccept);
 
 
-router.get('/search/download', async function (req, res, next) {
-  if(!req.query.token){
-    //TODO: handle in authenticated.
-    res.status(403).end();
-  }
+router.get('/search/download', authenticated(), async function (req, res, next) {
   if(!req.query.payload){
     res.status(400).json({message: "Unable to download.", error: "Invalid parameters."});
   }
@@ -162,7 +159,7 @@ router.get('/search/download', async function (req, res, next) {
 }, parseAdvancedSearchRequest, fetchManySqlAnd, resultToCsv);
 
 /** @deprecated */
-router.post('/search/download', async function (req, res, next) {
+router.post('/search/download', authenticated(), async function (req, res, next) {
  
   try{
     let payload = {};
@@ -219,7 +216,7 @@ router.get('/:product_id', function (req, res, next) {
 
 
 /** Create a product */
-router.post('/', function (req, res, next) {
+router.post('/', authenticated(), function (req, res, next) {
 
   let entity = req.body;
   res.locals.dbInstructions = {
@@ -232,7 +229,7 @@ router.post('/', function (req, res, next) {
 
 
 /** Update a product */
-router.put('/:product_id', async function (req, res, next) {
+router.put('/:product_id', authenticated(), async function (req, res, next) {
 
   let entity = req.body;
   let productDao = req.app.locals.database.getDao('product');
@@ -303,7 +300,7 @@ async function topCategoryFor(categoryDao, categoryId){
 
 
 /** Delete a product (database cascades related entities) */
-router.delete('/:product_id', function (req, res, next) {
+router.delete('/:product_id', authenticated(), function (req, res, next) {
 
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('product'),
@@ -325,7 +322,7 @@ router.get('/:product_id/certificates', function (req, res, next) {
 }, fetchMany, resultToJson);
 
 /** Saves product certificates */
-router.post('/:product_id/certificates', function (req, res, next) {
+router.post('/:product_id/certificates', authenticated(), function (req, res, next) {
   
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('product_certificate'),
@@ -347,7 +344,7 @@ router.get('/:product_id/custom_attributes', function (req, res, next) {
 }, fetchMany, resultToJson);
 
 /** Save all product custom attributes. */
-router.post('/:product_id/custom_attributes', function (req, res, next) {
+router.post('/:product_id/custom_attributes', authenticated(), function (req, res, next) {
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('product_custom_attribute'),
     toSave: req.body, //assuming an array of objects
@@ -369,7 +366,7 @@ router.get('/:product_id/equipment', function (req, res, next) {
 }, fetchMany, resultToJson);
 
 /** Save all product equipment connections. */
-router.post('/:product_id/equipment', function (req, res, next) {
+router.post('/:product_id/equipment', authenticated(), function (req, res, next) {
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('product_equipment'),
     toSave: req.body, //assuming an array
@@ -391,7 +388,7 @@ router.get('/:product_id/families', function (req, res, next) {
 }, fetchMany, resultToJson);
 
 /** Save all product family connections. */
-router.post('/:product_id/families', function (req, res, next) {
+router.post('/:product_id/families', authenticated(), function (req, res, next) {
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('product_family'),
     toSave: req.body, //assuming an array
@@ -411,7 +408,7 @@ router.get('/:product_id/filter_options', function (req, res, next) {
 }, fetchMany, resultToJson);
 
 /** Save all product filter options. */
-router.post('/:product_id/filter_options', function (req, res, next) {
+router.post('/:product_id/filter_options', authenticated(), function (req, res, next) {
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('product_filter_option'),
     toSave: req.body, //assuming an array
@@ -432,7 +429,7 @@ router.get('/:product_id/images', function (req, res, next) {
 }, fetchMany, resultToJson);
 
 /** Save all product images. */
-router.post('/:product_id/images', function (req, res, next) {
+router.post('/:product_id/images', authenticated(), function (req, res, next) {
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('product_image'),
     toSave: req.body, //assuming an array of objects
@@ -454,7 +451,7 @@ router.get('/:product_id/marketing_regions', function (req, res, next) {
 }, fetchMany, resultToJson);
 
 /** Save all product marketing regions. */
-router.post('/:product_id/marketing_regions', function (req, res, next) {
+router.post('/:product_id/marketing_regions', authenticated(), function (req, res, next) {
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('product_marketing_region'),
     toSave: req.body, //assuming an array of objects
@@ -475,7 +472,7 @@ router.get('/:product_id/oem_references', function (req, res, next) {
 }, fetchMany, resultToJson);
 
 /** Save all product oem references */
-router.post('/:product_id/oem_references', function (req, res, next) {
+router.post('/:product_id/oem_references', authenticated(), function (req, res, next) {
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('product_oem_reference'),
     toSave: req.body, //assuming an array of objects
@@ -497,7 +494,7 @@ router.get('/:product_id/sets', function (req, res, next) {
 }, fetchMany, resultToJson);
 
 /** Save all product sets values. */
-router.post('/:product_id/sets', function (req, res, next) {
+router.post('/:product_id/sets', authenticated(), function (req, res, next) {
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('product_set'),
     toSave: req.body, //assuming an array of objects
@@ -520,7 +517,7 @@ router.get('/:product_id/suppliers', function (req, res, next) {
 
 
 /** Save all product supplier values. */
-router.post('/:product_id/suppliers', function (req, res, next) {
+router.post('/:product_id/suppliers', authenticated(), function (req, res, next) {
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('product_supplier'),
     toSave: req.body, //assuming an array of objects

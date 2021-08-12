@@ -1,9 +1,9 @@
 var express = require('express');
 var router = express.Router({ mergeParams: true });
-var _ = require('lodash');
 let { create, fetchById, fetchMany, parseQueryOptions, resultToJson, saveAll, updateById } = require('@apigrate/dao/lib/express/db-api');
 const { fetchManySqlAnd, resultToAccept, resultToJsonDownload} = require('./db-api-ext');
 const {parseAdvancedSearchRequest} = require('./common');
+const authenticated = require('../middleware/authenticated');
 
 
 const ALLOWED_SEARCH_PARAMETERS = [
@@ -89,7 +89,7 @@ router.post('/search', async function (req, res, next) {
 
 
 /** @deprecated */
-router.post('/search/download', async function (req, res, next) {
+router.post('/search/download', authenticated(), async function (req, res, next) {
   
   let payload = {};
   Object.assign(payload, req.body);
@@ -115,33 +115,33 @@ router.get('/:equipment_id', function (req, res, next) {
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('equipment_view'),
     id: req.params.equipment_id
-  }
+  };
   next();
 
 }, fetchById, resultToJson);
 
 
 /** Create equipment */
-router.post('/', function (req, res, next) {
+router.post('/', authenticated(), function (req, res, next) {
 
   let entity = req.body;
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('equipment'),
     toSave: entity
-  }
+  };
   next();
 
 }, create);
 
 
 /** Update equipment */
-router.put('/:equipment_id', function (req, res, next) {
+router.put('/:equipment_id', authenticated(), function (req, res, next) {
 
   let entity = req.body;
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('equipment'),
     toUpdate: entity
-  }
+  };
   next();
 
 }, updateById, resultToJson);
@@ -153,13 +153,13 @@ router.get('/:equipment_id/available_regions', function (req, res, next) {
     dao: req.app.locals.database.getDao('equipment_available_region_view'),
     query: {equipment_id: req.params.equipment_id},
     //query_options: q.query_options
-  }
+  };
   next();
 }, fetchMany, resultToJson);
 
 
 /** Save all equipment available regions. */
-router.post('/:equipment_id/available_regions', function (req, res, next) {
+router.post('/:equipment_id/available_regions', authenticated(), function (req, res, next) {
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('equipment_available_region'),
     toSave: req.body, //assuming an array of objects
@@ -202,8 +202,8 @@ router.use(function (err, req, res, next) {
   res.status(500).json({
     message: "Unexpected error.",
     error: errMessage
-  })
-})
+  });
+});
 
 
 module.exports = router;

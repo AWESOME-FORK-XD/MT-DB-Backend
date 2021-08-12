@@ -3,6 +3,7 @@ var router = express.Router({ mergeParams: true });
 let { create, fetchById, fetchMany, parseQueryOptions, resultToJson, saveAll, updateById} = require('@apigrate/dao/lib/express/db-api');
 const { fetchManySqlAnd, resultToAccept, resultToJsonDownload} = require('./db-api-ext');
 const {parseAdvancedSearchRequest} = require('./common');
+const authenticated = require('../middleware/authenticated');
 
 const ALLOWED_SEARCH_PARAMETERS = [
   'id', 
@@ -65,7 +66,7 @@ router.post('/search', async function (req, res, next) {
 
 
 /** @deprecated */
-router.post('/search/download', async function (req, res, next) {
+router.post('/search/download', authenticated(), async function (req, res, next) {
   
   let payload = {};
   Object.assign(payload, req.body);
@@ -98,7 +99,7 @@ router.get('/:group_id', function (req, res, next) {
 
 
 /** Create group */
-router.post('/', function (req, res, next) {
+router.post('/', authenticated(), function (req, res, next) {
 
   let entity = req.body;
   res.locals.dbInstructions = {
@@ -111,7 +112,7 @@ router.post('/', function (req, res, next) {
 
 
 /** Update group */
-router.put('/:group_id', function (req, res, next) {
+router.put('/:group_id', authenticated(), function (req, res, next) {
 
   let entity = req.body;
   res.locals.dbInstructions = {
@@ -134,7 +135,7 @@ router.get('/:group_id/equipment', function (req, res, next) {
 }, fetchMany, resultToJson);
 
 /** Saves group equipment */
-router.post('/:group_id/equipment', function (req, res, next) {
+router.post('/:group_id/equipment', authenticated(), function (req, res, next) {
   if(!req.body){
     return res.status(400).json({message: "Invalid request.", error: "No data provided."});
   }
@@ -163,8 +164,8 @@ router.use(function (err, req, res, next) {
   res.status(500).json({
     message: "Unexpected error.",
     error: errMessage
-  })
-})
+  });
+});
 
 
 module.exports = router;

@@ -1,9 +1,9 @@
 var express = require('express');
 var router = express.Router({ mergeParams: true });
-var _ = require('lodash');
-let { create,  fetchById, fetchMany, parseQueryOptions, parseQueryOptionsFromObject, resultToJson, updateById } = require('@apigrate/dao/lib/express/db-api');
+let { create,  fetchById, fetchMany, parseQueryOptions, resultToJson, updateById } = require('@apigrate/dao/lib/express/db-api');
 const {  fetchManySqlAnd,  resultToAccept, resultToJsonDownload} = require('./db-api-ext');
 const {parseAdvancedSearchRequest} = require('./common');
+const authenticated = require('../middleware/authenticated');
 
 const ALLOWED_SEARCH_PARAMETERS = [
   'id',
@@ -94,7 +94,7 @@ router.post('/search', async function (req, res, next) {
 }, parseAdvancedSearchRequest, fetchManySqlAnd, resultToAccept);
 
 
-router.post('/search/download', async function (req, res, next) {
+router.post('/search/download', authenticated(), async function (req, res, next) {
   
   let payload = {};
   Object.assign(payload, req.body);
@@ -127,20 +127,20 @@ router.get('/:family_id', function (req, res, next) {
 
 
 /** Create a family */
-router.post('/', function (req, res, next) {
+router.post('/', authenticated(), function (req, res, next) {
 
   let entity = req.body;
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('family'),
     toSave: entity
-  }
+  };
   next();
 
 }, create);
 
 
 /** Update a family */
-router.put('/:family_id', function (req, res, next) {
+router.put('/:family_id', authenticated(), function (req, res, next) {
 
   let entity = req.body;
   res.locals.dbInstructions = {
