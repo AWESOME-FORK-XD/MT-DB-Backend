@@ -108,7 +108,7 @@ let parseAdvancedSearchRequest = async function (req, res, next){
     let filter_definitions = res.locals.dbInstructions.filter_definitions;
     let exclude_columns_on_output = res.locals.dbInstructions.exclude_columns_on_output || [];
 
-    await dao.fetchMetadata();
+    await dao.loadMetadata();
 
     //Which columns are output...
     let columns = [];

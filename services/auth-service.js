@@ -33,7 +33,7 @@ const ALLOWED_USER_PROPERTIES = [
   'bad_login_attempts'
 ];
 /**
- * An Authorization service providing login, logout, password-reset, and email verification functions.
+ * An Authorization service providing login, password-reset, and email verification functions.
  */
 class AuthService {
   /**

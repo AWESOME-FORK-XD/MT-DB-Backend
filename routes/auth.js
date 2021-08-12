@@ -60,13 +60,6 @@ router.post('/login', async function(req, res, next){
 });
 
 
-/** Signals a logout. */
-router.get('/logout', async function (req, res, next){
-  debug(`Handling logout...`);
-  res.status(200).end();
-});
-
-
 /**
  * Initiates password-reset email process.
  */

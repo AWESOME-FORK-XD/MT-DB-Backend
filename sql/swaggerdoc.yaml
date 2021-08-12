@@ -39,29 +39,7 @@ paths:
           description: Unauthorized. Invalid credentials.
         500:
           $ref: '#/components/responses/500ServerError'
-  /auth/logout:
-    post:
-      summary: Logs out, removing the allocated apikey.
-      tags: 
-        - authentication
-      requestBody:
-        description: The username to logout. (The password portion of the payload should be omitted).
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Login'
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema: 
-                $ref: '#/components/schemas/SimpleMessage'
-        400:
-          $ref: '#/components/responses/400ClientError'
-        500:
-          $ref: '#/components/responses/500ServerError'
+  
   /auth/password/forgot:
     post:
       summary: Handle a request to reset the users' password.

@@ -1,14 +1,6 @@
-#
-# Archetype for a webhook-triggered integration.
-#   Defines:
-#    1. processing queue
-#    2. dead letter queue
-#    3. lambda to handle webhook (including API gateway definition)
-#    4. lambda to process enqueued data
-#
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
-Description: Medten Product DB Backend Serverless Application (Test Environment)
+Description: Medten Product DB Backend Serverless Application (V2 Test Environment)
 Parameters:
   debuggingFor:
     Description: 'debugging category'
@@ -18,17 +10,17 @@ Parameters:
   lambdaExecutionRole:
     Description: 'Required. The role used for lambda execution.'
     Type: 'String'
-    Default: 'arn:aws:iam::432961014712:role/LambdaExecutionRole'
+    Default: 'arn:aws:iam::900914409567:role/LambdaExecutionRole'
 
 Resources:
-  handleAnyRequest:
+  v2handleAnyRequest:
     Type: 'AWS::Serverless::Function'
     Properties:
-      FunctionName: handleAnyRequestTest
+      FunctionName: v2handleAnyRequest
       Handler: lambda.handler
       Runtime: nodejs12.x
       CodeUri: ./
-      Description: Handles inbound test requests for the AWS serverless express webapp.
+      Description: Handles inbound test requests for the AWS V2 serverless express webapp.
       MemorySize: 256
       Timeout: 60
       Role:
@@ -57,6 +49,4 @@ Resources:
       #     DB_DATABASE: '{{resolve:ssm:DB_DATABASE:1}}'
       Tags:
         environment: test
-
-
-  
+        version: 2
