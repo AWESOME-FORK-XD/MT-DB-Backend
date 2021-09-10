@@ -170,7 +170,9 @@ let parseAdvancedSearchRequest = async function (req, res, next){
     if(payload.category_id && dao.table === 'v_product'){
       criteria.andGroup();
       if( _.isArray(payload.category_id) ){
-        criteria.and('v.category_id', 'IN', payload.category_id);
+        if( payload.category_id.length > 0){
+          criteria.and('v.category_id', 'IN', payload.category_id);
+        }
       } else {
         criteria.and('v.category_id', '=', `${payload.category_id}`);
       }
@@ -182,7 +184,9 @@ let parseAdvancedSearchRequest = async function (req, res, next){
       }
       criteria.andGroup();
       if( _.isArray(payload.category_id) ){
-        criteria.and('J.category_id', 'IN', payload.category_id);
+        if( payload.category_id.length > 0){
+          criteria.and('J.category_id', 'IN', payload.category_id);
+        }
       } else {
         criteria.and('J.category_id', '=', `${payload.category_id}`);
       }
