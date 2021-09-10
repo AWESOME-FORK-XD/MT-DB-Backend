@@ -4,6 +4,7 @@
 
 const {CriteriaHelper} = require('@apigrate/dao');
 const _ = require('lodash');
+const debug = require('debug')('gr8:db');
 
 /**
  * Provide consistent search term queries.
@@ -168,29 +169,37 @@ let parseAdvancedSearchRequest = async function (req, res, next){
     //   (could be an array or a single value)
     //
     if(payload.category_id && dao.table === 'v_product'){
-      criteria.andGroup();
+      
       if( _.isArray(payload.category_id) ){
         if( payload.category_id.length > 0){
+          criteria.andGroup();
           criteria.and('v.category_id', 'IN', payload.category_id);
+          criteria.groupEnd();
         }
       } else {
+        criteria.andGroup();
         criteria.and('v.category_id', '=', `${payload.category_id}`);
+        criteria.groupEnd();
       }
-      criteria.groupEnd();
+      
     } else if (payload.category_id && dao.table === 'v_family') {
       // Ugly hack for family category query
       if( !join.includes("v_product")){
         join += ` JOIN v_product J on J.family_id = v.id`; //ALWAYS ASSUMING A JOIN on the id column.
       }
-      criteria.andGroup();
+      
       if( _.isArray(payload.category_id) ){
         if( payload.category_id.length > 0){
+          criteria.andGroup();
           criteria.and('J.category_id', 'IN', payload.category_id);
+          criteria.groupEnd();
         }
       } else {
+        criteria.andGroup();
         criteria.and('J.category_id', '=', `${payload.category_id}`);
+        criteria.groupEnd();
       }
-      criteria.groupEnd();
+      
     }
 
     //
@@ -281,6 +290,7 @@ let parseAdvancedSearchRequest = async function (req, res, next){
       parms: criteria.parms,
     };
 
+    debug(`derived advanced search: %o`, res.locals.dbInstructions.sql);
     next(); 
   } catch (ex){
     console.error(ex);
