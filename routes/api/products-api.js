@@ -33,15 +33,15 @@ const ALLOWED_SEARCH_PARAMETERS = [
 ];
 
 const SEARCH_FILTERS = {
-  "brand": {
+  "oem_brands": {
     where_column: "oem_brand_id",
   },
-  "certificate": {
+  "certificates": {
     join_table: "t_product_certificate",
     join_column: "product_id",
     where_column: "certificate_id",
   },
-  "custom_attribute": {
+  "custom_attributes": {
     join_table: "t_product_custom_attribute",
     join_column: "product_id",
     where_column: "custom_attribute_id",
@@ -51,28 +51,28 @@ const SEARCH_FILTERS = {
     join_column: "product_id",
     where_column: "image_type_id",
   },
-  "lifecycle": {
+  "lifecycles": {
     where_column: "lifecycle_id",
   },
-  "marketing_region": {
+  "marketing_regions": {
     join_table: "t_product_marketing_region",
     join_column: "product_id",
     where_column: "marketing_region_id",
   },
-  "packaging_factor": {
+  "packaging_factors": {
     where_column: "packaging_factor_id",
   },
-  "supplier": {
+  "suppliers": {
     join_table: "t_product_supplier",
     join_column: "product_id",
     where_column: "supplier_id",
   },
-  "oem_reference": {
+  "oem_references": {
     join_table: "t_product_oem_reference",
     join_column: "product_id",
     where_column: "brand_id",
   },
-  "product_type": {
+  "product_types": {
     where_column: "product_type_id",
   },
 };
