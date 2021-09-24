@@ -33,6 +33,7 @@ function parseSearchTermCriteria(allowed_fields, qopts){
   
 
   let hasOtherFilters = false;
+  // eslint-disable-next-line no-unused-vars
   for(let field_name in qopts.query){
     hasOtherFilters = true; break;
   }
