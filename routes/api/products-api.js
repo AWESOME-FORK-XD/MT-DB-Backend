@@ -29,7 +29,9 @@ const ALLOWED_SEARCH_PARAMETERS = [
   'search_term',
   'search_term_fields',
   'created',
-  'updated'
+  'updated',
+
+  'oem_reference_name' //special handling in common.js
 ];
 
 const SEARCH_FILTERS = {

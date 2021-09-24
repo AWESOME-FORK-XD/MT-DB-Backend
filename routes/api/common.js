@@ -134,9 +134,18 @@ let parseAdvancedSearchRequest = async function (req, res, next){
     if(payload.search_term_fields && payload.search_term_fields.length > 0 && dao.table !== 'v_family' ){
       criteria.andGroup();
       for(let field_name of payload.search_term_fields){
-        if(searchable_columns.includes(field_name)){
-          criteria.or(`v.${field_name}`, 'LIKE', `%${payload.search_term}%`);
+        if(field_name === 'oem_reference_name' ){
+          if( !join.includes("t_product_oem_reference")){
+            join += ` JOIN t_product_oem_reference OEMREF on OEMREF.product_id = v.id`;
+          }
+          criteria.or(`OEMREF.name`, 'LIKE', `%${payload.search_term}%`);
+
+        } else {
+          if(searchable_columns.includes(field_name)){
+            criteria.or(`v.${field_name}`, 'LIKE', `%${payload.search_term}%`);
+          }
         }
+        
         //just ignore anything not searchable.
       }
       criteria.groupEnd();
