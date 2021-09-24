@@ -719,16 +719,15 @@ paths:
 
                         | search_filter | value is a(n) | matching |
                         |---------------|------------|----------|
-                        | brand | integer | brand id 
-                        | certificate | integer | certificate id
-                        | custom attribute | integer | attribute id 
-                        | image type | integer | image type id
-                        | lifecycle | integer | lifecycle id
-                        | marketing region | integer | marketing region id
-                        | packaging factor | integer | packaging factor id
-                        | supplier | integer | supplier id
-                        | oem reference | string | name of oem reference 
-                        | product type | integer | product type id
+                        | oem_brands | integer | oem brand id 
+                        | certificates | integer | certificate id
+                        | custom_attributes | integer | attribute id 
+                        | lifecycles | integer | lifecycle id
+                        | marketing_regions | integer | marketing region id
+                        | packaging_factors | integer | packaging factor id
+                        | suppliers | integer | supplier id
+                        | oem_references | string | name of oem reference 
+                        | product_types | integer | product type id
                   category_id:
                     type: array
                     description: The categories to add to the product search filtering. Specifying more than one category widens the search results.
