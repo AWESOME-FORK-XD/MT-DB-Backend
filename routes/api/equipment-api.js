@@ -35,18 +35,15 @@ const SEARCH_FILTERS = {
 
 
 /** Query for equipment */
-router.get('/', async function (req, res, next) {
+router.get('/', parseQueryOptions(ALLOWED_SEARCH_PARAMETERS, ['+model', '+id'], 1000), async function (req, res, next) {
 
-  let q = parseQueryOptions(req, ALLOWED_SEARCH_PARAMETERS, ['+model', '+id'], 1000);
-  
-  let dbInstructions = {
+  res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('equipment_view'),
-    query_options: q.query_options,
+    query_options: res.locals.query_options,
+    query: res.locals.modified_query,
     with_total: true,
   };
 
-  dbInstructions.query = q.query;
-  res.locals.dbInstructions = dbInstructions;
   next();
   
 }, fetchMany, resultToJson);

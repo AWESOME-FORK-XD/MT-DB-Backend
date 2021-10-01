@@ -80,17 +80,15 @@ const SEARCH_FILTERS = {
 };
 
 /** Query for products using a simple parametric search. Array values not supported. */
-router.get('/', async function (req, res, next) {
-  let q = parseQueryOptions(req, ALLOWED_SEARCH_PARAMETERS, ['+name_en', '+id'], 1000);
-  
-  let dbInstructions = {
+router.get('/', parseQueryOptions(ALLOWED_SEARCH_PARAMETERS, ['+name_en', '+id'], 1000), async function (req, res, next) {
+
+  res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('product_view'),
-    query_options: q.query_options,
+    query: res.locals.modified_query,
+    query_options: res.locals.query_options,
     with_total: true,
   };
 
-  dbInstructions.query = q.query;
-  res.locals.dbInstructions = dbInstructions;
   next();
   
 }, fetchMany, resultToJson);
@@ -360,7 +358,7 @@ router.post('/:product_id/custom_attributes', authenticated(), function (req, re
 // Get all product equipment connections
 router.get('/:product_id/equipment', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.database.getDao('product_equipment_view'),
+    dao: req.app.locals.database.getDao('product_equipment_connect_view'),
     query: {product_id: req.params.product_id},
     //query_options: q.query_options
   };
@@ -382,7 +380,7 @@ router.post('/:product_id/equipment', authenticated(), function (req, res, next)
 // Get all product family connections
 router.get('/:product_id/families', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.database.getDao('product_family'),
+    dao: req.app.locals.database.getDao('product_family_connect'),
     query: {product_id: req.params.product_id},
     //query_options: q.query_options
   };
@@ -392,7 +390,7 @@ router.get('/:product_id/families', function (req, res, next) {
 /** Save all product family connections. */
 router.post('/:product_id/families', authenticated(), function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.database.getDao('product_family'),
+    dao: req.app.locals.database.getDao('product_family_connect'),
     toSave: req.body, //assuming an array
     query: {product_id: req.params.product_id},
     comparison: function(obj){ return obj.family_id; }
