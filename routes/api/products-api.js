@@ -225,7 +225,7 @@ router.post('/', authenticated(), function (req, res, next) {
   };
   next();
 
-}, create);
+}, create, resultToJson);
 
 
 /** Update a product */
@@ -331,7 +331,7 @@ router.post('/:product_id/certificates', authenticated(), function (req, res, ne
     comparison: function(v){ return v.certificate_id; }
   };
   next();
-}, saveAll);
+}, saveAll, resultToJson);
 
 /** Get all custom attribute values for a product. */
 router.get('/:product_id/custom_attributes', function (req, res, next) {
@@ -352,7 +352,7 @@ router.post('/:product_id/custom_attributes', authenticated(), function (req, re
     comparison: function(obj){ return `${obj.custom_attribute_id}|${obj.value_en}|${obj.value_zh}`; }
   };
   next();
-}, saveAll);
+}, saveAll, resultToJson);
 
 
 // Get all product equipment connections
@@ -368,13 +368,13 @@ router.get('/:product_id/equipment', function (req, res, next) {
 /** Save all product equipment connections. */
 router.post('/:product_id/equipment', authenticated(), function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.database.getDao('product_equipment'),
+    dao: req.app.locals.database.getDao('product_equipment_connect'),
     toSave: req.body, //assuming an array
     query: {product_id: req.params.product_id},
     comparison: function(obj){ return obj.equipment_id; }
   };
   next();
-}, saveAll);
+}, saveAll, resultToJson);
 
 
 // Get all product family connections
@@ -396,7 +396,7 @@ router.post('/:product_id/families', authenticated(), function (req, res, next) 
     comparison: function(obj){ return obj.family_id; }
   };
   next();
-}, saveAll);
+}, saveAll, resultToJson);
 
 router.get('/:product_id/filter_options', function (req, res, next) {
   res.locals.dbInstructions = {
@@ -416,7 +416,7 @@ router.post('/:product_id/filter_options', authenticated(), function (req, res, 
     comparison: function(obj){ return `${obj.filter_option_id}|${obj.product_id}|${obj.priority_order}`; }
   };
   next();
-}, saveAll);
+}, saveAll, resultToJson);
 
 // Get all product family connections
 router.get('/:product_id/images', function (req, res, next) {
@@ -437,7 +437,7 @@ router.post('/:product_id/images', authenticated(), function (req, res, next) {
     comparison: function(obj){ return `${obj.image_link}|${obj.image_type_id}|${obj.priority_order}`; }
   };
   next();
-}, saveAll);
+}, saveAll, resultToJson);
 
 
 // Get all product marketing regions
@@ -459,7 +459,7 @@ router.post('/:product_id/marketing_regions', authenticated(), function (req, re
     comparison: function(obj){ return `${obj.marketing_region_id}`; }
   };
   next();
-}, saveAll);
+}, saveAll, resultToJson);
 
 // Get all product oem references
 router.get('/:product_id/oem_references', function (req, res, next) {
@@ -480,7 +480,7 @@ router.post('/:product_id/oem_references', authenticated(), function (req, res, 
     comparison: function(obj){ return `${obj.brand_id}|${obj.name}`; }
   };
   next();
-}, saveAll);
+}, saveAll, resultToJson);
 
 
 /** Get all set values for a product. */
@@ -502,7 +502,7 @@ router.post('/:product_id/sets', authenticated(), function (req, res, next) {
     comparison: function(obj){ return `${obj.child_product_id}|${obj.quantity}`; }
   };
   next();
-}, saveAll);
+}, saveAll, resultToJson);
 
 
 /** Get product supplier values. */
@@ -525,7 +525,7 @@ router.post('/:product_id/suppliers', authenticated(), function (req, res, next)
     comparison: function(obj){ return `${obj.supplier_id}|${obj.supplier_price}`; }
   };
   next();
-}, saveAll);
+}, saveAll, resultToJson);
 
 //Default error handling
 router.use(function (err, req, res, next) {

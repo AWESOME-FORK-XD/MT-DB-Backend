@@ -108,7 +108,7 @@ router.post('/', authenticated(), function (req, res, next) {
   };
   next();
 
-}, create);
+}, create, resultToJson);
 
 
 /** Update group */
@@ -151,7 +151,7 @@ router.post('/:group_id/equipment', authenticated(), function (req, res, next) {
     comparison: function(v){ return v.equipment_id; }
   };
   next();
-}, saveAll);
+}, saveAll, resultToJson);
 
 
 //Default error handling

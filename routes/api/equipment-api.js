@@ -128,7 +128,7 @@ router.post('/', authenticated(), function (req, res, next) {
   };
   next();
 
-}, create);
+}, create, resultToJson);
 
 
 /** Update equipment */
@@ -164,7 +164,7 @@ router.post('/:equipment_id/available_regions', authenticated(), function (req, 
     comparison: function(obj){ return `${obj.available_region_id}`; }
   };
   next();
-}, saveAll);
+}, saveAll, resultToJson);
 
 
 // Get all equipment available regions
@@ -186,7 +186,7 @@ router.post('/:equipment_id/images', function (req, res, next) {
     comparison: function(obj){ return `${obj.image_link}`; }
   };
   next();
-}, saveAll);
+}, saveAll, resultToJson);
 
 
 //Default error handling
