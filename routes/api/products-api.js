@@ -308,7 +308,7 @@ router.delete('/:product_id', authenticated(), function (req, res, next) {
   };
   next();
 
-}, deleteById);
+}, deleteById, resultToJson);
 
 
 // Get all product certificates
