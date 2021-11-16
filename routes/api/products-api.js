@@ -230,42 +230,60 @@ router.post('/', authenticated(), function (req, res, next) {
 
 /** Update a product */
 router.put('/:product_id', authenticated(), async function (req, res, next) {
-
-  let entity = req.body;
-  let productDao = req.app.locals.database.getDao('product');
-  
-  let existing = await productDao.get(entity.id);
-
-  //If new category is or is underneath one of the major categories, err.
-  if(entity.category_id && entity.category_id != existing.category_id){
-    debug(`A product category change has been detected...`);
-    let categoryDao = req.app.locals.database.getDao('category');
-
-    let sourceCategory = await topCategoryFor(categoryDao, existing.category_id);
-    let targetCategory = await topCategoryFor(categoryDao, entity.category_id);
+  try{
+    let latest = req.body;
+    let productDao = req.app.locals.database.getDao('product');
     
-    if(sourceCategory.id !== targetCategory.id){
-      res.status(400).json({message: "Unable to save product.", error: "Changing categories to another top level category hierarchy is not allowed."});
-      return;
+    // First retrieve, then overlay.
+    let existing = await productDao.get(latest.id);
+    let toSave = {};
+    toSave = Object.assign(toSave, existing);
+    toSave = Object.assign(toSave, latest);//overlay
+
+    //If new category is or is underneath one of the major categories, err.
+    if(latest.category_id && latest.category_id != existing.category_id){
+      debug(`A product category change has been detected...`);
+      let categoryDao = req.app.locals.database.getDao('category');
+
+      let sourceCategory = await topCategoryFor(categoryDao, existing.category_id);
+      let targetCategory = await topCategoryFor(categoryDao, latest.category_id);
+      
+      if(sourceCategory.id !== targetCategory.id){
+        res.status(400).json({message: "Unable to save product.", error: "Changing categories to another top level category hierarchy is not allowed."});
+        return;
+      }
+
+      //Delete category-dependent data.
+      //Filter Options
+      debug(`...deleting old filter options.`);
+      await req.app.locals.database.getDao('product_filter_option').deleteMatching({product_id: existing.product_id});
+      //Custom attributes
+      debug(`...deleting old custom attributes.`);
+      await req.app.locals.database.getDao('product_custom_attribute').deleteMatching({product_id: existing.product_id});
+
     }
 
-    //Delete category-dependent data.
-    //Filter Options
-    debug(`...deleting old filter options.`);
-    await req.app.locals.database.getDao('product_filter_option').deleteMatching({product_id: existing.product_id});
-    //Custom attributes
-    debug(`...deleting old custom attributes.`);
-    await req.app.locals.database.getDao('product_custom_attribute').deleteMatching({product_id: existing.product_id});
+    //Now save.
+    await productDao.update(toSave);
+    
+    //Now update the product family table from the family_id (if necessary)
+    let productFamilyDao = req.app.locals.database.getDao('product_family');
+    let current_pf = await productFamilyDao.one({product_id: toSave.id, is_primary: 1});
+    if(latest.family_id && (!current_pf || current_pf.family_id != latest.family_id) ){
+      await productFamilyDao.deleteMatching({product_id: toSave.id, is_primary: 1});
+      await productFamilyDao.create({product_id: toSave.id, family_id: latest.family_id, is_primary: 1});
+    }
 
+    res.locals.result = toSave;
+
+    next();
+  }catch(err){
+    console.error(err);
+    next(err);
   }
 
-  res.locals.dbInstructions = {
-    dao: productDao,
-    toUpdate: entity
-  };
-  next();
+}, resultToJson );
 
-}, updateById, resultToJson);
 
 /**
  * Returns the top-level category for a given subcategory id.
@@ -375,6 +393,53 @@ router.post('/:product_id/equipment', authenticated(), function (req, res, next)
   };
   next();
 }, saveAll, resultToJson);
+
+// Get all product family relationship data for a given product
+router.get('/:product_id/product-families', function (req, res, next) {
+  res.locals.dbInstructions = {
+    dao: req.app.locals.database.getDao('product_family'),
+    query: {product_id: req.params.product_id},
+    //query_options: q.query_options
+  }
+  next();
+}, fetchMany, resultToJson);
+
+// Get all products the specified product is used with. This is simply done by querying the product_family_connect table to find the family the product connects with, then getting the products
+// and all the specification data for each product in that family.
+router.get('/:product_id/used-with', async function (req, res, next) {
+  
+  try{
+    let dao = req.app.locals.database.getDao('product_family');
+
+    let usedWithQuery = `select p.id, p.name_en, p.name_zh, p.sku, p.oem_brand_en, p.oem_brand_zh, p.lifecycle_en, p.lifecycle_zh, sp.specifications_en, sp.specifications_zh 
+from t_product_family_connect fc
+join t_product_family pf on pf.family_id = fc.family_id
+join v_product p on p.id = pf.product_id
+join v_product_specifications sp on sp.id = p.id
+where fc.product_id=?
+order by oem_brand_en asc, sku asc`;
+    let results = await dao.sqlCommand(usedWithQuery, [req.params.product_id]);
+    res.status(200).json({used_with: results});
+  }catch(err){
+    console.error(err);
+    next(err);
+  }
+  
+});
+
+router.post('/:product_id/generate-connects-to', async function (req, res, next) {
+  let transcript = null;
+  try{
+    let {ProductionConnectionRelationshipService} = require('../../services/connects-with');
+    let service = new ProductionConnectionRelationshipService(req.app.locals.database);
+    transcript = await service.generateProductConnections(req.params.product_id);
+    res.status(200).json({success: true, transcript});
+  }catch(err){
+    console.error(err);
+    res.status(500).json({success: false, message: err.message, error: err.stack, transcript});
+    return;
+  }
+});
 
 
 // Get all product family connections
