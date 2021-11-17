@@ -129,3 +129,12 @@ create view v_product_oem_reference as
 select por.*, b.name_en as brand_en, b.name_zh as brand_zh
 from t_product_oem_reference por
 left outer join t_brand b on b.id = por.brand_id;
+
+-- product specifications view (concatenates product filter option_en, option_zh)
+create view v_product_specifications as
+select p.id, p.sku, p.name_en, p.name_zh, 
+GROUP_CONCAT(pfo.option_en ORDER BY pfo.option_en ASC SEPARATOR ', ') as specifications_en,
+GROUP_CONCAT(pfo.option_zh ORDER BY pfo.option_zh ASC SEPARATOR ' ') as specifications_zh 
+from v_product_filter_option pfo
+join v_product p on pfo.product_id = p.id  
+GROUP BY p.id, p.sku, p.name_en, p.name_zh;
