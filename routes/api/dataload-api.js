@@ -9,11 +9,11 @@ let debug = require('debug')('medten:routes');
 
 /** Get the available table entities (not the table names themselves, though) */
 router.get('/tables', async function (req, res, next) {
-  
-  res.status(200).json({
-    tables: req.app.locals.database.registry.filter(e=>e.entity.includes("view")?false:true).map(e=>{return e.entity; })()
-  });
-
+  let tables = req.app.locals.database.registry
+    .filter((e)=>{return e.entity.includes("view") ? false : true;})
+    .map(e=>{return e.entity; })()
+  res.status(200).json({tables});
+  return;
 });
 
 
@@ -227,7 +227,7 @@ async function validateDao(req, res, next){
     res.status(400).json({message: "There is no support for that type of data."});
     return;
   }
-  await dao.fetchMetadata();
+  await dao.loadMetadata();
 
   res.locals.dao = dao;
   next();
