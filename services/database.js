@@ -57,6 +57,9 @@ class DaoFactory {
       {table: 't_product_type',                entity: 'product_type',                options: this.standard_opts },
       {table: 't_supplier',                    entity: 'supplier',                    options: this.standard_opts },
       
+      {table: 't_test_pet',                    entity: 'pet',                         options: this.standard_opts },//for dataload testing
+      
+
       //views
       {table: 'v_category',                    entity: 'category_view'},
       {table: 'v_equipment_available_region',  entity: 'equipment_available_region_view'},
