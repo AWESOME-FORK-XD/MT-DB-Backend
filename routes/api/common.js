@@ -137,7 +137,7 @@ let parseAdvancedSearchRequest = async function (req, res, next){
       for(let field_name of payload.search_term_fields){
         if(field_name === 'oem_reference_name' ){
           if( !join.includes("t_product_oem_reference")){
-            join += ` JOIN t_product_oem_reference OEMREF on OEMREF.product_id = v.id`;
+            join += ` RIGHT OUTER JOIN t_product_oem_reference OEMREF on OEMREF.product_id = v.id`;
           }
           criteria.or(`OEMREF.name`, 'LIKE', `%${payload.search_term}%`);
 
