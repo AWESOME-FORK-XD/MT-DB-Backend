@@ -128,7 +128,17 @@ router.post('/search', async function (req, res, next) {
   
   next();
   
-}, parseAdvancedSearchRequest, fetchManySqlAnd, resultToAccept);
+}, parseAdvancedSearchRequest, fetchManySqlAnd, function(req, res, next){
+  //Allows the headers to be provided for CSV output in the client.
+  if(res.locals.result && req.body && req.body.with_headers===true && res.locals.dbInstructions){
+    let theHeaders = [];
+    res.locals.dbInstructions.dao.metadata.forEach( (meta) => {
+      theHeaders.push(meta.column);
+    });
+    res.locals.result.headers = theHeaders
+  }
+  next();
+}, resultToAccept);
 
 
 router.get('/search/download', authenticated(), async function (req, res, next) {
@@ -158,7 +168,6 @@ router.get('/search/download', authenticated(), async function (req, res, next) 
   
 }, parseAdvancedSearchRequest, fetchManySqlAnd, resultToCsv);
 
-/** @deprecated */
 router.post('/search/download', authenticated(), async function (req, res, next) {
  
   try{
