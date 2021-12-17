@@ -425,6 +425,24 @@ router.post('/:product_id/equipment', authenticated(), function (req, res, next)
   next();
 }, saveAll, resultToJson);
 
+// Get all product equipment connections
+router.get('/:product_id/equipment-compatibility', async function (req, res, next) {
+
+  //Compatibility query:
+  const compatibility_query = `select eg.group_id, eg.equipment_id, eg.model, eg.brand_id, eg.brand_en, brand_zh
+  from t_product p
+  join v_family f on f.id = p.family_id 
+  join v_equipment_group eg on eg.group_id = f.group_id
+  where p.id=?
+  group by group_id, equipment_id, model, brand_id, brand_en, brand_zh
+  order by brand_en asc, model asc`
+
+  res.locals.result = await req.app.locals.database.getDao('product').sqlCommand(compatibility_query, [req.params.product_id]);
+  
+  next();
+
+}, resultToJson);
+
 // Get all product family relationship data for a given product
 router.get('/:product_id/product-families', function (req, res, next) {
   res.locals.dbInstructions = {
