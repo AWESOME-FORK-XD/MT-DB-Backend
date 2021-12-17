@@ -641,7 +641,7 @@ ALTER TABLE `t_product_family_connect`
 
 
 ALTER TABLE `t_product_family` 
-  ADD CONSTRAINT `fk_product_family_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`);
+  ADD CONSTRAINT `fk_product_family_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`)  ON DELETE CASCADE;;
 
 ALTER TABLE `t_product_family` 
   ADD CONSTRAINT `fk_product_family_family` FOREIGN KEY (`family_id`) REFERENCES `t_family` (`id`);
