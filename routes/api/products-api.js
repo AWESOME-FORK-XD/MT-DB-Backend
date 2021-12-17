@@ -198,15 +198,37 @@ router.post('/search/download', authenticated(), async function (req, res, next)
 router.get('/skus', async function (req, res, next) {
   debug(`Getting distinct SKUs...`);
   let ProductView = req.app.locals.database.getDao('product_view');
-  let qresult = await ProductView.callDb(`SELECT DISTINCT(sku) as sku FROM ${ProductView.table} WHERE sku <> '' and sku is not null ORDER BY sku ASC`);
+  let qresult = await ProductView.sqlCommand(`SELECT DISTINCT(sku) as sku FROM ${ProductView.table} WHERE sku <> '' and sku is not null ORDER BY sku ASC`);
   res.status(200).json(qresult.map(r=>{return r.sku;}));
+});
+
+/** Gets an array of up to 1000 SKU/product_id pairs matching the search term. The search term checks the sku, oem fields on the t_product table and the t_product_oem_reference.name field for matches and partial matches. */
+router.get('/quicksearch', async function (req, res, next) {
+  let search_term = res.query ? res.query.search_term : "";
+  if(!search_term){
+    // return res.status(400).json({message: 'A search term is required.'});
+    search_term = "%";
+  } else {
+    search_term = `%${search_term}%`;
+  }
+
+  let sqlsearch = `select id as product_id, sku as label from t_product where sku <> '' and sku like ?
+  union
+  select id as product_id, oem as label from t_product where oem <> '' and oem like ?
+  union
+  select product_id, name as label from t_product_oem_reference where name <> '' and name like ?
+  order by label asc`;
+
+  let ProductView = req.app.locals.database.getDao('product_view');
+  let qresult = await ProductView.sqlCommand(sqlsearch, [search_term, search_term, search_term]);
+  res.status(200).json(qresult);
 });
 
 /** Gets an array of all distinct OEMs across all products. Used for validation. A SKU should be globally unique. */
 router.get('/oems', async function (req, res, next) {
   debug(`Getting distinct SKUs...`);
   let Product = req.app.locals.database.getDao('product');
-  let qresult = await Product.callDb(`SELECT id, oem FROM ${Product.table} WHERE oem <> '' and oem is not null GROUP BY id, oem ORDER BY oem ASC`);
+  let qresult = await Product.sqlCommand(`SELECT id, oem FROM ${Product.table} WHERE oem <> '' and oem is not null GROUP BY id, oem ORDER BY oem ASC`);
   res.status(200).json({total: qresult.length, product_oems: qresult});
 });
 
