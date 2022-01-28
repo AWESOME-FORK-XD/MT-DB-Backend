@@ -117,6 +117,24 @@ router.get('/:equipment_id', function (req, res, next) {
 
 }, fetchById, resultToJson);
 
+/** Gets products sharing the same equipment group (and corresponding family) as this piece of equipement */
+router.get('/:equipment_id/products', async function (req, res, next) {
+
+  //q (used on ProductDisplay)
+  const q = `select * from v_product p where family_id in 
+	( 
+		select id from v_family where group_id in
+			(
+				select distinct(group_id) from t_equipment_group where equipment_id=?
+			)
+	)`;
+
+  res.locals.result = await req.app.locals.database.getDao('equipment_view').sqlCommand(q, [req.params.equipment_id]);
+  
+  next();
+
+}, resultToJson);
+
 
 /** Create equipment */
 router.post('/', authenticated(), function (req, res, next) {
