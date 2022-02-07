@@ -212,11 +212,11 @@ router.get('/quicksearch', async function (req, res, next) {
     search_term = `%${search_term}%`;
   }
 
-  let sqlsearch = `select id as product_id, sku as label from t_product where sku <> '' and sku like ?
+  let sqlsearch = `select id as product_id, sku as label, 'SKU' as type from t_product where sku <> '' and sku like ?
   union
-  select id as product_id, oem as label from t_product where oem <> '' and oem like ?
+  select id as product_id, oem as label, 'OEM' as type from t_product where oem <> '' and oem like ?
   union
-  select product_id, name as label from t_product_oem_reference where name <> '' and name like ?
+  select product_id, name as label, 'OEM reference' as type from t_product_oem_reference where name <> '' and name like ?
   order by label asc`;
 
   let ProductView = req.app.locals.database.getDao('product_view');
