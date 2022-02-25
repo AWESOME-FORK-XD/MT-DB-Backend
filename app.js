@@ -16,16 +16,6 @@ const {AuthService} = require('./services/auth-service');
 var app = express();
 console.log("Environment initialized to: " + process.env.NODE_ENV);
 
-//Note, allow cross origin access to S3 static assets bucket cors config.
-/*
-<CORSConfiguration>
-  <CORSRule>
-    <AllowedOrigin>*</AllowedOrigin>
-    <AllowedMethod>GET</AllowedMethod>
-    <MaxAgeSeconds>3000</MaxAgeSeconds>
-  </CORSRule>
-</CORSConfiguration>
-*/
 
 app.use(logger('dev'));
 app.use(express.json());
