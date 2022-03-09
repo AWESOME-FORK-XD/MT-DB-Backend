@@ -79,6 +79,14 @@ const SEARCH_FILTERS = {
   },
 };
 
+const EQUIPMENT_COMPATIBILITY_QUERY_SQL = `select eg.group_id, eg.equipment_id, eg.model, eg.brand_id, eg.brand_en, brand_zh
+from t_product p
+join v_family f on f.id = p.family_id 
+join v_equipment_group eg on eg.group_id = f.group_id
+where p.id=?
+group by group_id, equipment_id, model, brand_id, brand_en, brand_zh
+order by brand_en asc, model asc`;
+
 /** Query for products using a simple parametric search. Array values not supported. */
 router.get('/', parseQueryOptions(ALLOWED_SEARCH_PARAMETERS, ['+name_en', '+id'], 1000), async function (req, res, next) {
 
@@ -234,7 +242,72 @@ router.get('/oems', async function (req, res, next) {
 
 
 
-/** Gets a product by id. (The extended view of the product is returned.) */
+/** 
+ * Purpose-built API for displaying the full product and info on the catalog page. The extended view of the product is returned. 
+ * along with other decorating data.
+ */
+router.get('/:product_id/detail', async function (req, res, next) {
+
+  let result = {
+    //...product fields
+
+    //...additional product data
+    // category_path:[],
+    compatibility:[],
+    custom_attributes:[],
+    filter_options: [],
+    images:[],
+    oem_references:[],
+  };
+
+  //product view
+  let productViewDao = req.app.locals.database.getDao('product_view');
+
+  let pv = await productViewDao.get(req.params.product_id);
+  
+  Object.assign(result, pv);
+
+  // //category path
+  // let categoryDao = req.app.locals.database.getDao('category');
+  // let depth = 0;
+  // let populateAncestorCategories = async (id)=>{
+  //   let c = await categoryDao.get(id);
+  //   depth++;
+  //   result.category_path.push({category_id: c.id, name_en: c.name_en, name_zh: c.name_zh });
+  //   if(!c || c.parent_id > 0 || depth > 4) populateAncestorCategories(c.parent_id);
+  // };
+  // await populateAncestorCategories(result.category_id); 
+    
+  //daos for related data...
+  let porViewDao = req.app.locals.database.getDao('product_oem_reference_view');
+  let pfoViewDao = req.app.locals.database.getDao('product_filter_option_view');
+  let pcaViewDao = req.app.locals.database.getDao('product_custom_attribute_view');
+  let piViewDao = req.app.locals.database.getDao('product_image_view');
+
+  //parallel retrieval
+  let related = [
+    productViewDao.sqlCommand(EQUIPMENT_COMPATIBILITY_QUERY_SQL, [req.params.product_id]), //0: compatibility
+    porViewDao.filter({product_id: req.params.product_id}), //1: oem references
+    pfoViewDao.filter({product_id: req.params.product_id}), //2: filter options
+    pcaViewDao.filter({product_id: req.params.product_id}), //3: custom attributes
+    piViewDao.filter({product_id: req.params.product_id}), //4: product images
+  ];
+
+  let related_results = await Promise.allSettled(related);
+
+  result.compatibility = related_results[0].value;
+  result.oem_references = related_results[1].value;
+  result.filter_options = related_results[2].value;
+  result.custom_attributes = related_results[3].value;
+  result.images = related_results[4].value;
+
+  res.locals.result = result;
+
+  next();
+
+}, resultToJson);
+
+/** Standard product by id getter for an extended view of the product (no other decorations) */
 router.get('/:product_id', function (req, res, next) {
 
   res.locals.dbInstructions = {
@@ -429,15 +502,8 @@ router.post('/:product_id/equipment', authenticated(), function (req, res, next)
 router.get('/:product_id/equipment-compatibility', async function (req, res, next) {
 
   //Compatibility query:
-  const compatibility_query = `select eg.group_id, eg.equipment_id, eg.model, eg.brand_id, eg.brand_en, brand_zh
-  from t_product p
-  join v_family f on f.id = p.family_id 
-  join v_equipment_group eg on eg.group_id = f.group_id
-  where p.id=?
-  group by group_id, equipment_id, model, brand_id, brand_en, brand_zh
-  order by brand_en asc, model asc`
 
-  res.locals.result = await req.app.locals.database.getDao('product').sqlCommand(compatibility_query, [req.params.product_id]);
+  res.locals.result = await req.app.locals.database.getDao('product').sqlCommand(EQUIPMENT_COMPATIBILITY_QUERY_SQL, [req.params.product_id]);
   
   next();
 
