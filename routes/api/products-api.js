@@ -218,9 +218,9 @@ router.get('/skus', async function (req, res, next) {
   res.status(200).json(qresult.map(r=>{return r.sku;}));
 });
 
-/** Gets an array of up to 1000 SKU/product_id pairs matching the search term. The search term checks the sku, oem fields on the t_product table and the t_product_oem_reference.name field for matches and partial matches. */
+/** Gets an array of up to 20 SKU/product_id pairs matching the search term. The search term checks the sku, oem fields on the t_product table and the t_product_oem_reference.name field for matches and partial matches. */
 router.get('/quicksearch', async function (req, res, next) {
-  let search_term = res.query ? res.query.search_term : "";
+  let search_term = req.query ? req.query.search_term : "";
   if(!search_term){
     // return res.status(400).json({message: 'A search term is required.'});
     search_term = "%";
@@ -228,16 +228,25 @@ router.get('/quicksearch', async function (req, res, next) {
     search_term = `%${search_term}%`;
   }
 
-  let sqlsearch = `select id as product_id, sku as label, 'SKU' as type from t_product where sku <> '' and sku like ?
-  union
-  select id as product_id, oem as label, 'OEM' as type from t_product where oem <> '' and oem like ?
-  union
-  select product_id, name as label, 'OEM reference' as type from t_product_oem_reference where name <> '' and name like ?
-  order by label asc`;
+  let sqlsearch = `from v_product p inner join (select id from t_product where (sku <> '' and sku like ?) or (oem <> '' and oem like ?)
+  union select product_id as id from t_product_oem_reference where name <> '' and name like ?) as search on search.id=p.id where p.sku <> '' order by sku asc`;
 
   let ProductView = req.app.locals.database.getDao('product_view');
-  let qresult = await ProductView.sqlCommand(sqlsearch, [search_term, search_term, search_term]);
+  
+  let offset = Number.isFinite( Number.parseInt(req.query.offset) ) ?  Number.parseInt(req.query.offset) : 0;
+  let limit = Number.isFinite( Number.parseInt(req.query.limit) ) ? Number.parseInt(req.query.limit) : 100;
+  let qresult = { total: 0, products:[], limit, offset};
+
+  // get count first
+  let qtotal = await ProductView.sqlCommand(`select count(p.id) as total ${sqlsearch}`, [search_term, search_term, search_term]);
+  qresult.total = qtotal[0].total;
+
+  if(qresult.total>0){
+    qresult.products = await ProductView.sqlCommand(`select p.* ${sqlsearch} limit ? offset ?`, [search_term, search_term, search_term, limit, offset]);
+  }
+  
   res.status(200).json(qresult);
+  
 });
 
 /** Gets an array of all distinct OEMs across all products. Used for validation. A SKU should be globally unique. */
