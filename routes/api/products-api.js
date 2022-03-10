@@ -87,6 +87,14 @@ where p.id=?
 group by group_id, equipment_id, model, brand_id, brand_en, brand_zh
 order by brand_en asc, model asc`;
 
+const USED_WITH_QUERY_SQL = `select p.id, p.name_en, p.name_zh, p.sku, p.oem_brand_en, p.oem_brand_zh, p.lifecycle_en, p.lifecycle_zh, sp.specifications_en, sp.specifications_zh 
+from t_product_family_connect fc
+join t_product_family pf on pf.family_id = fc.family_id
+join v_product p on p.id = pf.product_id
+join v_product_specifications sp on sp.id = p.id
+where fc.product_id=?
+order by oem_brand_en asc, sku asc`;
+
 /** Query for products using a simple parametric search. Array values not supported. */
 router.get('/', parseQueryOptions(ALLOWED_SEARCH_PARAMETERS, ['+name_en', '+id'], 1000), async function (req, res, next) {
 
@@ -255,9 +263,11 @@ router.get('/:product_id/detail', async function (req, res, next) {
     // category_path:[],
     compatibility:[],
     custom_attributes:[],
+    family: null,
     filter_options: [],
     images:[],
-    oem_references:[],
+    oem_products:[], //share the same oem as this product
+    oem_references:[], //other oem values potentially valid for this product
   };
 
   //product view
@@ -283,24 +293,31 @@ router.get('/:product_id/detail', async function (req, res, next) {
   let pfoViewDao = req.app.locals.database.getDao('product_filter_option_view');
   let pcaViewDao = req.app.locals.database.getDao('product_custom_attribute_view');
   let piViewDao = req.app.locals.database.getDao('product_image_view');
+  let famViewDao = req.app.locals.database.getDao('family_view');
 
   //parallel retrieval
   let related = [
     productViewDao.sqlCommand(EQUIPMENT_COMPATIBILITY_QUERY_SQL, [req.params.product_id]), //0: compatibility
-    porViewDao.filter({product_id: req.params.product_id}), //1: oem references
+    porViewDao.filter({product_id: req.params.product_id}, {orderBy: ['brand_en']}), //1: oem references
     pfoViewDao.filter({product_id: req.params.product_id}), //2: filter options
     pcaViewDao.filter({product_id: req.params.product_id}), //3: custom attributes
     piViewDao.filter({product_id: req.params.product_id}), //4: product images
+    productViewDao.filter({oem: result.oem}, {orderBy: ['product_type_id']}), //5: oem products
+    result.family_id ? famViewDao.get(result.family_id) : null, //6: family
   ];
 
   let related_results = await Promise.allSettled(related);
 
-  result.compatibility = related_results[0].value;
-  result.oem_references = related_results[1].value;
-  result.filter_options = related_results[2].value;
+  result.compatibility     = related_results[0].value;
+  result.oem_references    = related_results[1].value;
+  result.filter_options    = related_results[2].value;
   result.custom_attributes = related_results[3].value;
-  result.images = related_results[4].value;
+  result.images            = related_results[4].value;
+  result.oem_products      = related_results[5].value;
+  result.family            = related_results[6].value;
 
+  //TODO: redact certain properties ??? 
+  
   res.locals.result = result;
 
   next();
@@ -525,15 +542,7 @@ router.get('/:product_id/used-with', async function (req, res, next) {
   
   try{
     let dao = req.app.locals.database.getDao('product_family');
-
-    let usedWithQuery = `select p.id, p.name_en, p.name_zh, p.sku, p.oem_brand_en, p.oem_brand_zh, p.lifecycle_en, p.lifecycle_zh, sp.specifications_en, sp.specifications_zh 
-from t_product_family_connect fc
-join t_product_family pf on pf.family_id = fc.family_id
-join v_product p on p.id = pf.product_id
-join v_product_specifications sp on sp.id = p.id
-where fc.product_id=?
-order by oem_brand_en asc, sku asc`;
-    let results = await dao.sqlCommand(usedWithQuery, [req.params.product_id]);
+    let results = await dao.sqlCommand(USED_WITH_QUERY_SQL, [req.params.product_id]);
     res.status(200).json({used_with: results});
   }catch(err){
     console.error(err);
