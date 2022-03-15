@@ -243,8 +243,19 @@ router.get('/quicksearch', async function (req, res, next) {
 
   if(qresult.total>0){
     qresult.products = await ProductView.sqlCommand(`select p.* ${sqlsearch} limit ? offset ?`, [search_term, search_term, search_term, limit, offset]);
-  }
   
+  
+    // additional decoration?
+    if(req.query && req.query.with){
+      if(req.query.with.includes('images')){
+        let ids = qresult.products.map(p=>p.id);
+
+        const product_image_query = `select * from v_product_image where product_id in (?) order by product_id asc, priority_order asc`;
+
+        qresult.product_images = await ProductView.sqlCommand(product_image_query, [ids]);
+      }
+    }
+  }
   res.status(200).json(qresult);
   
 });
