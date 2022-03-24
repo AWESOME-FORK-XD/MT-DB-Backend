@@ -67,6 +67,8 @@ class DaoFactory {
       {table: 'v_equipment',                   entity: 'equipment_view'},
       {table: 'v_family',                      entity: 'family_view'},
       {table: 'v_filter_option',               entity: 'filter_option_view'},
+      {table: 'v_product',                     entity: 'product_view'},
+      {table: 'v_product_catalog',             entity: 'product_catalog_view'},
       {table: 'v_product_custom_attribute',    entity: 'product_custom_attribute_view'},
       {table: 'v_product_equipment_connect',   entity: 'product_equipment_connect_view'},
       {table: 'v_product_filter_option',       entity: 'product_filter_option_view'},
@@ -75,7 +77,7 @@ class DaoFactory {
       {table: 'v_product_oem_reference',       entity: 'product_oem_reference_view'},
       {table: 'v_product_set',                 entity: 'product_set_view'},
       {table: 'v_product_specifications',      entity: 'product_specifications_view'},
-      {table: 'v_product',                     entity: 'product_view'},
+      
     ];
 
   }

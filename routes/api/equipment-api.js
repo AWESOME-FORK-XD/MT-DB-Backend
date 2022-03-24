@@ -48,6 +48,15 @@ router.get('/', parseQueryOptions(ALLOWED_SEARCH_PARAMETERS, ['+model', '+id'], 
   
 }, fetchMany, resultToJson);
 
+router.get('/all', async function (req, res, next) {
+
+  const EQUIPMENT_VIEW_SQL = `select * from v_equipment order by model asc`;
+  let eqViewDao = req.app.locals.database.getDao('equipment_view');
+  res.locals.result = await eqViewDao.sqlCommand(EQUIPMENT_VIEW_SQL);
+
+  next();
+  
+}, resultToJson);
 
 /** 
  * Query for equipment using an advanced search.

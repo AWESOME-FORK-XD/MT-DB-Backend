@@ -5,6 +5,7 @@ const { fetchManySqlAnd, resultToCsv, resultToJsonDownload, resultToAccept} = re
 const debug = require('debug')('medten:routes');
 const {parseAdvancedSearchRequest} = require('./common');
 const authenticated = require('../middleware/authenticated');
+const { CriteriaHelper } = require('@apigrate/dao');
 
 const ALLOWED_SEARCH_PARAMETERS = [ 
   'id', 
@@ -79,6 +80,7 @@ const SEARCH_FILTERS = {
   },
 };
 
+// when product is known, find equipment 
 const EQUIPMENT_COMPATIBILITY_QUERY_SQL = `select eg.group_id, eg.equipment_id, eg.model, eg.brand_id, eg.brand_en, brand_zh
 from t_product p
 join v_family f on f.id = p.family_id 
@@ -87,6 +89,7 @@ where p.id=?
 group by group_id, equipment_id, model, brand_id, brand_en, brand_zh
 order by brand_en asc, model asc`;
 
+// when product is known, find other compatible products based on family
 const USED_WITH_QUERY_SQL = `select p.id, p.name_en, p.name_zh, p.sku, p.oem_brand_en, p.oem_brand_zh, p.lifecycle_en, p.lifecycle_zh, sp.specifications_en, sp.specifications_zh 
 from t_product_family_connect fc
 join t_product_family pf on pf.family_id = fc.family_id
@@ -218,41 +221,85 @@ router.get('/skus', async function (req, res, next) {
   res.status(200).json(qresult.map(r=>{return r.sku;}));
 });
 
-/** Gets an array of up to 20 SKU/product_id pairs matching the search term. The search term checks the sku, oem fields on the t_product table and the t_product_oem_reference.name field for matches and partial matches. */
+/** Gets a full list of all searchable fields in one dump. The user then refines it inside the browser. */
+router.post('/catalog', async function (req, res, next) {
+ 
+  let ProductCatalogView = req.app.locals.database.getDao('product_catalog_view');
+  let qresult = await ProductCatalogView.all();
+  res.status(200).json(qresult);
+ 
+});
+
+/** Gets an array products meeting the specified criteria. The search term checks the sku, oem fields on the t_product table and the t_product_oem_reference.name field for matches and partial matches. */
 router.get('/quicksearch', async function (req, res, next) {
+  
   let search_term = req.query ? req.query.search_term : "";
   if(!search_term){
-    // return res.status(400).json({message: 'A search term is required.'});
     search_term = "%";
   } else {
     search_term = `%${search_term}%`;
   }
 
-  let sqlsearch = `from v_product p inner join (select id from t_product where (sku <> '' and sku like ?) or (oem <> '' and oem like ?)
-  union select product_id as id from t_product_oem_reference where name <> '' and name like ?) as search on search.id=p.id where p.sku <> '' order by sku asc`;
+  let criteria = new CriteriaHelper();
+   
+  // Search term finds anything... (OR)
+  criteria.andGroup()
+    .or('pc.category_en', '<>', '')
+    .or('pc.category_en', 'LIKE', search_term)
+    .or('pc.sku', '<>', '')
+    .or('pc.sku', 'LIKE', search_term)
+    .or('pc.oem', '<>', '')
+    .or('pc.oem', 'LIKE', search_term)
+    .or('pc.oem_brand_en', '<>', '')
+    .or('pc.oem_brand_en', 'LIKE', search_term)
+    .or('pc.oem_refs', '<>', '')
+    .or('pc.oem_refs', 'LIKE', search_term)
+    .groupEnd();
 
+  // Specific values narrow the search... (AND)
+  let equipment_clause = '';//special case
+  if(req.query){
+    if(req.query.brand_ids){
+      criteria.and ( 'pc.oem_brand_id', 'IN', req.query.brand_ids.split('|') );
+    }
+  
+    if(req.query.category_ids){
+      criteria.and ( 'pc.category_id', 'IN', req.query.category_ids.split('|') );
+    }
+    
+    //TODO: correct logic here...
+    // if(req.query.equipment_ids){
+    //   equipment_clause = ` inner join ( select p2.id from v_equipment_group eg join v_family f on f.group_id = eg.group_id join v_product p2 on p2.family_id = f.id  where eg.equipment_id in (?) ) as eqsearch on eqsearch.id = pc.id `;
+    //   criteria.parms.push( req.query.equipment_ids.split('|') );
+    // }
+  }
+
+  let criteria_clause = `${equipment_clause} WHERE ${criteria.whereClause}`
+  
+  let ProductCatalogView = req.app.locals.database.getDao('product_catalog_view');
   let ProductView = req.app.locals.database.getDao('product_view');
   
-  let offset = Number.isFinite( Number.parseInt(req.query.offset) ) ?  Number.parseInt(req.query.offset) : 0;
-  let limit = Number.isFinite( Number.parseInt(req.query.limit) ) ? Number.parseInt(req.query.limit) : 100;
-  let qresult = { total: 0, products:[], limit, offset};
+  let qresult = { total: 0, products:[]};
 
   // get count first
-  let qtotal = await ProductView.sqlCommand(`select count(p.id) as total ${sqlsearch}`, [search_term, search_term, search_term]);
+  let qtotal = await ProductCatalogView.sqlCommand(`SELECT COUNT(pc.id) AS total FROM v_product_catalog pc ${criteria_clause}`, criteria.parms);
   qresult.total = qtotal[0].total;
 
   if(qresult.total>0){
-    qresult.products = await ProductView.sqlCommand(`select p.* ${sqlsearch} limit ? offset ?`, [search_term, search_term, search_term, limit, offset]);
+    let offset = Number.isFinite( Number.parseInt(req.query.offset) ) ?  Number.parseInt(req.query.offset) : 0;
+    let limit = Number.isFinite( Number.parseInt(req.query.limit) ) ? Number.parseInt(req.query.limit) : 100;
+  
+    const PRODUCT_FIELDS = ['id','category_id','name_en','oem','oem_brand_en','oem_brand_id','packaging_factor','product_type_id','price_us','sku']
+    qresult.products = await ProductView.sqlCommand(`SELECT ${PRODUCT_FIELDS.map(x=>`p.${x}`).join(', ')} FROM v_product_catalog pc INNER JOIN v_product p ON p.id=pc.id ${criteria_clause} ORDER BY p.sku ASC LIMIT ${limit} OFFSET ${offset}`, criteria.parms);
   
   
     // additional decoration?
     if(req.query && req.query.with){
       if(req.query.with.includes('images')){
-        let ids = qresult.products.map(p=>p.id);
 
-        const product_image_query = `select * from v_product_image where product_id in (?) order by product_id asc, priority_order asc`;
+        const product_image_query = `SELECT pi.* FROM v_product_image pi INNER JOIN ( SELECT pc.id FROM v_product_catalog pc ${criteria_clause}) AS query ON pi.product_id = query.id ORDER BY pi.product_id ASC, pi.priority_order ASC`;
 
-        qresult.product_images = await ProductView.sqlCommand(product_image_query, [ids]);
+        qresult.product_images = await ProductView.sqlCommand(product_image_query, criteria.parms);
       }
     }
   }

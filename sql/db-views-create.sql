@@ -138,3 +138,13 @@ GROUP_CONCAT(pfo.option_zh ORDER BY pfo.option_zh ASC SEPARATOR ' ') as specific
 from v_product_filter_option pfo
 join v_product p on pfo.product_id = p.id  
 GROUP BY p.id, p.sku, p.name_en, p.name_zh;
+
+-- product catalog view
+drop view if exists v_product_catalog;
+create view v_product_catalog as
+select p.id, p.name_en, p.sku, p.category_id, p.category_en, p.oem_brand_id, p.oem_brand_en, p.oem, eq.id as oem_equipment_id, oref.oem_refs, p.family_id
+from v_product p
+left outer join (
+  select product_id, group_concat( distinct name separator '|' ) as oem_refs from t_product_oem_reference group by product_id
+) as oref on oref.product_id = p.id
+left outer join t_equipment eq on eq.model = p.oem; 
