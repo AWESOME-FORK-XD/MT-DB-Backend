@@ -126,7 +126,7 @@ router.get('/equipment_models', function (req, res, next) {
   };
 
   res.locals.dbInstructions = {
-    dao: req.app.locals.database.get('equipment_view'),
+    dao: req.app.locals.database.getDao('equipment_view'),
     sql: sql,
     sql_count: sql_count,
     collection_name: `equipment_models`
