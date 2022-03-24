@@ -136,7 +136,7 @@ router.post('/', authenticated(), function (req, res, next) {
   };
   next();
 
-}, create);
+}, create, resultToJson);
 
 
 /** Update a family */
