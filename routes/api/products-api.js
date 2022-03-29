@@ -267,11 +267,23 @@ router.get('/quicksearch', async function (req, res, next) {
       criteria.and ( 'pc.category_id', 'IN', req.query.category_ids.split('|') );
     }
     
-    //TODO: correct logic here...
-    // if(req.query.equipment_ids){
-    //   equipment_clause = ` inner join ( select p2.id from v_equipment_group eg join v_family f on f.group_id = eg.group_id join v_product p2 on p2.family_id = f.id  where eg.equipment_id in (?) ) as eqsearch on eqsearch.id = pc.id `;
-    //   criteria.parms.push( req.query.equipment_ids.split('|') );
-    // }
+
+    // when model is known, find compatible products based on equipment/group/family/product relationship
+
+    if(req.query.model){
+      const MODEL_COMPATIBILITY_QUERY_SQL = `SELECT eg.equipment_id, eg.model, p.*
+FROM v_equipment_group eg
+JOIN t_group g on g.id = eg.group_id
+JOIN t_family f on f.group_id = g.id
+JOIN v_product p on p.family_id = f.id
+where model = ?
+ORDER BY p.oem_brand_en ASC, p.sku ASC`
+      ;
+
+      await req.app.locals.database.getDao('product').sqlCommand(MODEL_COMPATIBILITY_QUERY_SQL, [req.params.product_id]);
+      equipment_clause = ` inner join ( ${MODEL_COMPATIBILITY_QUERY_SQL} ) as modsearch on modsearch.id = pc.id `;
+      criteria.parms.splice( 0, 0, req.query.model );
+    }
   }
 
   let criteria_clause = `${equipment_clause} WHERE ${criteria.whereClause}`
@@ -582,7 +594,7 @@ router.post('/:product_id/equipment', authenticated(), function (req, res, next)
   next();
 }, saveAll, resultToJson);
 
-// Get all product equipment connections
+// Get all product equipment connections ("compatibility" is not the best name)
 router.get('/:product_id/equipment-compatibility', async function (req, res, next) {
 
   //Compatibility query:
@@ -591,6 +603,12 @@ router.get('/:product_id/equipment-compatibility', async function (req, res, nex
   
   next();
 
+}, resultToJson);
+
+/** For a given model, return products that may be associated with it via the equipment -> group -> family -> product relationship  */
+router.get('/model-compatibility/:model', async function (req, res, next) {
+  res.locals.result = await req.app.locals.database.getDao('product').sqlCommand(MODEL_COMPATIBILITY_QUERY_SQL, [req.params.model]);
+  next();
 }, resultToJson);
 
 // Get all product family relationship data for a given product

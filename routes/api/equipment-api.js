@@ -58,6 +58,16 @@ router.get('/all', async function (req, res, next) {
   
 }, resultToJson);
 
+/** Gets all the distinct model-brand combinations in the database. */
+router.get('/models', async function (req, res, next) {
+
+  let eqViewDao = req.app.locals.database.getDao('equipment_view');
+  res.locals.result = await eqViewDao.sqlCommand(`select model, brand_en from v_equipment group by model, brand_en order by model asc`);
+
+  next();
+  
+}, resultToJson); 
+
 /** 
  * Query for equipment using an advanced search.
  * 
