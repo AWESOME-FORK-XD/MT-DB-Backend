@@ -287,7 +287,7 @@ router.get('/quicksearch', async function (req, res, next) {
 
   if(qresult.total>0){
     let offset = Number.isFinite( Number.parseInt(req.query.offset) ) ?  Number.parseInt(req.query.offset) : 0;
-    let limit = Number.isFinite( Number.parseInt(req.query.limit) ) ? Number.parseInt(req.query.limit) : 100;
+    let limit = Number.isFinite( Number.parseInt(req.query.limit) ) ? Number.parseInt(req.query.limit) : 5000;
   
     const PRODUCT_FIELDS = ['id','category_id','name_en','oem','oem_brand_en','oem_brand_id','packaging_factor','product_type_id','price_us','sku']
     qresult.products = await ProductView.sqlCommand(`SELECT ${PRODUCT_FIELDS.map(x=>`p.${x}`).join(', ')} FROM v_product_catalog pc INNER JOIN v_product p ON p.id=pc.id ${criteria_clause} ORDER BY p.sku ASC LIMIT ${limit} OFFSET ${offset}`, criteria.parms);
