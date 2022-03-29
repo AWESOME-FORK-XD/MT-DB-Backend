@@ -57,7 +57,26 @@ router.get('/categories', parseQueryOptions(['name_en','id'], ["+parent_id","+id
       query_options: res.locals.query_options
     };
     next();
-  }, fetchMany, resultToJson);
+  }, fetchMany, function(req, res, next){
+    //decorate with path property
+    let categories = res.locals.result.category_views;
+
+    let ancestorChain = (me, chain)=>{
+      if(!chain) chain = [];
+      chain.push(me.id);
+      let parent = categories.find(c => c.id == me.parent_id);
+      if(!parent) return chain;
+      return ancestorChain(parent, chain);
+    }
+
+    categories.forEach(c=>{
+      c.path = ancestorChain(c).reverse();
+    });
+
+    res.locals.result.category_views = categories;
+
+    next();
+  }, resultToJson);
 
 router.get('/certificates', parseQueryOptions(['name_en','id'], ['+name_en','+id'], 1000), 
   function (req, res, next) {
