@@ -1,0 +1,441 @@
++--------------------------------------------+
+| Catalog Diff Report                        |
++--------------------------------------------+
+Table `productdb`.`t_available_region` was created
+  columns:
+  - id of type INT
+  - name_en of type VARCHAR
+  - created of type TIMESTAMP
+  - updated of type TIMESTAMP
+  - version of type INT
+  __
+  indices:
+  - PRIMARY with columns: id
+  __
+  attributes:
+  - engine: InnoDB
+  - next auto increment: 6
+  - default character set: utf8mb4
+  - default collate: utf8mb4_0900_ai_ci
+  __
+Table `productdb`.`t_equipment_available_region` was created
+  columns:
+  - id of type INT
+  - equipment_id of type INT
+  - available_region_id of type INT
+  - created of type TIMESTAMP
+  - updated of type TIMESTAMP
+  - version of type INT
+  __
+  indices:
+  - PRIMARY with columns: id
+  - fk_equip_avail_region_equipment with columns: equipment_id
+  - fk_equip_avail_region_region with columns: available_region_id
+  __
+  foreign keys:
+  - fk_equip_avail_region_equipment with columns: equipment_id, referred table: t_equipment with columns: id
+    - action on update: none
+    - action on delete: none
+  - fk_equip_avail_region_region with columns: available_region_id, referred table: t_available_region with columns: id
+    - action on update: none
+    - action on delete: none
+  __
+  attributes:
+  - engine: InnoDB
+  - next auto increment: 10
+  - default character set: utf8mb4
+  - default collate: utf8mb4_0900_ai_ci
+  __
+Table `productdb`.`t_marketing_region` was created
+  columns:
+  - id of type INT
+  - name_en of type VARCHAR
+  - created of type TIMESTAMP
+  - updated of type TIMESTAMP
+  - version of type INT
+  __
+  indices:
+  - PRIMARY with columns: id
+  __
+  attributes:
+  - engine: InnoDB
+  - next auto increment: 6
+  - default character set: utf8mb4
+  - default collate: utf8mb4_0900_ai_ci
+  __
+Table `productdb`.`t_org` was created
+  columns:
+  - id of type INT
+  - name of type VARCHAR
+  - created of type TIMESTAMP
+  - updated of type TIMESTAMP
+  - version of type INT
+  __
+  indices:
+  - PRIMARY with columns: id
+  __
+  attributes:
+  - engine: InnoDB
+  - next auto increment: 2
+  - default character set: utf8mb4
+  - default collate: utf8mb4_0900_ai_ci
+  __
+Table `productdb`.`t_product_marketing_region` was created
+  columns:
+  - id of type INT
+  - product_id of type INT
+  - marketing_region_id of type INT
+  - created of type TIMESTAMP
+  - updated of type TIMESTAMP
+  - version of type INT
+  __
+  indices:
+  - PRIMARY with columns: id
+  - fk_prod_mkt_reg_region with columns: marketing_region_id
+  - fk_prod_mkt_reg_product with columns: product_id
+  __
+  foreign keys:
+  - fk_prod_mkt_reg_product with columns: product_id, referred table: t_product with columns: id
+    - action on update: none
+    - action on delete: CASCADE
+  - fk_prod_mkt_reg_region with columns: marketing_region_id, referred table: t_marketing_region with columns: id
+    - action on update: none
+    - action on delete: none
+  __
+  attributes:
+  - engine: InnoDB
+  - next auto increment: 12
+  - default character set: utf8mb4
+  - default collate: utf8mb4_0900_ai_ci
+  __
+Table `productdb`.`t_product_supplier` was created
+  columns:
+  - id of type INT
+  - product_id of type INT
+  - supplier_id of type INT
+  - supplier_price of type DECIMAL
+  - created of type TIMESTAMP
+  - updated of type TIMESTAMP
+  - version of type INT
+  __
+  indices:
+  - PRIMARY with columns: id
+  - fk_product_supplier_supplier with columns: supplier_id
+  - fk_product_supplier_product with columns: product_id
+  __
+  foreign keys:
+  - fk_product_supplier_product with columns: product_id, referred table: t_product with columns: id
+    - action on update: none
+    - action on delete: CASCADE
+  - fk_product_supplier_supplier with columns: supplier_id, referred table: t_supplier with columns: id
+    - action on update: none
+    - action on delete: none
+  __
+  attributes:
+  - engine: InnoDB
+  - next auto increment: 18
+  - default character set: utf8mb4
+  - default collate: utf8mb4_0900_ai_ci
+  __
+Table `productdb`.`t_test_pet` was created
+  columns:
+  - id of type INT
+  - name of type VARCHAR
+  - species of type VARCHAR
+  - color of type VARCHAR
+  - weight_kg of type DECIMAL
+  - created of type TIMESTAMP
+  - updated of type TIMESTAMP
+  - version of type INT
+  __
+  indices:
+  - PRIMARY with columns: id
+  __
+  attributes:
+  - engine: InnoDB
+  - next auto increment: 8
+  - default character set: utf8mb4
+  - default collate: utf8mb4_0900_ai_ci
+  __
+Table `productdb`.`t_user` was created
+  columns:
+  - id of type INT
+  - username of type VARCHAR
+  - email of type VARCHAR
+  - email_verified of type BIT
+  - email_verification_token of type VARCHAR
+  - first_name of type VARCHAR
+  - last_name of type VARCHAR
+  - mobile_phone of type VARCHAR
+  - password of type VARCHAR
+  - status of type VARCHAR
+  - must_reset_password of type BIT
+  - bad_login_attempts of type INT
+  - last_login of type TIMESTAMP
+  - login_count of type INT
+  - reset_password_token of type VARCHAR
+  - reset_password_token_expires of type TIMESTAMP
+  - timezone of type VARCHAR
+  - created of type TIMESTAMP
+  - updated of type TIMESTAMP
+  - version of type INT
+  __
+  indices:
+  - PRIMARY with columns: id
+  - username_UNIQUE with columns: username
+  - email_UNIQUE with columns: email
+  - username with columns: username, first_name, last_name
+  __
+  attributes:
+  - engine: InnoDB
+  - next auto increment: 8
+  - default character set: utf8mb4
+  - default collate: utf8mb4_0900_ai_ci
+  __
+Table `productdb`.`t_user_org` was created
+  columns:
+  - id of type INT
+  - user_id of type INT
+  - org_id of type INT
+  - is_default of type BIT
+  - created of type TIMESTAMP
+  - updated of type TIMESTAMP
+  - version of type INT
+  __
+  indices:
+  - PRIMARY with columns: id
+  - fk_user_org_client with columns: org_id
+  - fk_user_org_user with columns: user_id
+  __
+  foreign keys:
+  - fk_user_org_client with columns: org_id, referred table: t_org with columns: id
+    - action on update: none
+    - action on delete: none
+  - fk_user_org_user with columns: user_id, referred table: t_user with columns: id
+    - action on update: none
+    - action on delete: none
+  __
+  attributes:
+  - engine: InnoDB
+  - next auto increment: 5
+  - default character set: utf8mb4
+  - default collate: utf8mb4_0900_ai_ci
+  __
+Table `productdb`.`t_user_role` was created
+  columns:
+  - id of type INT
+  - user_id of type INT
+  - role of type VARCHAR
+  - created of type TIMESTAMP
+  - updated of type TIMESTAMP
+  - version of type INT
+  __
+  indices:
+  - PRIMARY with columns: id
+  - fk_user_role_user with columns: user_id
+  __
+  foreign keys:
+  - fk_user_role_user with columns: user_id, referred table: t_user with columns: id
+    - action on update: none
+    - action on delete: none
+  __
+  attributes:
+  - engine: InnoDB
+  - next auto increment: 6
+  - default character set: utf8mb4
+  - default collate: utf8mb4_0900_ai_ci
+  __
+Table `productdb`.`t_category` was modified
+  foreign keys:
+  __
+Table `productdb`.`t_product` was modified
+  foreign keys:
+  - removed foreign key: fk_product_supplier
+  __
+Table `productdb`.`t_product_certificate` was modified
+  foreign keys:
+  - removed foreign key: fk_product_certificate_product
+  __
+Table `productdb`.`t_product_custom_attribute` was modified
+  foreign keys:
+  - removed foreign key: fk_custom_attribute_product
+  __
+Table `productdb`.`t_product_equipment_connect` was modified
+  foreign keys:
+  - removed foreign key: fk_product_equipment_connect_product
+  __
+Table `productdb`.`t_product_family` was modified
+  foreign keys:
+  - removed foreign key: fk_product_family_product
+  __
+Table `productdb`.`t_product_family_connect` was modified
+  foreign keys:
+  - removed foreign key: fk_product_family_connect_product
+  __
+Table `productdb`.`t_product_filter_option` was modified
+  foreign keys:
+  - removed foreign key: fk_product_option_product
+  __
+Table `productdb`.`t_product_image` was modified
+  foreign keys:
+  - removed foreign key: fk_product_image_product
+  __
+Table `productdb`.`t_product_oem_reference` was modified
+  foreign keys:
+  - removed foreign key: fk_product_oem_reference_product
+  __
+Table `productdb`.`t_product_set` was modified
+  foreign keys:
+  - removed foreign key: fk_product_set_child_product
+  - removed foreign key: fk_product_set_parent_product
+  __
+Table `productdb`.`t_brand` was modified
+  columns:
+  - added column is_oem of type TINYINT(4)
+  __
+Table `productdb`.`t_category` was modified
+  columns:
+  - added column family_name_formula_id of type INT(10)
+  - removed column valid_image_types
+  __
+  indices:
+  - added index fk_family_name_formula with columns: family_name_formula_id
+  __
+  foreign keys:
+  - added foreign key fk_family_name_formula with columns: family_name_formula_id, referred table: t_formula with columns: id
+    - action on update: none
+    - action on delete: none
+  __
+Table `productdb`.`t_custom_attribute` was modified
+  columns:
+  - modified column category_id
+  - modified column name_en
+  - modified column name_zh
+  __
+Table `productdb`.`t_family` was modified
+  columns:
+  - added column name_en of type VARCHAR(255)
+  - added column name_edit_user_id of type INT(10)
+  - added column name_edit_timestamp of type TIMESTAMP
+  - added column video_link of type VARCHAR(255)
+  __
+Table `productdb`.`t_filter_option` was modified
+  columns:
+  - added column option_us of type VARCHAR(255)
+  __
+Table `productdb`.`t_packaging_factor` was modified
+  columns:
+  - removed column value
+  __
+Table `productdb`.`t_product` was modified
+  columns:
+  - added column price_us of type DECIMAL(9,2)
+  - added column weight_kg of type DECIMAL(9,4)
+  - added column price_zh of type DECIMAL(9,2)
+  - added column price_eu of type DECIMAL(9,2)
+  - added column weight_lbs of type DECIMAL(9,4)
+  - added column name_en_edit_user_id of type INT(10)
+  - added column name_en_edit_timestamp of type TIMESTAMP
+  - added column name_zh_edit_user_id of type INT(10)
+  - added column name_zh_edit_timestamp of type TIMESTAMP
+  - added column video_link of type VARCHAR(255)
+  - added column note_internal of type VARCHAR(512)
+  - added column note_client of type VARCHAR(512)
+  - added column is_oem of type BIT(1)
+  - removed column weight
+  - removed column supplier_id
+  - removed column price
+  __
+  indices:
+  - removed index fk_product_supplier
+  __
+  foreign keys:
+  __
+Table `productdb`.`t_product_certificate` was modified
+  foreign keys:
+  - added foreign key fk_product_certificate_product with columns: product_id, referred table: t_product with columns: id
+    - action on update: none
+    - action on delete: CASCADE
+  __
+Table `productdb`.`t_product_custom_attribute` was modified
+  columns:
+  - modified column value_en
+  - modified column value_zh
+  __
+  foreign keys:
+  - added foreign key fk_custom_attribute_product with columns: product_id, referred table: t_product with columns: id
+    - action on update: none
+    - action on delete: CASCADE
+  __
+Table `productdb`.`t_product_equipment_connect` was modified
+  foreign keys:
+  - added foreign key fk_product_equipment_connect_product with columns: product_id, referred table: t_product with columns: id
+    - action on update: none
+    - action on delete: CASCADE
+  __
+Table `productdb`.`t_product_family` was modified
+  foreign keys:
+  - added foreign key fk_product_family_product with columns: product_id, referred table: t_product with columns: id
+    - action on update: none
+    - action on delete: CASCADE
+  __
+Table `productdb`.`t_product_family_connect` was modified
+  foreign keys:
+  - added foreign key fk_product_family_connect_product with columns: product_id, referred table: t_product with columns: id
+    - action on update: none
+    - action on delete: CASCADE
+  __
+Table `productdb`.`t_product_filter_option` was modified
+  columns:
+  - added column priority_order of type SMALLINT(6)
+  __
+  foreign keys:
+  - added foreign key fk_product_option_product with columns: product_id, referred table: t_product with columns: id
+    - action on update: none
+    - action on delete: CASCADE
+  __
+Table `productdb`.`t_product_image` was modified
+  columns:
+  - added column priority_order of type SMALLINT(6)
+  __
+  foreign keys:
+  - added foreign key fk_product_image_product with columns: product_id, referred table: t_product with columns: id
+    - action on update: none
+    - action on delete: CASCADE
+  __
+Table `productdb`.`t_product_oem_reference` was modified
+  columns:
+  - added column is_oem of type BIT(1)
+  __
+  foreign keys:
+  - added foreign key fk_product_oem_reference_product with columns: product_id, referred table: t_product with columns: id
+    - action on update: none
+    - action on delete: CASCADE
+  __
+Table `productdb`.`t_product_set` was modified
+  foreign keys:
+  - added foreign key fk_product_set_child_product with columns: child_product_id, referred table: t_product with columns: id
+    - action on update: none
+    - action on delete: CASCADE
+  - added foreign key fk_product_set_parent_product with columns: parent_product_id, referred table: t_product with columns: id
+    - action on update: none
+    - action on delete: CASCADE
+  __
+View `productdb`.`v_category` was created
+View `productdb`.`v_equipment` was created
+View `productdb`.`v_equipment_available_region` was created
+View `productdb`.`v_equipment_group` was created
+View `productdb`.`v_family` was created
+View `productdb`.`v_filter_option` was created
+View `productdb`.`v_product` was created
+View `productdb`.`v_product_catalog` was created
+View `productdb`.`v_product_custom_attribute` was created
+View `productdb`.`v_product_equipment_connect` was created
+View `productdb`.`v_product_filter_option` was created
+View `productdb`.`v_product_image` was created
+View `productdb`.`v_product_marketing_region` was created
+View `productdb`.`v_product_oem_reference` was created
+View `productdb`.`v_product_set` was created
+View `productdb`.`v_product_specifications` was created
+----------------------------------------------
+End of MySQL Workbench Report
