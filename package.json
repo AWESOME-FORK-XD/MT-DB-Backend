@@ -5,11 +5,11 @@
   "scripts": {
     "use-development": "cp .env.development.local .env",
     "use-test": "cp .env.test.local .env",
-    "package-test": "npm run use-test && sam package --profile medten-test --template-file sam-test.yaml --output-template-file package-test.yaml --s3-bucket test-med10-staging",
+    "package-test": "npm run use-test && sam package --profile medten-test --template-file sam-test.yaml --output-template-file package-test.yaml --resolve-s3",
     "deploy-test": "aws cloudformation deploy --profile medten-test --template-file package-test.yaml --stack-name v2-dbtest",
     "use-production": "cp .env.production.local .env",
-    "package-production": "npm run use-production && sam package --profile medten --template-file sam-backend.yaml --output-template-file pkg-dbbackend.yaml --s3-bucket med10-staging",
-    "deploy-production": "aws cloudformation deploy --profile medten --template-file pkg-dbbackend.yaml --stack-name v2-dbbackend",
+    "package-production": "npm run use-production && sam package --profile medten --region us-west-1 --template-file sam-backend.yaml --output-template-file pkg-dbbackend.yaml --resolve-s3",
+    "deploy-production": "aws cloudformation deploy --profile medten --region us-west-1 --template-file pkg-dbbackend.yaml --stack-name v2-dbbackend",
     "startmon": "nodemon ./bin/www"
   },
   "dependencies": {

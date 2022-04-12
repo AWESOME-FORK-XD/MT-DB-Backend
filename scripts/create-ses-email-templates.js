@@ -3,7 +3,7 @@ const AWS = require('aws-sdk');
 let sesv2 = new AWS.SESV2();
 
 const appName = "ProductDB";
-const sesVerifiedEmailAddress = "support@medten.com";
+const sesVerifiedEmailAddress = "info@medten.com";
 
 const templates = {
 
