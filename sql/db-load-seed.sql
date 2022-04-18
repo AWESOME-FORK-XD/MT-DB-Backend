@@ -9,10 +9,10 @@ insert into t_org (id, name) values
 (1, 'Medten');
 
 insert into t_user (id, username, password, email, first_name, last_name, status) values
-(1, 'andres', 'update me', 'andres@medten.com', 'Andres', 'Orjuela', 'active'),
-(2, 'scott', 'update me', 'scott@apigrate.com', 'Scott', 'Ly',  'active'),
-(3, 'data', 'update me', 'derek+data@gmail.com', 'Commander', 'Data','active'),
-(4, 'derek', 'update me', 'derek@gmail.com', 'Derek', 'Gau','active');
+(1, 'andres',   'update me', 'andres@medten.com', 'Andres', 'Orjuela', 'active'),
+(2, 'mike',     'update me', 'mike@apigrate.com', 'Mike', 'Shao',  'active'),
+(3, 'datamike', 'update me', 'mike+data@medten.com', 'Mike', 'Shao (Data)','active'),
+(4, 'derek',    'update me', 'derek@apigrate.com', 'Derek', 'Gau','active');
 
 insert into t_user_role (user_id, role) values
 (1, 'admin'),
