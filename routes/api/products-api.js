@@ -271,17 +271,14 @@ router.get('/quicksearch', async function (req, res, next) {
     // when model is known, find compatible products based on equipment/group/family/product relationship
 
     if(req.query.model){
-      const MODEL_COMPATIBILITY_QUERY_SQL = `SELECT eg.equipment_id, eg.model, p.*
+      const MODEL_COMPATIBILITY_QUERY_SQL = `SELECT DISTINCT(p.id)
 FROM v_equipment_group eg
 JOIN t_group g on g.id = eg.group_id
 JOIN t_family f on f.group_id = g.id
 JOIN v_product p on p.family_id = f.id
-where model = ?
-ORDER BY p.oem_brand_en ASC, p.sku ASC`
-      ;
+where model = ?`;
 
-      await req.app.locals.database.getDao('product').sqlCommand(MODEL_COMPATIBILITY_QUERY_SQL, [req.params.product_id]);
-      equipment_clause = ` inner join ( ${MODEL_COMPATIBILITY_QUERY_SQL} ) as modsearch on modsearch.id = pc.id `;
+      equipment_clause = ` INNER JOIN( ${MODEL_COMPATIBILITY_QUERY_SQL} ) AS modsearch ON modsearch.id = pc.id `;
       criteria.parms.splice( 0, 0, req.query.model );
     }
   }
@@ -294,15 +291,21 @@ ORDER BY p.oem_brand_en ASC, p.sku ASC`
   let qresult = { total: 0, products:[]};
 
   // get count first
-  let qtotal = await ProductCatalogView.sqlCommand(`SELECT COUNT(pc.id) AS total FROM v_product_catalog pc ${criteria_clause}`, criteria.parms);
+  let fullCountSql = `SELECT COUNT(pc.id) AS total FROM v_product_catalog pc ${criteria_clause}`;
+  // console.log(`\n\nfull quicksearch count sql: ${fullCountSql}\n\n`);
+  let qtotal = await ProductCatalogView.sqlCommand(fullCountSql, criteria.parms);
   qresult.total = qtotal[0].total;
 
   if(qresult.total>0){
     let offset = Number.isFinite( Number.parseInt(req.query.offset) ) ?  Number.parseInt(req.query.offset) : 0;
     let limit = Number.isFinite( Number.parseInt(req.query.limit) ) ? Number.parseInt(req.query.limit) : 5000;
   
-    const PRODUCT_FIELDS = ['id','category_id','name_en','oem','oem_brand_en','oem_brand_id','packaging_factor','product_type_id','price_us','sku']
-    qresult.products = await ProductView.sqlCommand(`SELECT ${PRODUCT_FIELDS.map(x=>`p.${x}`).join(', ')} FROM v_product_catalog pc INNER JOIN v_product p ON p.id=pc.id ${criteria_clause} ORDER BY p.sku ASC LIMIT ${limit} OFFSET ${offset}`, criteria.parms);
+    const PRODUCT_FIELDS = ['id','category_id','name_en','description_en','oem','oem_brand_en','oem_brand_id','packaging_factor','product_type_id','price_us','sku'];
+
+    let fullSql = `SELECT ${PRODUCT_FIELDS.map(x=>`p.${x}`).join(', ')} FROM v_product_catalog pc INNER JOIN v_product p ON p.id=pc.id ${criteria_clause} ORDER BY p.sku ASC LIMIT ${limit} OFFSET ${offset}`;
+    // console.log(`\n\nfull quicksearch sql: ${fullSql}\n\n`);
+
+    qresult.products = await ProductView.sqlCommand(fullSql, criteria.parms);
   
   
     // additional decoration?
