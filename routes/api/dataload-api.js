@@ -2,17 +2,17 @@ const express = require('express');
 const {parse} = require('fast-csv');
 
 let router = express.Router({ mergeParams: true });
-const {fetchManyAnd, resultToCsv, resultToJsonDownload} = require('./db-api-ext');
+const {fetchManyAnd, resultToCsv, resultToJsonDownload, resultToJson} = require('./db-api-ext');
 
 let debug = require('debug')('medten:routes');
 
 
 /** Get the available table entities (not the table names themselves, though) */
 router.get('/tables', async function (req, res, next) {
-  let tables = req.app.locals.database.registry
-    .filter((e)=>{return e.entity.includes("view") ? false : true;})
-    .map(e=>{return e.entity; })()
-  res.status(200).json({tables});
+  let tableRegistry = req.app.locals.database.registry
+    .filter((e)=>{return e.entity.includes("view") ? false : true;});
+  let names = tableRegistry.map( (e) => { return e.entity; });
+  res.status(200).json({tables: names});
   return;
 });
 
@@ -138,80 +138,24 @@ router.post('/:entity/bulkupdate', validateDao, async function (req, res, next) 
   
 });
 
-
-/** Downloads an entire table of data.
+/** Downloads an entire table of data (as JSON) */
 router.post('/:entity/download', validateDao, async function (req, res, next) {
- //Which columns are output...
-  let query_options = {
-    columns: [],
-    limit: 100000
-  };
-  
-  res.locals.dao.metadata.forEach(m=>{
-    query_options.columns.push(m.column);
-  }); 
-
-  let dbInstructions = {
-    dao: res.locals.dao,
-    query_options: query_options,
-    with_total: true,
-    criteria: {}
-  };
-
-  res.locals.dbInstructions = dbInstructions;
-  next();
-  
-}, fetchManyAnd, resultToAccept);
-*/
-
-/** Downloads an entire table of data. */
-router.get('/:entity/download', validateDao, async function (req, res, next) {
   //Which columns are output...
    let query_options = {
-     columns: [],
      limit: 100000
    };
-   
-   res.locals.dao.metadata.forEach(m=>{
-     query_options.columns.push(m.column);
-   }); 
- 
-   let dbInstructions = {
-     dao: res.locals.dao,
-     query_options: query_options,
-     with_total: true,
-     criteria: {}
-   };
- 
-   res.locals.dbInstructions = dbInstructions;
-   next();
-   
- }, fetchManyAnd, resultToJsonDownload);
+   let items = await res.locals.dao.all( query_options );
 
+   let headers = [];
+   res.locals.dao.metadata.forEach( field => { headers.push( field.column ); } );
 
-/** Downloads an entire table of data. */
-router.get('/:entity/download', validateDao, async function (req, res, next) {
-  //Which columns are output...
-   let query_options = {
-     columns: [],
-     limit: 100000
-   };
-   
-   res.locals.dao.metadata.forEach(m=>{
-     query_options.columns.push(m.column);
-   }); 
- 
-   let dbInstructions = {
-     dao: res.locals.dao,
-     query_options: query_options,
-     with_total: true,
-     criteria: {}
-   };
- 
-   res.locals.dbInstructions = dbInstructions;
-   next();
-   
- }, fetchManyAnd, resultToCsv);
+   res.status(200).json({
+     total: items.length,
+     headers,
+     items,
+   })
+   return; 
+ });
 
 
 /**

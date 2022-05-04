@@ -52,7 +52,7 @@ exports.fetchManyAnd = async function(req, res, next) {
         result.total = await dbi.dao.count(dbi.query);
         if(result.total === 0){
           //Don't bother with the full query and return immediately.
-          result[dbi.dao.plural] = [];
+          result[dbi.items_property_name || dbi.dao.plural] = [];
           
           res.locals.result = result;
           next();
@@ -60,7 +60,7 @@ exports.fetchManyAnd = async function(req, res, next) {
         }
       }
       let multipleEntities = await dbi.dao.filter(dbi.query, dbi.query_options);
-      result[dbi.dao.plural] = multipleEntities;
+      result[dbi.items_property_name || dbi.dao.plural] = multipleEntities;
 
       res.locals.result = result;
       next();
@@ -72,7 +72,7 @@ exports.fetchManyAnd = async function(req, res, next) {
         result.total = temp[0].count;
         if(result.total === 0){
           //Don't bother with the full query and return immediately.
-          result[dbi.dao.plural] = [];
+          result[dbi.items_property_name || dbi.dao.plural] = [];
           
           res.locals.result = result;
           next();
@@ -80,7 +80,7 @@ exports.fetchManyAnd = async function(req, res, next) {
         }
       }
       let multipleEntities = await dbi.dao.selectWhere(dbi.criteria.whereClause, dbi.criteria.parms, dbi.query_options);
-      result[dbi.dao.plural] = multipleEntities;
+      result[dbi.items_property_name || dbi.dao.plural] = multipleEntities;
      
       res.locals.result = result;
       next();
