@@ -141,10 +141,20 @@ GROUP BY p.id, p.sku, p.name_en, p.name_zh;
 
 -- product catalog view
 drop view if exists v_product_catalog;
+
 create view v_product_catalog as
-select p.id, p.name_en, p.sku, p.category_id, p.category_en, p.oem_brand_id, p.oem_brand_en, p.oem, eq.id as oem_equipment_id, oref.oem_refs, p.family_id
+select p.id, p.name_en, p.sku, p.category_id, p.category_en, p.oem_brand_id, p.oem_brand_en, p.oem, 
+mods.models, 
+oref.oem_refs, p.family_id
 from v_product p
 left outer join (
   select product_id, group_concat( distinct name separator '|' ) as oem_refs from t_product_oem_reference group by product_id
 ) as oref on oref.product_id = p.id
-left outer join t_equipment eq on eq.model = p.oem; 
+left outer join (
+  select p.id, GROUP_CONCAT(eq.model ORDER BY eq.model ASC SEPARATOR '|') as models
+  from v_product p
+  join t_family f on f.id = p.family_id
+  join t_equipment_group g on g.group_id = f.group_id
+  join t_equipment eq on eq.id = g.equipment_id
+  group by p.id
+) as mods on mods.id = p.id;
