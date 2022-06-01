@@ -302,7 +302,7 @@ where model = ?`;
   
     const PRODUCT_FIELDS = ['id','category_id','name_en','description_en','oem','oem_brand_en','oem_brand_id','packaging_factor','product_type_id','price_us','sku'];
  
-    let fullSql = `SELECT ${PRODUCT_FIELDS.map(x=>`p.${x}`).join(', ')}, pc.models FROM v_product_catalog pc INNER JOIN v_product p ON p.id=pc.id ${criteria_clause} ORDER BY p.sku ASC LIMIT ${limit} OFFSET ${offset}`;
+    let fullSql = `SELECT ${PRODUCT_FIELDS.map(x=>`p.${x}`).join(', ')}, pc.models, pc.filter_option_ids FROM v_product_catalog pc INNER JOIN v_product p ON p.id=pc.id ${criteria_clause} ORDER BY p.sku ASC LIMIT ${limit} OFFSET ${offset}`;
     // console.log(`\n\nfull quicksearch sql: ${fullSql}\n\n`);
 
     qresult.products = await ProductView.sqlCommand(fullSql, criteria.parms);

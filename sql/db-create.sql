@@ -216,6 +216,7 @@ CREATE TABLE `t_filter` (
   `category_id` int(11) unsigned NOT NULL,
   `name_en` varchar(255) DEFAULT NULL,
   `name_zh` varchar(255) DEFAULT NULL,
+  `visible_in_catalog` bit NOT NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `version` int(11) NOT NULL DEFAULT '0',

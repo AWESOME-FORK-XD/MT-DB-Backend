@@ -154,7 +154,7 @@ router.get('/equipment_models', function (req, res, next) {
   next();
 }, fetchManySqlAnd, resultToJson);
 
-router.get('/filter_option_views', parseQueryOptions(['category_id','filter_id','filter_option_id','filter_en','filter_zh','option_en','option_zh'], ['+filter_id','+filter_option_id'],  1000),
+router.get('/filter_option_views', parseQueryOptions(['category_id','category_en','category_zh','filter_id','visible_in_catalog','filter_option_id','filter_en','filter_zh','option_en','option_zh'], ['+filter_id','+filter_option_id'],  1000),
   function (req, res, next) {
     res.locals.dbInstructions = {
       dao: req.app.locals.database.getDao('filter_option_view'),

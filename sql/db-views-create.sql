@@ -24,9 +24,10 @@ left outer join t_packaging_factor pf on pf.id = p.packaging_factor_id;
 
 -- filters and filter options
 create view v_filter_option as 
-select f.category_id, f.id as filter_id, f.name_en as filter_en, f.name_zh as filter_zh, 
+select f.category_id, c.name_en as category_en, c.name_zh as category_zh, f.id as filter_id, f.visible_in_catalog, f.name_en as filter_en, f.name_zh as filter_zh, 
 o.id as filter_option_id, o.option_en, o.option_zh, o.option_us
 from t_filter f 
+join t_category c on c.id = f.category_id
 join t_filter_option o on o.filter_id = f.id
 order by filter_id asc, filter_option_id asc;
 
