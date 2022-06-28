@@ -398,8 +398,18 @@ router.get('/:product_id/detail', async function (req, res, next) {
   result.oem_products      = related_results[5].value;
   result.family            = related_results[6].value;
 
-  //TODO: redact certain properties ??? 
+  // redact internal notes, supplier info.
+  delete result.note_internal;
+  delete result.product_name_formula;
+  delete result.product_description_formula;
   
+  result.oem_products = result.oem_products.map(oemp=>{
+    delete oemp.note_internal;
+    delete oemp.product_name_formula;
+    delete oemp.product_description_formula;
+    return oemp;
+  });
+
   res.locals.result = result;
 
   next();
@@ -783,7 +793,7 @@ router.post('/:product_id/sets', authenticated(), function (req, res, next) {
 
 
 /** Get product supplier values. */
-router.get('/:product_id/suppliers', function (req, res, next) {
+router.get('/:product_id/suppliers', authenticated(), function (req, res, next) {
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('product_supplier'),
     query: {product_id: req.params.product_id},
