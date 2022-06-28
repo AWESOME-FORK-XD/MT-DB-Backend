@@ -402,7 +402,7 @@ router.get('/:product_id/detail', async function (req, res, next) {
   delete result.note_internal;
   delete result.product_name_formula;
   delete result.product_description_formula;
-  
+
   result.oem_products = result.oem_products.map(oemp=>{
     delete oemp.note_internal;
     delete oemp.product_name_formula;
@@ -792,7 +792,7 @@ router.post('/:product_id/sets', authenticated(), function (req, res, next) {
 }, saveAll, resultToJson);
 
 
-/** Get product supplier values. */
+/** Get product supplier values. (Suppliers are private data and should not be made available publicly) */
 router.get('/:product_id/suppliers', authenticated(), function (req, res, next) {
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('product_supplier'),
