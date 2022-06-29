@@ -6,6 +6,7 @@ p.product_type_id, t.name_en as product_type_en, t.name_zh as product_type_zh,
 p.family_id, f.family_code, f.family_connector_code, f.name_en as family_name_en, f.video_link as family_video_link,
 p.oem_brand_id, b.name_en as oem_brand_en, b.name_zh as oem_brand_zh,
 p.category_id, c.name_en as category_en, c.name_zh as category_zh,
+p.publish_usa, p.publish_eu, p.stock_usa, p.stock_eu, p.stock_zh,
 nf.content as product_name_formula, 
 df.content as product_description_formula, 
 pf.name as packaging_factor, p.packaging_factor_id, p.price_us, p.price_zh, p.price_eu,
@@ -145,8 +146,10 @@ drop view if exists v_product_catalog;
 
 create view v_product_catalog as
 select p.id, p.name_en, p.sku, p.category_id, p.category_en, p.oem_brand_id, p.oem_brand_en, p.oem, 
+p.publish_usa, p.publish_eu, p.stock_usa, p.stock_eu, p.stock_zh,
 mods.models, 
-oref.oem_refs, p.family_id
+oref.oem_refs, p.family_id,
+pfilo.filter_option_ids
 from v_product p
 left outer join (
   select product_id, group_concat( distinct name separator '|' ) as oem_refs from t_product_oem_reference group by product_id
@@ -158,4 +161,7 @@ left outer join (
   join t_equipment_group g on g.group_id = f.group_id
   join t_equipment eq on eq.id = g.equipment_id
   group by p.id
-) as mods on mods.id = p.id;
+) as mods on mods.id = p.id
+left outer join (
+  select product_id, GROUP_CONCAT( distinct filter_option_id separator '|' ) as filter_option_ids from t_product_filter_option group by product_id
+) as pfilo on pfilo.product_id = p.id;

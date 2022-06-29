@@ -232,7 +232,8 @@ router.post('/catalog', async function (req, res, next) {
 
 /** Gets an array products meeting the specified criteria. The search term checks the sku, oem fields on the t_product table and the t_product_oem_reference.name field for matches and partial matches. */
 router.get('/quicksearch', async function (req, res, next) {
-  
+  let locale = "US";
+
   let search_term = req.query ? req.query.search_term : "";
   if(!search_term){
     search_term = "%";
@@ -255,6 +256,10 @@ router.get('/quicksearch', async function (req, res, next) {
     .or('pc.oem_refs', '<>', '')
     .or('pc.oem_refs', 'LIKE', search_term)
     .groupEnd();
+
+  // published for the locale?
+  if(locale === 'US') criteria.and('pc.publish_usa', '=', true);
+  else if(locale === 'EU') criteria.and('pc.publish_eu', '=', true);
 
   // Specific values narrow the search... (AND)
   let equipment_clause = '';//special case
