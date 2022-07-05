@@ -1,7 +1,7 @@
 /* 
   Populate the t_filter.visible_in_catalog field.
   Created: 5/27/2022 by Derek Gau
-  Deployed: 
+  Deployed: 7/5/2022 by Derek Gau
 
 */
 update t_filter set visible_in_catalog=1 where id=1;

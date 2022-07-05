@@ -1,7 +1,7 @@
 /* 
   Modify filter option and product catalog views to return filter option information for each product.
   Created: 5/27/2022 by Derek Gau
-  Deployed: 
+  Deployed: 7/5/2022 by Derek Gau
 
 */
 drop view if exists v_filter_option;

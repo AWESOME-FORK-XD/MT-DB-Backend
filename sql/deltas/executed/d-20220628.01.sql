@@ -4,7 +4,7 @@
   - three indicate stock levels for the product.
 
   Created: 06/28/2022 by Derek Gau
-  Deployed: 
+  Deployed: 7/5/2022 by Derek Gau
 
 */
 alter table t_product add column publish_usa bit not null;
