@@ -1271,6 +1271,84 @@ paths:
           $ref: '#/components/responses/400ClientError'
         500:
           $ref: '#/components/responses/500ServerError'
+  /products/${id}/detail:
+    summary:  Detailed product information for the product catalog.
+    description: A full product and supporting info for display in the catalog. The extended view of the product is returned along with other decorating data.
+    parameters:
+    - name: id
+      in: path
+      description: the product id
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: gets a product by id
+      tags:
+        - products
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ProductView'
+                  - type: object
+                    properties:
+                      compatibility:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            group_id:
+                              type: integer
+                            equipment_id:
+                              type: integer
+                            model:
+                              type: string
+                            brand_id:
+                              type: integer
+                            brand_en:
+                              type: string
+                            brand_zh:
+                              type: string
+                      custom_attributes:
+                        description: custom attributes for the product
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/CustomAttribute'
+                      family:
+                        description: the family the product belongs to
+                        type: object
+                        $ref: '#/components/schemas/FamilyView'
+                      filter_options:
+                        description: the filter options values (i.e. specifications) for the product
+                        type: array
+                        items:
+                          type: object
+                          $ref: '#/components/schemas/ProductFilterOptionView'
+                      images:
+                        type: array
+                        items:
+                          type: object
+                          $ref: '#/components/schemas/ProductImageView'
+                      oem_products:
+                        description: other products related to this product based on a shared oem value
+                        type: array
+                        items:
+                          type: object
+                          $ref: '#/components/schemas/ProductView'
+                      oem_references:
+                        description: cross-references to other products based on assigned OEM references
+                        type: array
+                        items:
+                          type: object
+                          $ref: '#/components/schemas/ProductOemReferenceView'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+        
   /products/${id}/equipment:
     summary: The equipment for a product.
     parameters:
