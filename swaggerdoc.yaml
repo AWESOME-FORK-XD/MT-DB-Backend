@@ -1856,7 +1856,64 @@ paths:
       schema:
         type: string
       description: If `with` parameter includes the word 'images', product images will also be retrieved..
+    get:
+      summary: Performs a catalog search for all products in the database.
+      tags:
+        - products
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                  products:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        category_id:
+                          type: integer
+                        name_en:
+                          type: string
+                        description_en:
+                          type: string
+                        oem:
+                          type: string
+                        oem_brand_en:
+                          type: string
+                        oem_brand_id:
+                          type: integer
+                        packaging_factor:
+                          type: string
+                        product_type_id:
+                          type: integer
+                        price_us:
+                          type: number
+                        sku:
+                          type: string
+                        models:
+                          type: string
+                          description: pipe-separated list of models
+                        filter_option_ids:
+                          type: string
+                          description: pipe-separated list of filter option ids
+                  product_images:
+                    type: array
+                    items:
+                      type: object
+                      $ref: '#/components/schemas/ProductImage'
 
+                    
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
   /equipment:
     get:
       summary: searches for equipment
