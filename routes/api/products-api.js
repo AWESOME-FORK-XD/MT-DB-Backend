@@ -227,7 +227,6 @@ router.post('/catalog', async function (req, res, next) {
   let ProductCatalogView = req.app.locals.database.getDao('product_catalog_view');
   let qresult = await ProductCatalogView.all();
   res.status(200).json(qresult);
- 
 });
 
 /** Gets an array products meeting the specified criteria. The search term checks the sku, oem fields on the t_product table and the t_product_oem_reference.name field for matches and partial matches. */
@@ -288,7 +287,7 @@ where model = ?`;
     }
   }
 
-  let criteria_clause = `${equipment_clause} WHERE ${criteria.whereClause}`
+  let criteria_clause = `${equipment_clause} WHERE ${criteria.whereClause}`;
   
   let ProductCatalogView = req.app.locals.database.getDao('product_catalog_view');
   let ProductView = req.app.locals.database.getDao('product_view');
