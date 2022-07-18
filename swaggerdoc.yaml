@@ -1858,6 +1858,9 @@ paths:
       description: If `with` parameter includes the word 'images', product images will also be retrieved..
     get:
       summary: Performs a catalog search for all products in the database.
+      description: >
+        The quicksearch endpoint is used to perform searches for products. A search term can be provided to find products matching a sku,
+        oem, category name, or brand. It is also possible to search by one or more brands, one or categories, or by a compatible equipment model.
       tags:
         - products
       responses:
