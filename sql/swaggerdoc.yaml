@@ -4,10 +4,10 @@ info:
   title: 'Medten Product API'
   description: 'Interact with the Medten product database using this API.'
 servers:
-  - url: https://mgtwitxxi1.execute-api.ap-southeast-1.amazonaws.com/Prod/api/v1/
+  - url: https://hm5fehgga2.execute-api.ap-southeast-1.amazonaws.com/Prod/api/v1/
     description: API Test Environment
-  - url: https://v73kddyeqk.execute-api.ap-southeast-1.amazonaws.com/Prod/api/v1/
-    description: API POC (Proof of Concept) Environment
+  - url: https://w5d9g2jvp2.execute-api.us-west-1.amazonaws.com/Prod/api/v1/
+    description: API Production Environment
   - url: http://localhost:3000/api/v1/
     description: Developer Local Test Environments
   # Added by API Auto Mocking Plugin
@@ -210,6 +210,42 @@ paths:
           $ref: '#/components/responses/400ClientError'
         500:
           $ref: '#/components/responses/500ServerError'
+  /categories:
+    summary: Categories of medical device products.
+    parameters:
+    - name: id
+      in: query
+      description: a specific category id
+      required: false
+      schema:
+        type: integer
+    - name: name_en
+      in: query
+      description: name of the category (English)
+      required: false
+      schema:
+        type: string
+    get:
+      summary: searches for categories
+      tags:
+        - general
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  brands:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Category'
+
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
   /custom_attributes:
     summary: Custom attributes that may be assigned to products.
     parameters:
@@ -303,6 +339,83 @@ paths:
           $ref: '#/components/responses/400ClientError'
         500:
           $ref: '#/components/responses/500ServerError'
+  /filter_option_views:
+    summary: Filtering options available across products to facilitate precise searches.
+    parameters:
+    - name: category_id
+      in: query
+      description: a specific category id
+      required: false
+      schema:
+        type: integer
+    - name: category_en
+      in: query
+      description: name of the category (English)
+      required: false
+      schema:
+        type: string
+    - name: category_zh
+      in: query
+      description: name of the category (Chinese)
+      required: false
+      schema:
+        type: string
+    - name: filter_id
+      in: query
+      description: the id of the filter
+      required: false
+      schema:
+        type: integer
+    - name: visible_in_catalog
+      in: query
+      description: flag indicating whether the filter is used (visible) in the Product Catalog application for filtering
+      required: false
+      schema:
+        type: boolean 
+    - name: filter_option_id
+      in: query
+      description: the individual filter option id
+      required: false
+      schema:
+        type: integer
+    - name: filter_en
+      in: query
+      description: name of the filter (English)
+      required: false
+      schema:
+        type: string
+    - name: filter_zh
+      in: query
+      description: name of the filter (Chinese)
+      required: false
+      schema:
+        type: string
+    - name: option_en
+      in: query
+      description: name of the option (English)
+      required: false
+      schema:
+        type: string
+    - name: option_zh
+      in: query
+      description: name of the option (Chinese)
+      required: false
+      schema:
+        type: string
+    get:
+      summary: search for filter options based on criteria other than product id
+      tags:
+        - general
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  $ref: '#/components/schemas/ProductFilterOptionView'
   /marketing_regions:
     summary: Marketing regions.
     parameters:
@@ -1879,6 +1992,29 @@ paths:
           $ref: '#/components/responses/400ClientError'
         500:
           $ref: '#/components/responses/500ServerError'
+  /equipment/models:
+    get:
+      summary: lists all distinct equipment model and brand combinations in the DB
+      tags:
+        - equipment
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    model:
+                      type: string
+                    brand_en:
+                      type: string
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
   /equipment/search:
     post:
       summary: Perform an advanced search for equipment.
@@ -2692,6 +2828,9 @@ components:
             description: Chinese name.
             type: string
             maxLength: 255
+          parent_id:
+            description: ID of containing parent category
+            type: integer
           product_name_formula_id:
             description: Identifies a stored **Formula** that can be used to auto-generate product names (title)
             type: string
