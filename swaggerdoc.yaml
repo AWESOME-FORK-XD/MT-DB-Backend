@@ -1824,6 +1824,39 @@ paths:
           $ref: '#/components/responses/400ClientError'
         500:
           $ref: '#/components/responses/500ServerError'
+  /products/quicksearch:
+    summary: Perform a catalog search for products.
+    parameters:
+    - in: query
+      name: search_term
+      schema:
+        type: string
+      description: Using the `search_term` parameter searches the category, oem, sku, brand and oem references of a product.
+    - in: query
+      name: brand_ids
+      schema:
+        type: array
+        items:
+          type: integer
+      description: Using brand ids searches for products that match OEM brands associated with product
+    - in: query
+      name: category_ids
+      schema:
+        type: array
+        items:
+          type: integer
+      description: Using category ids searches for products that belong to any of the provided categories.
+    - in: query
+      name: model
+      schema:
+        type: string
+      description: Using the `model` parameter searches for products compatible with the given equipment model.
+    - in: query
+      name: with
+      schema:
+        type: string
+      description: If `with` parameter includes the word 'images', product images will also be retrieved..
+
   /equipment:
     get:
       summary: searches for equipment
