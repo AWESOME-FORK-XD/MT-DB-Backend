@@ -225,6 +225,12 @@ paths:
       required: false
       schema:
         type: string
+    - name: featured
+      in: query
+      description: whether the category is featured in the Catalog (1) or not (0)
+      required: false
+      schema:
+        type: integer
     get:
       summary: searches for categories
       tags:
@@ -237,10 +243,10 @@ paths:
               schema:
                 type: object
                 properties:
-                  brands:
+                  category_views:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Category'
+                      $ref: '#/components/schemas/CategoryView'
 
         400:
           $ref: '#/components/responses/400ClientError'
@@ -663,8 +669,9 @@ paths:
           $ref: '#/components/responses/500ServerError'
   /products:
     get:
-      summary: find products using a simple search
-      description: If you need to perform more sophisticated searches, please use the `/products/search` API.
+      summary: Find products using a simple search
+      description: >
+        Retrieves lists of matching products for the given search criteria. If you need to perform more sophisticated searches, please use the `/products/search` API.
       tags:
         - products
       parameters:
@@ -740,7 +747,21 @@ paths:
           name: category_zh
           schema:
             type: string
-        
+        - in: query
+          name: featured
+          description: specify 1 for true, 0 for false
+          schema:
+            type: integer
+        - in: query
+          name: popular
+          description: specify 1 for true, 0 for false
+          schema:
+            type: integer
+        - in: query
+          name: boolean
+          description: specify 'or' when you want all specified criteria to be unioned (defaults to 'and'). Otherwise criteria will be anded (intersected).
+          schema:
+            type: string 
       responses:
         200:
           description: OK
@@ -3017,6 +3038,34 @@ components:
           valid_image_types:
             type: string
             maxLength: 255
+          featured:
+            description: Identifies whether the category should be featured in the Catalog.
+            type: boolean
+          image_url:
+            description: Specifies a category image to graphically depict the category in the Catalog.
+            type: string
+            maxLength: 255
+      - $ref: '#/components/schemas/Auditable'
+    CategoryView:
+      type: object
+      description: Extended view of the Category. It pulls in the naming-formulas associated with the category.
+      allOf:
+      - type: object
+        properties:
+          
+          product_name_formula:
+            description: javascript formula for generating product names
+            type: string
+            maxLength: 4000
+          product_description_formula:
+            description: javascript formula for generating product descriptions
+            type: string
+            maxLength: 4000
+          family_name_formula:
+            description: javascript formula for generating family names (title).
+            type: string
+            maxLength: 4000
+      - $ref: '#/components/schemas/Category'
       - $ref: '#/components/schemas/Auditable'
     Certificate:
       type: object

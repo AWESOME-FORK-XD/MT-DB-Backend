@@ -23,12 +23,14 @@ const ALLOWED_SEARCH_PARAMETERS = [
   'family_id',
   'family_code',
   'family_name_en',
+  'featured',
   'category_id',
   'category_en',
   'category_zh',
   'certificate_id',
   'search_term',
   'search_term_fields',
+  'popular',
   'created',
   'updated',
 
@@ -103,7 +105,8 @@ router.get('/', parseQueryOptions(ALLOWED_SEARCH_PARAMETERS, ['+name_en', '+id']
 
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('product_view'),
-    query: res.locals.modified_query,
+    // query: res.locals.modified_query,
+    criteria: res.locals.criteria,
     query_options: res.locals.query_options,
     with_total: true,
   };

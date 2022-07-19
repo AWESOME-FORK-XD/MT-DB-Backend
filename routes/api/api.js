@@ -49,7 +49,7 @@ router.put('/brands/:brand_id', function (req, res, next) {
 }, updateById, resultToJson);
 
 
-router.get('/categories', parseQueryOptions(['name_en','id'], ["+parent_id","+id"], 1000),
+router.get('/categories', parseQueryOptions(['name_en','id','featured'], ["+parent_id","+id"], 1000),
   function (req, res, next) {
     res.locals.dbInstructions = {
       dao: req.app.locals.database.getDao('category_view'),

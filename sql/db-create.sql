@@ -105,6 +105,8 @@ CREATE TABLE `t_category` (
   `parent_id` int(11) unsigned DEFAULT NULL,
   `product_name_formula_id` int(11) unsigned DEFAULT NULL,
   `product_description_formula_id` int(11) unsigned DEFAULT NULL,
+  `featured` bit not null,
+  `image_url` varchar(255) not null,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `version` int(11) NOT NULL DEFAULT '0',

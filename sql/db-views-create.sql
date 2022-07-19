@@ -6,7 +6,7 @@ p.product_type_id, t.name_en as product_type_en, t.name_zh as product_type_zh,
 p.family_id, f.family_code, f.family_connector_code, f.name_en as family_name_en, f.video_link as family_video_link,
 p.oem_brand_id, b.name_en as oem_brand_en, b.name_zh as oem_brand_zh,
 p.category_id, c.name_en as category_en, c.name_zh as category_zh,
-p.publish_usa, p.publish_eu, p.stock_usa, p.stock_eu, p.stock_zh,
+p.publish_usa, p.publish_eu, p.stock_usa, p.stock_eu, p.stock_zh, p.popular, p.featured,
 nf.content as product_name_formula, 
 df.content as product_description_formula, 
 pf.name as packaging_factor, p.packaging_factor_id, p.price_us, p.price_zh, p.price_eu,
@@ -99,7 +99,8 @@ join v_equipment e on e.id = pe.equipment_id;
 
 -- category view (to pick up formulas)
 create view v_category as select 
-c.id, c.name_en, c.name_zh, c.parent_id, nf.content as product_name_formula, df.content as product_description_formula, ff.content as family_name_formula,
+c.id, c.name_en, c.name_zh, c.parent_id, c.featured, c.image_url,
+nf.content as product_name_formula, df.content as product_description_formula, ff.content as family_name_formula,
 c.created, c.updated, c.version
 from t_category c 
 left outer join t_formula      nf on nf.id = c.product_name_formula_id
@@ -146,7 +147,7 @@ drop view if exists v_product_catalog;
 
 create view v_product_catalog as
 select p.id, p.name_en, p.sku, p.category_id, p.category_en, p.oem_brand_id, p.oem_brand_en, p.oem, 
-p.publish_usa, p.publish_eu, p.stock_usa, p.stock_eu, p.stock_zh,
+p.publish_usa, p.publish_eu, p.stock_usa, p.stock_eu, p.stock_zh, p.popular, p.featured,
 mods.models, 
 oref.oem_refs, p.family_id,
 pfilo.filter_option_ids
