@@ -420,7 +420,6 @@ paths:
               schema:
                 type: array
                 items:
-                  type: object
                   $ref: '#/components/schemas/ProductFilterOptionView'
   /marketing_regions:
     summary: Marketing regions.
@@ -636,9 +635,7 @@ paths:
           name: entity
           schema:
             type: string
-      requestBody:
-        required: false
-        content: {}
+      
           
       responses:
         200:
@@ -808,16 +805,6 @@ paths:
       description: Extends basic search capabilities, allowing a search term to be used across many different product fields. Additional filter criteria can be used to further narrow the search-term search.
       tags:
         - products
-      parameters:
-        - in: header
-          name: Accept
-          required: false
-          description: If omitted, `application/json` is assumed.
-          schema:
-            type: string
-            enum:
-              - application/json
-              - text/csv
       requestBody:
         description: >
           The search criteria to use for the search.
@@ -864,6 +851,8 @@ paths:
                         | product_types | integer | product type id
                   category_id:
                     type: array
+                    items:
+                      type: integer
                     description: The categories to add to the product search filtering. Specifying more than one category widens the search results.
                    
             examples:
@@ -994,6 +983,8 @@ paths:
                         | product_type | integer | product type id
                   category_id:
                     type: array
+                    items:
+                      type: integer
                     description: The categories to add to the product search filtering. Specifying more than one category widens the search results.
                    
             examples:
@@ -1340,30 +1331,25 @@ paths:
                           $ref: '#/components/schemas/CustomAttribute'
                       family:
                         description: the family the product belongs to
-                        type: object
                         $ref: '#/components/schemas/FamilyView'
                       filter_options:
                         description: the filter options values (i.e. specifications) for the product
                         type: array
                         items:
-                          type: object
                           $ref: '#/components/schemas/ProductFilterOptionView'
                       images:
                         type: array
                         items:
-                          type: object
                           $ref: '#/components/schemas/ProductImageView'
                       oem_products:
                         description: other products related to this product based on a shared oem value
                         type: array
                         items:
-                          type: object
                           $ref: '#/components/schemas/ProductView'
                       oem_references:
                         description: cross-references to other products based on assigned OEM references
                         type: array
                         items:
-                          type: object
                           $ref: '#/components/schemas/ProductOemReferenceView'
         400:
           $ref: '#/components/responses/400ClientError'
@@ -2537,6 +2523,8 @@ paths:
                         
                   category_id:
                     type: array
+                    items:
+                      type: integer
                     description: >
                       The categories to add to the family search filtering. 
                       Specifying more than one category widens the search results. 
@@ -2640,6 +2628,8 @@ paths:
                         
                   category_id:
                     type: array
+                    items:
+                      type: integer
                     description: >
                       The categories to add to the family search filtering. 
                       Specifying more than one category widens the search results. 
