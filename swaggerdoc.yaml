@@ -1845,14 +1845,14 @@ paths:
         type: array
         items:
           type: integer
-      description: Using brand ids searches for products that match OEM brands associated with product
+      description: Using brand ids searches for products that match ANY of the OEM brands associated with product
     - in: query
       name: category_ids
       schema:
         type: array
         items:
           type: integer
-      description: Using category ids searches for products that belong to any of the provided categories.
+      description: Using category ids searches for products that belong to ANY of the provided categories.
     - in: query
       name: model
       schema:
@@ -1863,6 +1863,16 @@ paths:
       schema:
         type: string
       description: If `with` parameter includes the word 'images', product images will also be retrieved..
+    - in: query
+      name: featured
+      schema:
+        type: integer
+      description: Retrieves only featured products when set to 1, non-featured when set to 0.
+    - in: query
+      name: popular
+      schema:
+        type: integer
+      description: Retrieves only popular products when set to 1, non-popular when set to 0.
     get:
       summary: Performs a catalog search for all products in the database.
       description: >

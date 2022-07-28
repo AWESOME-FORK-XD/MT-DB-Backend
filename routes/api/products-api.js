@@ -92,6 +92,7 @@ group by group_id, equipment_id, model, brand_id, brand_en, brand_zh
 order by brand_en asc, model asc`;
 
 // when product is known, find other compatible products based on family
+// TODO: Trello card #250 https://trello.com/c/LZ7pTx7B/250-family-fsp-040-lists-product-sa-040-24-in-v2-and-it-is-not-listed-in-v1
 const USED_WITH_QUERY_SQL = `select p.id, p.name_en, p.name_zh, p.sku, p.oem_brand_en, p.oem_brand_zh, p.lifecycle_en, p.lifecycle_zh, sp.specifications_en, sp.specifications_zh 
 from t_product_family_connect fc
 join t_product_family pf on pf.family_id = fc.family_id
@@ -266,6 +267,14 @@ router.get('/quicksearch', async function (req, res, next) {
   // Specific values narrow the search... (AND)
   let equipment_clause = '';//special case
   if(req.query){
+    if(req.query.featured){
+      criteria.and ( 'pc.featured', '=', req.query.featured );
+    }
+
+    if(req.query.popular){
+      criteria.and ( 'pc.popular', '=', req.query.popular );
+    }
+
     if(req.query.brand_ids){
       criteria.and ( 'pc.oem_brand_id', 'IN', req.query.brand_ids.split('|') );
     }
