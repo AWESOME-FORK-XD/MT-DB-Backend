@@ -40,10 +40,7 @@ class ProductionConnectionRelationshipService {
         return;
       } 
 
-      let productFamilyDao = this.daoFactory.getDao("product_family");
-      let variantFamilyRel = await productFamilyDao.one({product_id: product_id, is_primary: true});
-      if(!variantFamilyRel) throw new Error(`No primary product family was found.`);
-      let variantFamilyId = variantFamilyRel.family_id;
+      let variantFamilyId = product.family_id;
 
       let familyDao = this.daoFactory.getDao("family");
       let variantFamily = await familyDao.get(variantFamilyId);
@@ -90,12 +87,6 @@ class ProductionConnectionRelationshipService {
               logger.info(`  ...created "connects-to" family id=${connectsToFamily.id}`);
 
             }
-            await productFamilyDao.create({
-              product_id: member.product_id,
-              family_id: connectsToFamily.id,
-              is_primary: 0,
-            });
-            logger.info(`  ...with member product id=${member.product_id}`);
           }
 
           // Finally Associate the "Connects-To" family with the original product.

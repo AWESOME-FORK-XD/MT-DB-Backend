@@ -46,7 +46,7 @@ class DaoFactory {
       {table: 't_product_certificate',         entity: 'product_certificate',         options: this.standard_opts },
       {table: 't_product_custom_attribute',    entity: 'product_custom_attribute',    options: this.standard_opts },
       {table: 't_product_equipment_connect',   entity: 'product_equipment_connect',   options: this.standard_opts },
-      {table: 't_product_family',              entity: 'product_family',              options: this.standard_opts },
+      
       {table: 't_product_family_connect',      entity: 'product_family_connect',      options: this.standard_opts },
       {table: 't_product_filter_option',       entity: 'product_filter_option',       options: this.standard_opts },
       {table: 't_product_image',               entity: 'product_image',               options: this.standard_opts },
