@@ -345,18 +345,6 @@ CREATE TABLE `t_product_family_connect` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Holds product relationships with families.
-CREATE TABLE `t_product_family` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `product_id` int(11) unsigned NOT NULL,
-  `family_id` int(11) unsigned NOT NULL,
-  `is_primary` bit NOT NULL,
-  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `version` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 -- Create syntax for TABLE 't_product_image'
 CREATE TABLE `t_product_image` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -646,13 +634,6 @@ ALTER TABLE `t_product_family_connect`
 
 ALTER TABLE `t_product_family_connect` 
   ADD CONSTRAINT `fk_product_family_connect_family` FOREIGN KEY (`family_id`) REFERENCES `t_family` (`id`);
-
-
-ALTER TABLE `t_product_family` 
-  ADD CONSTRAINT `fk_product_family_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`)  ON DELETE CASCADE;;
-
-ALTER TABLE `t_product_family` 
-  ADD CONSTRAINT `fk_product_family_family` FOREIGN KEY (`family_id`) REFERENCES `t_family` (`id`);
 
 
 ALTER TABLE `t_product_image` 

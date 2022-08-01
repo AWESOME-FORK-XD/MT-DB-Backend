@@ -95,8 +95,7 @@ order by brand_en asc, model asc`;
 // TODO: Trello card #250 https://trello.com/c/LZ7pTx7B/250-family-fsp-040-lists-product-sa-040-24-in-v2-and-it-is-not-listed-in-v1
 const USED_WITH_QUERY_SQL = `select p.id, p.name_en, p.name_zh, p.sku, p.oem_brand_en, p.oem_brand_zh, p.lifecycle_en, p.lifecycle_zh, sp.specifications_en, sp.specifications_zh 
 from t_product_family_connect fc
-join t_product_family pf on pf.family_id = fc.family_id
-join v_product p on p.id = pf.product_id
+join v_product p on p.family_id = fc.family_id
 join v_product_specifications sp on sp.id = p.id
 where fc.product_id=?
 order by oem_brand_en asc, sku asc`;
@@ -494,14 +493,6 @@ router.put('/:product_id', authenticated(), async function (req, res, next) {
 
     //Now save.
     await productDao.update(toSave);
-    
-    //Now update the product family table from the family_id (if necessary)
-    let productFamilyDao = req.app.locals.database.getDao('product_family');
-    let current_pf = await productFamilyDao.one({product_id: toSave.id, is_primary: 1});
-    if(latest.family_id && (!current_pf || current_pf.family_id != latest.family_id) ){
-      await productFamilyDao.deleteMatching({product_id: toSave.id, is_primary: 1});
-      await productFamilyDao.create({product_id: toSave.id, family_id: latest.family_id, is_primary: 1});
-    }
 
     res.locals.result = toSave;
 
@@ -640,22 +631,13 @@ router.get('/model-compatibility/:model', async function (req, res, next) {
   next();
 }, resultToJson);
 
-// Get all product family relationship data for a given product
-router.get('/:product_id/product-families', function (req, res, next) {
-  res.locals.dbInstructions = {
-    dao: req.app.locals.database.getDao('product_family'),
-    query: {product_id: req.params.product_id},
-    //query_options: q.query_options
-  }
-  next();
-}, fetchMany, resultToJson);
 
 // Get all products the specified product is used with. This is simply done by querying the product_family_connect table to find the family the product connects with, then getting the products
 // and all the specification data for each product in that family.
 router.get('/:product_id/used-with', async function (req, res, next) {
   
   try{
-    let dao = req.app.locals.database.getDao('product_family');
+    let dao = req.app.locals.database.getDao('product_family_connect');
     let results = await dao.sqlCommand(USED_WITH_QUERY_SQL, [req.params.product_id]);
     res.status(200).json({used_with: results});
   }catch(err){
