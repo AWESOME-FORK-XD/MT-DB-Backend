@@ -1873,6 +1873,11 @@ paths:
       schema:
         type: integer
       description: Retrieves only popular products when set to 1, non-popular when set to 0.
+    - in: query
+      name: created_since
+      schema:
+        type: string
+      description: Retrieves only products since (i.e. >=) the date. The date should be in YYYY-MM-DD format
     get:
       summary: Performs a catalog search for all products in the database.
       description: >

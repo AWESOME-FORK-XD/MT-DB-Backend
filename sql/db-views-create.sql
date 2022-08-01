@@ -147,7 +147,7 @@ drop view if exists v_product_catalog;
 
 create view v_product_catalog as
 select p.id, p.name_en, p.sku, p.category_id, p.category_en, p.oem_brand_id, p.oem_brand_en, p.oem, 
-p.publish_usa, p.publish_eu, p.stock_usa, p.stock_eu, p.stock_zh, p.popular, p.featured,
+p.publish_usa, p.publish_eu, p.stock_usa, p.stock_eu, p.stock_zh, p.popular, p.featured, p.created, p.updated,
 mods.models, 
 oref.oem_refs, p.family_id,
 pfilo.filter_option_ids

@@ -281,6 +281,10 @@ router.get('/quicksearch', async function (req, res, next) {
     if(req.query.category_ids){
       criteria.and ( 'pc.category_id', 'IN', req.query.category_ids.split('|') );
     }
+
+    if(req.query.created_since){
+      criteria.and ( 'pc.created', '>=', req.query.created_since );
+    }
     
 
     // when model is known, find compatible products based on equipment/group/family/product relationship
