@@ -1854,6 +1854,13 @@ paths:
           type: integer
       description: Using category ids searches for products that belong to ANY of the provided categories.
     - in: query
+      name: product_ids
+      schema:
+        type: array
+        items:
+          type: integer
+      description: Using product ids searches for ANY of the specified products.
+    - in: query
       name: model
       schema:
         type: string

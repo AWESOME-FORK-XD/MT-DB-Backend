@@ -266,6 +266,10 @@ router.get('/quicksearch', async function (req, res, next) {
   // Specific values narrow the search... (AND)
   let equipment_clause = '';//special case
   if(req.query){
+    if(req.query.product_ids){
+      criteria.and ( 'pc.id', 'IN', req.query.product_ids.split('|') );
+    }
+    
     if(req.query.featured){
       criteria.and ( 'pc.featured', '=', req.query.featured );
     }
