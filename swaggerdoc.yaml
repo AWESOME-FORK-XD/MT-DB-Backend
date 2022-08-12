@@ -1351,6 +1351,10 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ProductOemReferenceView'
+                      certificates:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Certificate'
         400:
           $ref: '#/components/responses/400ClientError'
         500:
@@ -1842,24 +1846,23 @@ paths:
     - in: query
       name: brand_ids
       schema:
-        type: array
-        items:
-          type: integer
-      description: Using brand ids searches for products that match ANY of the OEM brands associated with product
+        type: string
+      description: Using brand ids searches for products that match ANY of the OEM brands associated with product. Separate multiple brand ids by the pipe character '|'.
     - in: query
       name: category_ids
       schema:
-        type: array
-        items:
-          type: integer
-      description: Using category ids searches for products that belong to ANY of the provided categories.
+        type: string
+      description: Using category ids searches for products that belong to ANY of the provided categories. Separate multiple category ids by the pipe character '|'.
     - in: query
       name: product_ids
       schema:
-        type: array
-        items:
-          type: integer
-      description: Using product ids searches for ANY of the specified products.
+        type: string
+      description: Using product ids searches for ANY of the specified products. Separate multiple product ids by the pipe character '|'.
+    - in: query
+      name: family_ids
+      schema:
+        type: string
+      description: Using family ids searches for products that belong to ANY of the provided families. Separate multiple family ids by the pipe character '|'.
     - in: query
       name: model
       schema:

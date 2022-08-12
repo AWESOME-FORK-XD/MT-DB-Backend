@@ -286,6 +286,10 @@ router.get('/quicksearch', async function (req, res, next) {
       criteria.and ( 'pc.category_id', 'IN', req.query.category_ids.split('|') );
     }
 
+    if(req.query.family_ids){
+      criteria.and ( 'pc.family_id', 'IN', req.query.family_ids.split('|') );
+    }
+
     if(req.query.created_since){
       criteria.and ( 'pc.created', '>=', req.query.created_since );
     }
@@ -323,7 +327,7 @@ where model = ?`;
     let offset = Number.isFinite( Number.parseInt(req.query.offset) ) ?  Number.parseInt(req.query.offset) : 0;
     let limit = Number.isFinite( Number.parseInt(req.query.limit) ) ? Number.parseInt(req.query.limit) : 5000;
   
-    const PRODUCT_FIELDS = ['id','category_id','name_en','description_en','oem','oem_brand_en','oem_brand_id','packaging_factor','product_type_id','price_us','sku'];
+    const PRODUCT_FIELDS = ['id','category_id','name_en','description_en','oem','oem_brand_en','oem_brand_id','packaging_factor','product_type_id','price_us','sku','family_id'];
  
     let fullSql = `SELECT ${PRODUCT_FIELDS.map(x=>`p.${x}`).join(', ')}, pc.models, pc.filter_option_ids FROM v_product_catalog pc INNER JOIN v_product p ON p.id=pc.id ${criteria_clause} ORDER BY p.sku ASC LIMIT ${limit} OFFSET ${offset}`;
     // console.log(`\n\nfull quicksearch sql: ${fullSql}\n\n`);
@@ -373,6 +377,7 @@ router.get('/:product_id/detail', async function (req, res, next) {
     images:[],
     oem_products:[], //share the same oem as this product
     oem_references:[], //other oem values potentially valid for this product
+    certificates:[],
   };
 
   //product view
@@ -399,7 +404,10 @@ router.get('/:product_id/detail', async function (req, res, next) {
   let pcaViewDao = req.app.locals.database.getDao('product_custom_attribute_view');
   let piViewDao = req.app.locals.database.getDao('product_image_view');
   let famViewDao = req.app.locals.database.getDao('family_view');
-
+  let pcertDao = req.app.locals.database.getDao('product_certificate');
+  
+  let pcertSql = `select pc.certificate_id, c.name_en from t_product_certificate pc left outer join t_certificate c on c.id=pc.certificate_id where product_id=?`;
+  
   //parallel retrieval
   let related = [
     productViewDao.sqlCommand(EQUIPMENT_COMPATIBILITY_QUERY_SQL, [req.params.product_id]), //0: compatibility
@@ -409,6 +417,7 @@ router.get('/:product_id/detail', async function (req, res, next) {
     piViewDao.filter({product_id: req.params.product_id}), //4: product images
     productViewDao.filter({oem: result.oem}, {orderBy: ['product_type_id']}), //5: oem products
     result.family_id ? famViewDao.get(result.family_id) : null, //6: family
+    pcertDao.sqlCommand(pcertSql, req.params.product_id), //7: certificates
   ];
 
   let related_results = await Promise.allSettled(related);
@@ -420,6 +429,7 @@ router.get('/:product_id/detail', async function (req, res, next) {
   result.images            = related_results[4].value;
   result.oem_products      = related_results[5].value;
   result.family            = related_results[6].value;
+  result.certificates      = related_results[7].value;
 
   // redact internal notes, supplier info.
   delete result.note_internal;
