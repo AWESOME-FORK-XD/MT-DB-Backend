@@ -260,9 +260,8 @@ router.get('/quicksearch', async function (req, res, next) {
     .groupEnd();
 
   // published for the locale?
-  if(locale === 'US') criteria.and('pc.publish_usa', '=', true);
-  else if(locale === 'EU') criteria.and('pc.publish_eu', '=', true);
-
+  if(locale === 'US') criteria.and('pc.publish', '=', true);
+  
   // Specific values narrow the search... (AND)
   let equipment_clause = '';//special case
   if(req.query){
