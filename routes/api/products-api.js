@@ -382,8 +382,9 @@ router.get('/:product_id/detail', async function (req, res, next) {
   //product view
   let productViewDao = req.app.locals.database.getDao('product_view');
 
-  let pv = await productViewDao.get(req.params.product_id);
-  
+  let pv = await productViewDao.one({id: req.params.product_id, publish: true});
+  if(!pv) return res.status(404).end(); 
+
   Object.assign(result, pv);
 
   // //category path
