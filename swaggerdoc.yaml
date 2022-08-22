@@ -1355,6 +1355,11 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/Certificate'
+                      family_connections:
+                        description: cross-references to other family ids that this product can connect with
+                        type: array
+                        items:
+                          type: integer
         400:
           $ref: '#/components/responses/400ClientError'
         500:

@@ -377,6 +377,7 @@ router.get('/:product_id/detail', async function (req, res, next) {
     oem_products:[], //share the same oem as this product
     oem_references:[], //other oem values potentially valid for this product
     certificates:[],
+    family_connections: [],
   };
 
   //product view
@@ -405,7 +406,8 @@ router.get('/:product_id/detail', async function (req, res, next) {
   let piViewDao = req.app.locals.database.getDao('product_image_view');
   let famViewDao = req.app.locals.database.getDao('family_view');
   let pcertDao = req.app.locals.database.getDao('product_certificate');
-  
+  let pfamConnDao = req.app.locals.database.getDao('product_family_connect');
+
   let pcertSql = `select pc.certificate_id, c.name_en from t_product_certificate pc left outer join t_certificate c on c.id=pc.certificate_id where product_id=?`;
   
   //parallel retrieval
@@ -418,6 +420,7 @@ router.get('/:product_id/detail', async function (req, res, next) {
     productViewDao.filter({oem: result.oem}, {orderBy: ['product_type_id']}), //5: oem products
     result.family_id ? famViewDao.get(result.family_id) : null, //6: family
     pcertDao.sqlCommand(pcertSql, req.params.product_id), //7: certificates
+    pfamConnDao.filter({product_id: req.params.product_id}), //8: family_connections
   ];
 
   let related_results = await Promise.allSettled(related);
@@ -430,6 +433,7 @@ router.get('/:product_id/detail', async function (req, res, next) {
   result.oem_products      = related_results[5].value;
   result.family            = related_results[6].value;
   result.certificates      = related_results[7].value;
+  result.family_connections= related_results[8].value.map(fc=>fc.family_id);
 
   // redact internal notes, supplier info.
   delete result.note_internal;
