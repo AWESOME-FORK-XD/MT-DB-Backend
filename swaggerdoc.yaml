@@ -1923,6 +1923,8 @@ paths:
                           type: string
                         description_en:
                           type: string
+                        family_id:
+                          type: integer
                         oem:
                           type: string
                         oem_brand_en:
@@ -1933,10 +1935,18 @@ paths:
                           type: string
                         product_type_id:
                           type: integer
+                        product_type_en:
+                          type: string
                         price_us:
                           type: number
                         sku:
                           type: string
+                        stock_usa:
+                          type: number
+                        stock_eu:
+                          type: number
+                        stock_zh:
+                          type: number
                         models:
                           type: string
                           description: pipe-separated list of models
@@ -3942,8 +3952,10 @@ components:
           child_sku:
             type: string
           quantity:
-            type: string
+            type: integer
             description: the quantity (count) of the child product for the set
+          description:
+            type: string
             maxLength: 255
       - $ref: '#/components/schemas/Auditable'
     ProductSupplier:
