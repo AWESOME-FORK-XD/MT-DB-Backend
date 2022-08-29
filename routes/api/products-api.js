@@ -260,7 +260,12 @@ router.get('/quicksearch', async function (req, res, next) {
     .groupEnd();
 
   // published for the locale?
-  if(locale === 'US') criteria.and('pc.publish', '=', true);
+  let marketing_region_clause = '';
+  if(locale === 'US'){ 
+    criteria.and('pc.publish', '=', true);
+    criteria.and('mr.marketing_region_id', '=', 1);//1=usa 2=EU 3=China 4=Latin America 5=Asia(outside of china)
+    marketing_region_clause = 'INNER JOIN t_product_marketing_region mr on mr.product_id = pc.id'
+  }
   
   // Specific values narrow the search... (AND)
   let equipment_clause = '';//special case
@@ -309,7 +314,7 @@ where model = ?`;
     }
   }
 
-  let criteria_clause = `${equipment_clause} WHERE ${criteria.whereClause}`;
+  let criteria_clause = `${marketing_region_clause} ${equipment_clause} WHERE ${criteria.whereClause}`;
   
   let ProductCatalogView = req.app.locals.database.getDao('product_catalog_view');
   let ProductView = req.app.locals.database.getDao('product_view');
@@ -326,7 +331,7 @@ where model = ?`;
     let offset = Number.isFinite( Number.parseInt(req.query.offset) ) ?  Number.parseInt(req.query.offset) : 0;
     let limit = Number.isFinite( Number.parseInt(req.query.limit) ) ? Number.parseInt(req.query.limit) : 5000;
   
-    const PRODUCT_FIELDS = ['id','category_id','name_en','description_en','oem','oem_brand_en','oem_brand_id','packaging_factor','product_type_id','price_us','sku','family_id'];
+    const PRODUCT_FIELDS = ['id','category_id','name_en','description_en','oem','oem_brand_en','oem_brand_id','packaging_factor','product_type_id','product_type_en','price_us','sku','family_id'];
  
     let fullSql = `SELECT ${PRODUCT_FIELDS.map(x=>`p.${x}`).join(', ')}, pc.models, pc.filter_option_ids FROM v_product_catalog pc INNER JOIN v_product p ON p.id=pc.id ${criteria_clause} ORDER BY p.sku ASC LIMIT ${limit} OFFSET ${offset}`;
     // console.log(`\n\nfull quicksearch sql: ${fullSql}\n\n`);
