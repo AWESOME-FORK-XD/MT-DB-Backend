@@ -1,6 +1,7 @@
 /* 
   Adds featured flag, category image url to the category table. These features are used on the catalog landing page.
   Created: 7/22/2022 by Derek Gau
+  Deployed: 9/1/2022 by Derek Gau
 */
 
 alter table t_category add column featured bit not null;

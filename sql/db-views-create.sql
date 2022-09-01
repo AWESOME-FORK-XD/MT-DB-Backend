@@ -87,7 +87,7 @@ left outer join t_image_type it on it.id = pi.image_type_id;
 -- product set view
 create view v_product_set as select s.id, s.parent_product_id, pp.sku as parent_sku, 
 s.child_product_id, p.sku as child_sku,
-s.quantity, s.created, s.updated, s.version
+s.quantity, s.description, s.created, s.updated, s.version
 from t_product_set s
 left outer join t_product pp on pp.id=s.parent_product_id
 left outer join t_product p on p.id=s.child_product_id;

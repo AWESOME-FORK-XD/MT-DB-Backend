@@ -1,13 +1,17 @@
 /* 
-  Adds popular, featured flags to the product table. These features are used on the catalog landing page.
-  Created: 7/22/2022 by Derek Gau
+  Adds a has_components column to t_product
+  Adds a description column to t_product_set
+
+  Adds the a has_components column to all product views
+  Adds the description column to the v_product_set
+  
+  Created: 8/22/2022 by Derek Gau
+  Deployed: 9/1/2022 by Derek Gau
 */
-alter table t_product rename column publish_usa to publish;
-alter table t_product add column popular bit not null;
-alter table t_product add column featured bit not null;
+alter table t_product add column `has_components` bit NOT NULL;
 
 --
--- drop and re-add related views.
+-- add has_components column
 --
 drop view if exists v_product;
 
@@ -17,7 +21,7 @@ p.product_type_id, t.name_en as product_type_en, t.name_zh as product_type_zh,
 p.family_id, f.family_code, f.family_connector_code, f.name_en as family_name_en, f.video_link as family_video_link,
 p.oem_brand_id, b.name_en as oem_brand_en, b.name_zh as oem_brand_zh,
 p.category_id, c.name_en as category_en, c.name_zh as category_zh,
-p.publish, p.stock_usa, p.stock_eu, p.stock_zh, p.popular, p.featured,
+p.publish, p.stock_usa, p.stock_eu, p.stock_zh, p.popular, p.featured, p.has_components,
 nf.content as product_name_formula, 
 df.content as product_description_formula, 
 pf.name as packaging_factor, p.packaging_factor_id, p.price_us, p.price_zh, p.price_eu,
@@ -39,7 +43,7 @@ drop view if exists v_product_catalog;
 
 create view v_product_catalog as
 select p.id, p.name_en, p.sku, p.category_id, p.category_en, p.oem_brand_id, p.oem_brand_en, p.oem, 
-p.publish, p.stock_usa, p.stock_eu, p.stock_zh, p.popular, p.featured,
+p.publish, p.stock_usa, p.stock_eu, p.stock_zh, p.popular, p.featured, p.has_components,
 mods.models, 
 oref.oem_refs, p.family_id,
 pfilo.filter_option_ids
@@ -58,3 +62,17 @@ left outer join (
 left outer join (
   select product_id, GROUP_CONCAT( distinct filter_option_id separator '|' ) as filter_option_ids from t_product_filter_option group by product_id
 ) as pfilo on pfilo.product_id = p.id;
+
+--
+-- add description column
+--
+alter table t_product_set add column description varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL;
+
+drop view if exists v_product_set;
+
+create view v_product_set as select s.id, s.parent_product_id, pp.sku as parent_sku, 
+s.child_product_id, p.sku as child_sku,
+s.quantity, s.description, s.created, s.updated, s.version
+from t_product_set s
+left outer join t_product pp on pp.id=s.parent_product_id
+left outer join t_product p on p.id=s.child_product_id;

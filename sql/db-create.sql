@@ -387,6 +387,7 @@ CREATE TABLE `t_product_set` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `parent_product_id` int(11) unsigned NOT NULL,
   `child_product_id` int(11) unsigned NOT NULL,
+  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
   `quantity` int(11) NOT NULL DEFAULT '1',
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,

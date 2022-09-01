@@ -1,6 +1,7 @@
 /* 
   Adds the created, updated columns to the v_product_catalog view
   Created: 8/01/2022 by Derek Gau
+  Deployed: 9/1/2022 by Derek Gau
 */
 
 drop view if exists v_product_catalog;
