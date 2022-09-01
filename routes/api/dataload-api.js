@@ -10,6 +10,11 @@ const import_constraints = {
       ['sku'], //each array is a list of fields that together imply unique key
     ]
   },
+  t_product_oem_reference:{
+    unique_keys: [
+      ['product_id','brand_id','name'], 
+    ]
+  },
   t_test_pet:{
     unique_keys: [
       ['name'],
