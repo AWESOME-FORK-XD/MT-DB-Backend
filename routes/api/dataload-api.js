@@ -4,6 +4,19 @@ const {parse} = require('fast-csv');
 let router = express.Router({ mergeParams: true });
 const {fetchManyAnd, resultToCsv, resultToJsonDownload, resultToJson} = require('./db-api-ext');
 
+const import_constraints = {
+  t_product:{
+    unique_keys: [
+      ['sku'], //each array is a list of fields that together imply unique key
+    ]
+  },
+  t_test_pet:{
+    unique_keys: [
+      ['name'],
+    ]
+  }
+};
+
 let debug = require('debug')('medten:routes');
 
 
@@ -54,28 +67,49 @@ router.post('/:entity/bulkinsert', validateDao, async function (req, res, next) 
     let warnings = to_process.warnings;
 
     //Each row
-    let promises = [];
-    to_process.data.forEach(function(row, idx){
+    // let promises = [];
+    for(let idx = 0;  idx < to_process.data.length; idx++ ){
+      let row = to_process.data[idx];
       try{
-        
-        promises.push( res.locals.dao.create(row,{explicit_pk: true}) );
+        // check uniqueness.
+        let exists = false;
+        let uniqueQuery = null;
+        let constraints = import_constraints[res.locals.dao.table]
+        if(constraints){
+          if(constraints.unique_keys){
+            for(let keys of constraints.unique_keys){
+              uniqueQuery = {};
+              keys.forEach(k=>{
+                uniqueQuery[k] = row[k];
+              });
+              let results = await res.locals.dao.filter(uniqueQuery);//check for uniqueness
+              exists = results && results.length > 0;
+              if(exists) break;
+            }
+          }
+        }
+        if(exists) throw new Error(`${res.locals.dao.entity} already exists for: ${JSON.stringify(uniqueQuery)}.`)
+        // promises.push( res.locals.dao.create(row,{explicit_pk: true}) );
+        await res.locals.dao.create(row,{explicit_pk: true});
+        inserted++;
 
       }catch(ex){
         console.error(ex);
+        skipped++;
         warnings.push(`Row ${idx+1}: ${ex.message}`);
       }
 
-    });
+    }
     
-    let resultant = await Promise.allSettled(promises);
-    resultant.forEach((p,idx) => {
-      if(p.status === 'fulfilled'){
-        inserted++;
-      } else if (p.status === 'rejected'){
-        skipped++;
-        warnings.push(`Row ${idx+1}: ${p.reason}`);
-      }
-    });
+    // let resultant = await Promise.allSettled(promises);
+    // resultant.forEach((p,idx) => {
+    //   if(p.status === 'fulfilled'){
+    //     inserted++;
+    //   } else if (p.status === 'rejected'){
+    //     skipped++;
+    //     warnings.push(`Row ${idx+1}: ${p.reason}`);
+    //   }
+    // });
 
     res.status(200).json({
       total: to_process.data.length,
@@ -101,28 +135,54 @@ router.post('/:entity/bulkupdate', validateDao, async function (req, res, next) 
     let warnings = to_process.warnings;
 
     //Each row
-    let promises = [];
-    to_process.data.forEach(function(row, idx){
+    // let promises = [];
+    for(let idx = 0;  idx < to_process.data.length; idx++ ){
+      let row = to_process.data[idx];
       try{
+        // check uniqueness.
+        let exists = false;
+        let uniqueQuery = null;
+        let constraints = import_constraints[res.locals.dao.table]
+        if(constraints){
+          if(constraints.unique_keys){
+            for(let keys of constraints.unique_keys){
+              uniqueQuery = {};
+              keys.forEach(k=>{
+                uniqueQuery[k] = row[k];
+              });
+              let results = await res.locals.dao.filter(uniqueQuery);//check for uniqueness
+              exists = results && results.length > 0 && results.filter(r=>r.id!=row.id).length>0;
+              if(exists) break;
+            }
+          }
+        }
+        if(exists) throw new Error(`${res.locals.dao.entity} already exists for: ${JSON.stringify(uniqueQuery)}.`)
+        // promises.push( res.locals.dao.update(row) );
+        let update_result = await res.locals.dao.update(row);
+        if(update_result._affectedRows>0){
+          updated++;
+        } else {
+          throw new Error(`${res.locals.dao.entity} not found for id: ${row.id}.`)
+        }
         
-        promises.push( res.locals.dao.update(row,{explicit_pk: true}) );
 
       }catch(ex){
         console.error(ex);
+        skipped++;
         warnings.push(`Row ${idx+1}: ${ex.message}`);
       }
 
-    });
+    }
     
-    let resultant = await Promise.allSettled(promises);
-    resultant.forEach((p,idx) => {
-      if(p.status === 'fulfilled'){
-        updated++;
-      } else if (p.status === 'rejected'){
-        skipped++;
-        warnings.push(`Row ${idx+1}: ${p.reason}`);
-      }
-    });
+    // let resultant = await Promise.allSettled(promises);
+    // resultant.forEach((p,idx) => {
+    //   if(p.status === 'fulfilled'){
+    //     updated++;
+    //   } else if (p.status === 'rejected'){
+    //     skipped++;
+    //     warnings.push(`Row ${idx+1}: ${p.reason}`);
+    //   }
+    // });
 
     res.status(200).json({
       total: to_process.data.length,
