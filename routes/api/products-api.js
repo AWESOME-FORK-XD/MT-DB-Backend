@@ -331,7 +331,7 @@ where model = ?`;
     let offset = Number.isFinite( Number.parseInt(req.query.offset) ) ?  Number.parseInt(req.query.offset) : 0;
     let limit = Number.isFinite( Number.parseInt(req.query.limit) ) ? Number.parseInt(req.query.limit) : 5000;
   
-    const PRODUCT_FIELDS = ['id','category_id','name_en','description_en','oem','oem_brand_en','oem_brand_id','packaging_factor','product_type_id','product_type_en','price_us','sku','family_id'];
+    const PRODUCT_FIELDS = ['id','category_id','name_en','description_en','oem','oem_brand_en','oem_brand_id','packaging_factor','product_type_id','product_type_en','price_us','sku','family_id','ad_url'];
  
     let fullSql = `SELECT ${PRODUCT_FIELDS.map(x=>`p.${x}`).join(', ')}, pc.stock_usa, pc.stock_eu, pc.stock_zh, pc.models, pc.filter_option_ids FROM v_product_catalog pc INNER JOIN v_product p ON p.id=pc.id ${criteria_clause} ORDER BY p.sku ASC LIMIT ${limit} OFFSET ${offset}`;
     // console.log(`\n\nfull quicksearch sql: ${fullSql}\n\n`);
