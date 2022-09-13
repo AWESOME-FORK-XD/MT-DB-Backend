@@ -7,6 +7,8 @@ p.family_id, f.family_code, f.family_connector_code, f.name_en as family_name_en
 p.oem_brand_id, b.name_en as oem_brand_en, b.name_zh as oem_brand_zh,
 p.category_id, c.name_en as category_en, c.name_zh as category_zh,
 p.publish, p.stock_usa, p.stock_eu, p.stock_zh, p.popular, p.featured,
+p.has_components,
+p.outsourced, p.source_region, p.minimum_profit_pct, p.leadtime, p.dealer_price,
 nf.content as product_name_formula, 
 df.content as product_description_formula, 
 pf.name as packaging_factor, p.packaging_factor_id, p.price_us, p.price_zh, p.price_eu,
@@ -148,6 +150,7 @@ drop view if exists v_product_catalog;
 create view v_product_catalog as
 select p.id, p.name_en, p.sku, p.category_id, p.category_en, p.oem_brand_id, p.oem_brand_en, p.oem, 
 p.publish, p.stock_usa, p.stock_eu, p.stock_zh, p.popular, p.featured, p.has_components, p.created, p.updated,
+p.outsourced, p.source_region, p.minimum_profit_pct, p.leadtime, p.dealer_price,
 mods.models, 
 oref.oem_refs, p.family_id,
 pfilo.filter_option_ids
