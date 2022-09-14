@@ -2,7 +2,7 @@
   Adds outsourced product fields to the product table and related views.
   
   Created: 9/12/2022 by Derek Gau
-  Deployed: 
+  Deployed: 9/14/2022 by Derek Gau
 */
 alter table t_product add column  `outsourced`          bit                                                     NOT NULL;
 alter table t_product add column  `source_region`       varchar(10)  CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '';

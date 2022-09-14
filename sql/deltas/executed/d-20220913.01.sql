@@ -2,7 +2,7 @@
   Adds outsourced product fields to the product table and related views.
   
   Created: 9/13/2022 by Derek Gau
-  Deployed: 
+  Deployed: 9/14/2022 by Derek Gau
 */
 alter table t_product add column  `ad_url` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '';
 
