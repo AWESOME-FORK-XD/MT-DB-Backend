@@ -1925,6 +1925,8 @@ paths:
                           type: string
                         family_id:
                           type: integer
+                        list_price_us:
+                          type: number
                         oem:
                           type: string
                         oem_brand_en:
