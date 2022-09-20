@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
-Description: Medten Product DB Backend Serverless Application (V2 Test Environment)
+Description: Medten Product DB Backend Serverless Application
 Parameters:
   debuggingFor:
     Description: 'debugging category'
@@ -13,10 +13,10 @@ Parameters:
     Default: 'arn:aws:iam::900914409567:role/LambdaExecutionRole'
 
 Resources:
-  v2handleAnyRequest:
+  productDbRequest:
     Type: 'AWS::Serverless::Function'
     Properties:
-      FunctionName: v2handleAnyRequest
+      FunctionName: productDbRequest
       Handler: lambda.handler
       Runtime: nodejs12.x
       CodeUri: ./
@@ -49,4 +49,3 @@ Resources:
       #     DB_DATABASE: '{{resolve:ssm:DB_DATABASE:1}}'
       Tags:
         environment: test
-        version: 2
