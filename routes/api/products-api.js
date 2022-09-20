@@ -331,7 +331,7 @@ where model = ?`;
     let offset = Number.isFinite( Number.parseInt(req.query.offset) ) ?  Number.parseInt(req.query.offset) : 0;
     let limit = Number.isFinite( Number.parseInt(req.query.limit) ) ? Number.parseInt(req.query.limit) : 5000;
   
-    const PRODUCT_FIELDS = ['id','category_id','name_en','description_en','oem','oem_brand_en','oem_brand_id','packaging_factor','product_type_id','product_type_en','price_us','sku','family_id'];
+    const PRODUCT_FIELDS = ['id','category_id','name_en','description_en','oem','oem_brand_en','oem_brand_id','packaging_factor','product_type_id','product_type_en','price_us','sku','family_id','ad_url'];
  
     let fullSql = `SELECT ${PRODUCT_FIELDS.map(x=>`p.${x}`).join(', ')}, pc.stock_usa, pc.stock_eu, pc.stock_zh, pc.models, pc.filter_option_ids FROM v_product_catalog pc INNER JOIN v_product p ON p.id=pc.id ${criteria_clause} ORDER BY p.sku ASC LIMIT ${limit} OFFSET ${offset}`;
     // console.log(`\n\nfull quicksearch sql: ${fullSql}\n\n`);
@@ -368,94 +368,98 @@ router.get('/oems', async function (req, res, next) {
  * along with other decorating data.
  */
 router.get('/:product_id/detail', async function (req, res, next) {
-
-  let result = {
-    //...product fields
-
-    //...additional product data
-    // category_path:[],
-    compatibility:[],
-    custom_attributes:[],
-    family: null,
-    filter_options: [],
-    images:[],
-    oem_products:[], //share the same oem as this product
-    oem_references:[], //other oem values potentially valid for this product
-    certificates:[],
-    family_connections: [],
-  };
-
-  //product view
-  let productViewDao = req.app.locals.database.getDao('product_view');
-
-  let pv = await productViewDao.one({id: req.params.product_id, publish: true});
-  if(!pv) return res.status(404).end(); 
-
-  Object.assign(result, pv);
-
-  // //category path
-  // let categoryDao = req.app.locals.database.getDao('category');
-  // let depth = 0;
-  // let populateAncestorCategories = async (id)=>{
-  //   let c = await categoryDao.get(id);
-  //   depth++;
-  //   result.category_path.push({category_id: c.id, name_en: c.name_en, name_zh: c.name_zh });
-  //   if(!c || c.parent_id > 0 || depth > 4) populateAncestorCategories(c.parent_id);
-  // };
-  // await populateAncestorCategories(result.category_id); 
-    
-  //daos for related data...
-  let porViewDao = req.app.locals.database.getDao('product_oem_reference_view');
-  let pfoViewDao = req.app.locals.database.getDao('product_filter_option_view');
-  let pcaViewDao = req.app.locals.database.getDao('product_custom_attribute_view');
-  let piViewDao = req.app.locals.database.getDao('product_image_view');
-  let famViewDao = req.app.locals.database.getDao('family_view');
-  let pcertDao = req.app.locals.database.getDao('product_certificate');
-  let pfamConnDao = req.app.locals.database.getDao('product_family_connect');
-
-  let pcertSql = `select pc.certificate_id, c.name_en from t_product_certificate pc left outer join t_certificate c on c.id=pc.certificate_id where product_id=?`;
+  try{
+    let result = {
+      //...product fields
   
-  //parallel retrieval
-  let related = [
-    productViewDao.sqlCommand(EQUIPMENT_COMPATIBILITY_QUERY_SQL, [req.params.product_id]), //0: compatibility
-    porViewDao.filter({product_id: req.params.product_id}, {orderBy: ['brand_en']}), //1: oem references
-    pfoViewDao.filter({product_id: req.params.product_id}), //2: filter options
-    pcaViewDao.filter({product_id: req.params.product_id}), //3: custom attributes
-    piViewDao.filter({product_id: req.params.product_id}), //4: product images
-    productViewDao.filter({oem: result.oem}, {orderBy: ['product_type_id']}), //5: oem products
-    result.family_id ? famViewDao.get(result.family_id) : null, //6: family
-    pcertDao.sqlCommand(pcertSql, req.params.product_id), //7: certificates
-    pfamConnDao.filter({product_id: req.params.product_id}), //8: family_connections
-  ];
-
-  let related_results = await Promise.allSettled(related);
-
-  result.compatibility     = related_results[0].value;
-  result.oem_references    = related_results[1].value;
-  result.filter_options    = related_results[2].value;
-  result.custom_attributes = related_results[3].value;
-  result.images            = related_results[4].value;
-  result.oem_products      = related_results[5].value;
-  result.family            = related_results[6].value;
-  result.certificates      = related_results[7].value;
-  result.family_connections= related_results[8].value.map(fc=>fc.family_id);
-
-  // redact internal notes, supplier info.
-  delete result.note_internal;
-  delete result.product_name_formula;
-  delete result.product_description_formula;
-
-  result.oem_products = result.oem_products.map(oemp=>{
-    delete oemp.note_internal;
-    delete oemp.product_name_formula;
-    delete oemp.product_description_formula;
-    return oemp;
-  });
-
-  res.locals.result = result;
-
-  next();
-
+      //...additional product data
+      // category_path:[],
+      compatibility:[],
+      custom_attributes:[],
+      family: null,
+      filter_options: [],
+      images:[],
+      oem_products:[], //share the same oem as this product
+      oem_references:[], //other oem values potentially valid for this product
+      certificates:[],
+      family_connections: [],
+    };
+  
+    //product view
+    let productViewDao = req.app.locals.database.getDao('product_view');
+  
+    let pv = await productViewDao.one({id: req.params.product_id, publish: true});
+    if(!pv) return res.status(404).end(); 
+  
+    Object.assign(result, pv);
+  
+    // //category path
+    // let categoryDao = req.app.locals.database.getDao('category');
+    // let depth = 0;
+    // let populateAncestorCategories = async (id)=>{
+    //   let c = await categoryDao.get(id);
+    //   depth++;
+    //   result.category_path.push({category_id: c.id, name_en: c.name_en, name_zh: c.name_zh });
+    //   if(!c || c.parent_id > 0 || depth > 4) populateAncestorCategories(c.parent_id);
+    // };
+    // await populateAncestorCategories(result.category_id); 
+      
+    //daos for related data...
+    let porViewDao = req.app.locals.database.getDao('product_oem_reference_view');
+    let pfoViewDao = req.app.locals.database.getDao('product_filter_option_view');
+    let pcaViewDao = req.app.locals.database.getDao('product_custom_attribute_view');
+    let piViewDao = req.app.locals.database.getDao('product_image_view');
+    let famViewDao = req.app.locals.database.getDao('family_view');
+    let pcertDao = req.app.locals.database.getDao('product_certificate');
+    let pfamConnDao = req.app.locals.database.getDao('product_family_connect');
+  
+    let pcertSql = `select pc.certificate_id, c.name_en from t_product_certificate pc left outer join t_certificate c on c.id=pc.certificate_id where product_id=?`;
+    
+    //parallel retrieval
+    let related = [
+      productViewDao.sqlCommand(EQUIPMENT_COMPATIBILITY_QUERY_SQL, [req.params.product_id]), //0: compatibility
+      porViewDao.filter({product_id: req.params.product_id}, {orderBy: ['brand_en']}), //1: oem references
+      pfoViewDao.filter({product_id: req.params.product_id}), //2: filter options
+      pcaViewDao.filter({product_id: req.params.product_id}), //3: custom attributes
+      piViewDao.filter({product_id: req.params.product_id}), //4: product images
+      productViewDao.filter({oem: result.oem}, {orderBy: ['product_type_id']}), //5: oem products
+      result.family_id ? famViewDao.get(result.family_id) : null, //6: family
+      pcertDao.sqlCommand(pcertSql, req.params.product_id), //7: certificates
+      pfamConnDao.filter({product_id: req.params.product_id}), //8: family_connections
+    ];
+  
+    let related_results = await Promise.allSettled(related);
+  
+    result.compatibility     = related_results[0].value;
+    result.oem_references    = related_results[1].value;
+    result.filter_options    = related_results[2].value;
+    result.custom_attributes = related_results[3].value;
+    result.images            = related_results[4].value;
+    result.oem_products      = related_results[5].value;
+    result.family            = related_results[6].value;
+    result.certificates      = related_results[7].value;
+    result.family_connections= related_results[8].value.map(fc=>fc.family_id);
+  
+    // redact internal notes, supplier info.
+    delete result.note_internal;
+    delete result.product_name_formula;
+    delete result.product_description_formula;
+  
+    result.oem_products = result.oem_products.map(oemp=>{
+      delete oemp.note_internal;
+      delete oemp.product_name_formula;
+      delete oemp.product_description_formula;
+      return oemp;
+    });
+  
+    res.locals.result = result;
+  
+    next();
+  }catch(err){
+    console.error(err);
+    next(err);
+  }
+  
 }, resultToJson);
 
 /** Standard product by id getter for an extended view of the product (no other decorations) */

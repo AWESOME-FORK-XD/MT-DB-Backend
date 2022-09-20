@@ -2,7 +2,7 @@
   Adds a created column to the product catalog view 
   
   Created: 9/7/2022 by Derek Gau
-  Deployed: 
+  Deployed: 9/14/2022 by Derek Gau
 */
 
 drop view if exists v_product_catalog;
