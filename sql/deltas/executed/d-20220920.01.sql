@@ -2,7 +2,7 @@
   Adds list_price_us product field to the product table and related views.
   
   Created: 9/20/2022 by Derek Gau
-  Deployed: 
+  Deployed: 9/21/2022 by Derek Gau
 */
 alter table t_product add column  `list_price_us` decimal(9,2) DEFAULT NULL;
 
