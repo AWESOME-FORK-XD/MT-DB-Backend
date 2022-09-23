@@ -422,7 +422,7 @@ router.get('/:product_id/detail', async function (req, res, next) {
       pfoViewDao.filter({product_id: req.params.product_id}), //2: filter options
       pcaViewDao.filter({product_id: req.params.product_id}), //3: custom attributes
       piViewDao.filter({product_id: req.params.product_id}), //4: product images
-      result.oem ? productViewDao.filter({oem: result.oem}, {orderBy: ['product_type_id']}) : productViewDao.filter({id: result.id}), //5: oem products 
+      result.oem ? productViewDao.filter({oem: result.oem, publish: true}, {orderBy: ['product_type_id']}) : productViewDao.filter({id: result.id, publish: true}), //5: oem products 
       result.family_id ? famViewDao.get(result.family_id) : null, //6: family
       pcertDao.sqlCommand(pcertSql, req.params.product_id), //7: certificates
       pfamConnDao.filter({product_id: req.params.product_id}), //8: family_connections
