@@ -1889,6 +1889,11 @@ paths:
         type: integer
       description: Retrieves only popular products when set to 1, non-popular when set to 0.
     - in: query
+      name: new_arrival
+      schema:
+        type: integer
+      description: Retrieves only "new arrival" products when set to 1, non-new arrival when set to 0. 
+    - in: query
       name: created_since
       schema:
         type: string
