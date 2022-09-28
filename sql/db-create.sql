@@ -311,6 +311,7 @@ CREATE TABLE `t_product` (
   `dealer_price` decimal(9,2) DEFAULT NULL,
   `ad_url` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '',
   `list_price_us` decimal(9,2) DEFAULT NULL,
+  `new_arrival` bit not null,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `version` int(11) NOT NULL DEFAULT '0',
