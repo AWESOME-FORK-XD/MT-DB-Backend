@@ -2234,6 +2234,8 @@ paths:
                   properties:
                     model:
                       type: string
+                    brand_id:
+                      type: integer
                     brand_en:
                       type: string
         400:
