@@ -37,7 +37,6 @@ class ProductNameGenerator {
       if(forName){
         if(!product.product_name_formula){
           debug(`Product ${product_id} has no name formula associated with it.`);
-          return;
         } else {
           generateName = eval(product.product_name_formula);
         }
@@ -47,11 +46,15 @@ class ProductNameGenerator {
       if(forDescription){
         if(!product.product_description_formula){
           debug(`Product ${product_id} has no description formula associated with it.`);
-          return;
         } else {
           generateDescription = eval(product.product_description_formula);
         }
       } 
+
+      if(!generateName && !generateDescription) {
+        debug(`No formulas available for product ${product_id}. Skipping.`);
+        return;
+      }
 
       let context = {
         product
@@ -64,7 +67,7 @@ class ProductNameGenerator {
       //Filter options needed?
       context.filter_options = await this.db.getDao("product_filter_option_view").filter({product_id: product_id});
 
-      if(forName){
+      if(forName && generateName){
         debug(`Generating name for product ${product_id}...`);
         product.name_en = generateName(context, 'en').replace(/null|undefined/gi,'');
         debug(`  name_zh: ${product.name_en}`);
@@ -72,7 +75,7 @@ class ProductNameGenerator {
         debug(`  name_zh: ${product.name_zh}`);
       }
       
-      if(forDescription){
+      if(forDescription && generateDescription){
         debug(`Generating name for product ${product_id}...`);
         product.description_en = generateDescription(context, 'en').replace(/null|undefined/gi,'');
         debug(`  description_en: ${product.description_en}`);

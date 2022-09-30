@@ -1,6 +1,7 @@
 require('dotenv').config();
 const {program} = require('commander');
 const mysql = require('mysql');
+const {DaoFactory} = require('../services/database');
 // const cliProgress = require('cli-progress');
 const {ProductNameGenerator} = require('../services/product-name-generator');
 
@@ -46,7 +47,7 @@ var connPool = mysql.createPool({
 });
 
 //Makes a DAO factory, named 'Database' available globally.
-var database = require('../database')(connPool);
+var database = new DaoFactory(connPool);
 
 console.log(`Generating product names...
   beginning id: ${program.beginId}
