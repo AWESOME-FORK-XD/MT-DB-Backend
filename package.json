@@ -38,6 +38,7 @@
     "morgan": "~1.9.1",
     "mysql": "^2.18.1",
     "request": "^2.88.0",
+    "server-timing": "^3.3.2",
     "uuidv4": "^6.2.0"
   }
 }

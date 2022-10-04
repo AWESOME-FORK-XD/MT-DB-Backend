@@ -73,6 +73,14 @@ app.locals.authService = new AuthService(daoFactory);
 
 
 // Routing .....................................................................
+// For timing app, db response time
+const serverTiming = require('server-timing');
+app.use(serverTiming());
+app.use(function(req, res, next){
+  res.startTime('app');
+  next();
+});
+
 var authRouter = require('./routes/auth');
 
 var productsApiRouter = require('./routes/api/products-api');

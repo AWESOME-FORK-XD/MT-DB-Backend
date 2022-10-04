@@ -328,7 +328,10 @@ where model = ?`;
   // get count first
   let fullCountSql = `SELECT COUNT(pc.id) AS total FROM v_product_catalog pc ${criteria_clause}`;
   // console.log(`\n\nfull quicksearch count sql: ${fullCountSql}\n\n`);
+  res.startTime('db');
+  res.startTime('db.count', 'quicksearch count query');
   let qtotal = await ProductCatalogView.sqlCommand(fullCountSql, criteria.parms);
+  res.endTime('db.count');
   qresult.total = qtotal[0].total;
 
   if(qresult.total>0){
@@ -340,8 +343,9 @@ where model = ?`;
     let fullSql = `SELECT ${PRODUCT_FIELDS.map(x=>`p.${x}`).join(', ')}, pc.stock_usa, pc.stock_eu, pc.stock_zh, pc.models, pc.filter_option_ids FROM v_product_catalog pc INNER JOIN v_product p ON p.id=pc.id ${criteria_clause} ORDER BY p.sku ASC LIMIT ${limit} OFFSET ${offset}`;
     // console.log(`\n\nfull quicksearch sql: ${fullSql}\n\n`);
 
+    res.startTime('db.query', 'quicksearch query');
     qresult.products = await ProductView.sqlCommand(fullSql, criteria.parms);
-  
+    res.endTime('db.query');
   
     // additional decoration?
     if(req.query && req.query.with){
@@ -349,10 +353,15 @@ where model = ?`;
 
         const product_image_query = `SELECT pi.* FROM v_product_image pi INNER JOIN ( SELECT pc.id FROM v_product_catalog pc ${criteria_clause}) AS query ON pi.product_id = query.id ORDER BY pi.product_id ASC, pi.priority_order ASC`;
 
+        res.startTime('db.images','also retrieve images');
         qresult.product_images = await ProductView.sqlCommand(product_image_query, criteria.parms);
+        res.endTime('db.images');
       }
     }
   }
+  res.endTime('db');
+  res.endTime('app');
+
   res.status(200).json(qresult);
   
 });
