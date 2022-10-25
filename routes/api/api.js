@@ -36,6 +36,16 @@ router.get('/brands/:brand_id', function (req, res, next) {
 
 }, fetchById, resultToJson);
 
+/** Get a customer by id */
+router.get('/customers/:customer_id', function (req, res, next) {
+  res.locals.dbInstructions = {
+    dao: req.app.locals.database.getDao('customer'),
+    id: req.params.customer_id
+  };
+  next();
+
+}, fetchById, resultToJson);
+
 /** Update a brand */
 router.put('/brands/:brand_id', function (req, res, next) {
 

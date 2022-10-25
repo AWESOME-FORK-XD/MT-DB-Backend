@@ -4,6 +4,11 @@
   "private": true,
   "scripts": {
     "use-development": "cp .env.development.local .env",
+    
+    "use-brandingtest": "cp .env.brandingtest.local .env",
+    "package-brandingtest": "npm run use-brandingtest && sam package --profile medten-test --template-file sam-brandingtest.yaml --output-template-file package-brandingtest.yaml --resolve-s3",
+    "deploy-brandingtest": "aws cloudformation deploy --profile medten-test --template-file package-brandingtest.yaml --stack-name productdb-brandingtest-backend",
+    
     "use-test": "cp .env.test.local .env",
     "package-test": "npm run use-test && sam package --profile medten-test --template-file sam-test.yaml --output-template-file package-test.yaml --resolve-s3",
     "deploy-test": "aws cloudformation deploy --profile medten-test --template-file package-test.yaml --stack-name productdb-backend",

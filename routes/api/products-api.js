@@ -5,6 +5,7 @@ const { fetchManySqlAnd, resultToCsv, resultToJsonDownload, resultToAccept} = re
 const debug = require('debug')('medten:routes');
 const {parseAdvancedSearchRequest} = require('./common');
 const authenticated = require('../middleware/authenticated');
+const customerDependent = require('../middleware/customer-dependent');
 const { CriteriaHelper } = require('@apigrate/dao');
 
 const ALLOWED_SEARCH_PARAMETERS = [ 
@@ -233,7 +234,7 @@ router.post('/catalog', async function (req, res, next) {
 });
 
 /** Gets an array products meeting the specified criteria. The search term checks the sku, oem fields on the t_product table and the t_product_oem_reference.name field for matches and partial matches. */
-router.get('/quicksearch', async function (req, res, next) {
+router.get('/quicksearch', customerDependent(), async function (req, res, next) {
   let locale = "US";
 
   let search_term = req.query ? req.query.search_term : "";
@@ -259,6 +260,10 @@ router.get('/quicksearch', async function (req, res, next) {
     .or('pc.oem_refs', 'LIKE', search_term)
     .groupEnd();
 
+  // extended customer product table.
+  let customer_product_clause = '';
+  customer_product_clause = ` LEFT OUTER JOIN t_product_customer pcust ON pcust.product_id=pc.id AND pcust.customer_id=${res.locals.customer_id} `;
+    
   // published for the locale?
   let marketing_region_clause = '';
   if(locale === 'US'){ 
@@ -301,7 +306,7 @@ router.get('/quicksearch', async function (req, res, next) {
     if(req.query.created_since){
       criteria.and ( 'pc.created', '>=', req.query.created_since );
     }
-    
+
 
     // when model is known, find compatible products based on equipment/group/family/product relationship
 
@@ -318,7 +323,7 @@ where model = ?`;
     }
   }
 
-  let criteria_clause = `${marketing_region_clause} ${equipment_clause} WHERE ${criteria.whereClause}`;
+  let criteria_clause = `${customer_product_clause} ${marketing_region_clause} ${equipment_clause} WHERE ${criteria.whereClause}`;
   
   let ProductCatalogView = req.app.locals.database.getDao('product_catalog_view');
   let ProductView = req.app.locals.database.getDao('product_view');
@@ -339,8 +344,17 @@ where model = ?`;
     let limit = Number.isFinite( Number.parseInt(req.query.limit) ) ? Number.parseInt(req.query.limit) : 5000;
   
     const PRODUCT_FIELDS = ['id','category_id','name_en','description_en','oem','oem_brand_en','oem_brand_id','packaging_factor','product_type_id','product_type_en','price_us','list_price_us','sku','family_id','ad_url','featured','popular','new_arrival'];
+    // customer-specific properties must all begin with 'customer_'...
+    const PRODUCT_CUSTOMER_FIELDS = ['sku as customer_sku'];
  
-    let fullSql = `SELECT ${PRODUCT_FIELDS.map(x=>`p.${x}`).join(', ')}, pc.stock_usa, pc.stock_eu, pc.stock_zh, pc.models, pc.filter_option_ids FROM v_product_catalog pc INNER JOIN v_product p ON p.id=pc.id ${criteria_clause} ORDER BY p.sku ASC LIMIT ${limit} OFFSET ${offset}`;
+    let fullSql = `SELECT 
+  ${PRODUCT_FIELDS.map(x=>`p.${x}`).join(', ')}, 
+  pc.stock_usa, pc.stock_eu, pc.stock_zh, pc.models, pc.filter_option_ids,
+  ${PRODUCT_CUSTOMER_FIELDS.map(x=>`pcust.${x}`).join(', ')}
+  FROM v_product_catalog pc 
+  INNER JOIN v_product p ON p.id=pc.id 
+  ${criteria_clause} 
+  ORDER BY p.sku ASC LIMIT ${limit} OFFSET ${offset}`;
     // console.log(`\n\nfull quicksearch sql: ${fullSql}\n\n`);
 
     res.startTime('db.query', 'quicksearch query');
@@ -380,7 +394,7 @@ router.get('/oems', async function (req, res, next) {
  * Purpose-built API for displaying the full product and info on the catalog page. The extended view of the product is returned. 
  * along with other decorating data.
  */
-router.get('/:product_id/detail', async function (req, res, next) {
+router.get('/:product_id/detail', customerDependent(), async function (req, res, next) {
   try{
     let result = {
       //...product fields
@@ -403,9 +417,17 @@ router.get('/:product_id/detail', async function (req, res, next) {
   
     let pv = await productViewDao.one({id: req.params.product_id, publish: true});
     if(!pv) return res.status(404).end(); 
-  
+    
     Object.assign(result, pv);
-  
+
+    // customer-specific properties all begin with (customer_...)
+    let pcustDao = req.app.locals.database.getDao('product_customer');
+    let pcust = pcustDao.one({product_id: req.params.product_id, customer_id: res.locals.customer_id});
+    if(pcust){
+      //...anything in this block should also match field names as defined in quicksearch API
+      result.customer_sku = pcust.sku;
+    }
+    
     // //category path
     // let categoryDao = req.app.locals.database.getDao('category');
     // let depth = 0;

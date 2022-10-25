@@ -28,6 +28,7 @@ class DaoFactory {
       {table: 't_category',                    entity: 'category',                    options: this.standard_opts },
       {table: 't_certificate',                 entity: 'certificate',                 options: this.standard_opts },
       {table: 't_custom_attribute',            entity: 'custom_attribute',            options: this.standard_opts },
+      {table: 't_customer',                    entity: 'customer',                    options: this.standard_opts },
       {table: 't_equipment',                   entity: 'equipment',                   options: this.standard_opts },
       {table: 't_equipment_available_region',  entity: 'equipment_available_region',  options: this.standard_opts },
       {table: 't_equipment_group',             entity: 'equipment_group',             options: this.standard_opts },
@@ -45,6 +46,7 @@ class DaoFactory {
       {table: 't_product',                     entity: 'product',                     options: this.standard_opts },
       {table: 't_product_certificate',         entity: 'product_certificate',         options: this.standard_opts },
       {table: 't_product_custom_attribute',    entity: 'product_custom_attribute',    options: this.standard_opts },
+      {table: 't_product_customer',            entity: 'product_customer',            options: this.standard_opts },
       {table: 't_product_equipment_connect',   entity: 'product_equipment_connect',   options: this.standard_opts },
       
       {table: 't_product_family_connect',      entity: 'product_family_connect',      options: this.standard_opts },

@@ -87,6 +87,7 @@ var productsApiRouter = require('./routes/api/products-api');
 var familiesApiRouter = require('./routes/api/families-api');
 var equipmentApiRouter = require('./routes/api/equipment-api');
 var groupsApiRouter = require('./routes/api/groups-api');
+var customerIdentityRouter = require('./routes/customer-identity');
 var apiRouter = require('./routes/api/api');
 var dataloadApiRouter = require('./routes/api/dataload-api');
 
@@ -99,6 +100,7 @@ app.use('/api/v1/products', productsApiRouter);
 app.use('/api/v1/families', familiesApiRouter);
 app.use('/api/v1/equipment', equipmentApiRouter);
 app.use('/api/v1/groups', groupsApiRouter);
+app.use('/api/v1/customer-identity', customerIdentityRouter);
 app.use('/api/v1', apiRouter);
 app.use('/api/v1/dataload', authenticated(), dataloadApiRouter);
 
