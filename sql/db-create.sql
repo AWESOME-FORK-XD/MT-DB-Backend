@@ -105,6 +105,7 @@ CREATE TABLE `t_category` (
   `parent_id` int(11) unsigned DEFAULT NULL,
   `product_name_formula_id` int(11) unsigned DEFAULT NULL,
   `product_description_formula_id` int(11) unsigned DEFAULT NULL,
+  `publish` bit not null,
   `featured` bit not null,
   `image_url` varchar(255) not null,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -199,6 +200,7 @@ CREATE TABLE `t_family` (
   `family_code` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
   `group_id` int(11) unsigned NOT NULL,
   `family_connector_code` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `image_type_id` int unsigned DEFAULT null,
   `image_link_connector_distal` varchar(255) DEFAULT NULL,
   `name_en` varchar(255) DEFAULT null,
   `name_edit_user_id` int unsigned DEFAULT null,
@@ -597,6 +599,9 @@ ALTER TABLE `t_equipment_image`
 
 ALTER TABLE `t_family` 
   ADD CONSTRAINT `fk_family_group` FOREIGN KEY (`group_id`) REFERENCES `t_group` (`id`);
+
+ALTER TABLE t_family 
+  ADD CONSTRAINT fk_family_distal_image_type FOREIGN KEY (image_type_id) REFERENCES t_image_type (id);
 
 
 ALTER TABLE `t_filter` 

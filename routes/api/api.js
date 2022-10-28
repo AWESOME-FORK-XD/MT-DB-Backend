@@ -49,7 +49,7 @@ router.put('/brands/:brand_id', function (req, res, next) {
 }, updateById, resultToJson);
 
 
-router.get('/categories', parseQueryOptions(['name_en','id','featured'], ["+parent_id","+id"], 1000),
+router.get('/categories', parseQueryOptions(['name_en','id','featured','publish'], ["+parent_id","+id"], 1000),
   function (req, res, next) {
     res.locals.dbInstructions = {
       dao: req.app.locals.database.getDao('category_view'),
@@ -164,7 +164,7 @@ router.get('/filter_option_views', parseQueryOptions(['category_id','category_en
     next();
   }, fetchMany, resultToJson);
 
-router.get('/filters', parseQueryOptions(['category_id','name_en','name_zh','id'], ['+name_en','+category_id','+id'], 1000), 
+router.get('/filters', parseQueryOptions(['category_id','name_en','name_zh','id','visible_in_catalog',], ['+name_en','+category_id','+id'], 1000), 
   function (req, res, next) {
     res.locals.dbInstructions = {
       dao: req.app.locals.database.getDao('filter'),

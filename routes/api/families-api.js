@@ -11,6 +11,7 @@ const ALLOWED_SEARCH_PARAMETERS = [
   'family_code',
   'group_id',
   'group_code',
+  'image_type_id',
   'image_link_connector_distal',
   'name_en',
   'created',

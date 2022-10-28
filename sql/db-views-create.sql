@@ -38,7 +38,7 @@ order by filter_id asc, filter_option_id asc;
 -- filter_id is needed to render the dynamic elements properly.
 create view v_product_filter_option
 as select pfo.id, pfo.product_id, 
-f.id as filter_id, f.name_en as filter_en, f.name_zh as filter_zh,
+f.id as filter_id, f.name_en as filter_en, f.name_zh as filter_zh, f.visible_in_catalog,
 fo.id as filter_option_id, fo.option_en, fo.option_zh, fo.option_us,
 pfo.priority_order, pfo.created, pfo.updated, pfo.version
 from t_product_filter_option pfo
@@ -49,7 +49,7 @@ order by pfo.product_id asc, fo.filter_id asc;
 -- family with brand, group info
 create view v_family as select f.`id`, f.`name_en`, f.`family_code`, f.`family_connector_code`, 
 f.`group_id`, g.`group_code`,
-f.`image_link_connector_distal`, f.`video_link`, f.`created`, f.`updated`
+f.image_type_id, f.`image_link_connector_distal`, f.`video_link`, f.`created`, f.`updated`
 from t_family f
 left outer join t_group g on g.id=f.group_id;
 
@@ -102,7 +102,7 @@ join v_equipment e on e.id = pe.equipment_id;
 
 -- category view (to pick up formulas)
 create view v_category as select 
-c.id, c.name_en, c.name_zh, c.parent_id, c.featured, c.image_url,
+c.id, c.name_en, c.name_zh, c.parent_id, c.publish, c.featured, c.image_url,
 nf.content as product_name_formula, df.content as product_description_formula, ff.content as family_name_formula,
 c.created, c.updated, c.version
 from t_category c 
