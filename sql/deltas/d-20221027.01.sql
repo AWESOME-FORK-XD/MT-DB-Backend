@@ -2,7 +2,7 @@
   Several database changes to control visibility, manage UI filtering.
 
   Created: 10/27/2022 by Derek Gau
-  Deployed: 
+  Deployed: 10/28/2022 by Derek Gau
 */
 
 -- Trello Card #23
