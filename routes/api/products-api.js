@@ -422,7 +422,7 @@ router.get('/:product_id/detail', customerDependent(), async function (req, res,
 
     // customer-specific properties all begin with (customer_...)
     let pcustDao = req.app.locals.database.getDao('product_customer');
-    let pcust = pcustDao.one({product_id: req.params.product_id, customer_id: res.locals.customer_id});
+    let pcust = await pcustDao.one({product_id: req.params.product_id, customer_id: res.locals.customer_id});
     if(pcust){
       //...anything in this block should also match field names as defined in quicksearch API
       result.customer_sku = pcust.sku;
