@@ -59,6 +59,38 @@ router.post('/login', async function(req, res, next){
   }
 });
 
+/** Verification that session is OK. */
+router.get('/sessionok', async function(req, res, next){ 
+  try{
+    let token = req.get("Authorization");
+    console.log(token);
+    if(!token){
+      token = req.query.token;//allow to be specified in url for certain cases (reports).
+    } else {
+      let tmp = token.split(" ", 2);
+      if(!tmp || tmp.length !== 2) { 
+        debug("Invalid header (# of tokens).");
+        return res.status(200).json({valid: false});
+      } //Invalid header.
+      if(tmp[0] !== "Bearer") { 
+        debug("Invalid header (type of auth).");
+        return res.status(200).json({valid: false});
+      } //Invalid header
+      token = tmp[1];
+    }  
+    
+    if(!token) { 
+      debug("No header or authorization token could be found.");
+      return res.status(200).json({valid: false});
+    } //No header.
+
+    jwt.verify(token, process.env.JWT_SECRET);
+
+    return res.status(200).json({valid: true});
+  }catch(ex){
+    return res.status(200).json({valid: false});
+  }
+});
 
 /**
  * Initiates password-reset email process.
