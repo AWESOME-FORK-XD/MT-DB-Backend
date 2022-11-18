@@ -159,7 +159,7 @@ let parseAdvancedSearchRequest = async function (req, res, next){
       for(let field_name of payload.search_term_fields){
         if(field_name === 'oem_brand_en' || field_name === 'category_en'){
           if( !join.includes("v_product")){
-            join += ` JOIN v_product J on J.family_id = v.id`; 
+            join += ` LEFT OUTER JOIN v_product J on J.family_id = v.id`; 
           }
           criteria.or(`J.${field_name}`, 'LIKE', `%${payload.search_term}%`);
 
@@ -195,7 +195,7 @@ let parseAdvancedSearchRequest = async function (req, res, next){
     } else if (payload.category_id && dao.table === 'v_family') {
       // Ugly hack for family category query
       if( !join.includes("v_product")){
-        join += ` JOIN v_product J on J.family_id = v.id`; //ALWAYS ASSUMING A JOIN on the id column.
+        join += ` LEFT OUTER JOIN v_product J on J.family_id = v.id`; //ALWAYS ASSUMING A JOIN on the id column.
       }
       
       if( _.isArray(payload.category_id) ){
