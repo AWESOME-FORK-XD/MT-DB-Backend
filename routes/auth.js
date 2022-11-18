@@ -63,7 +63,6 @@ router.post('/login', async function(req, res, next){
 router.get('/sessionok', async function(req, res, next){ 
   try{
     let token = req.get("Authorization");
-    console.log(token);
     if(!token){
       token = req.query.token;//allow to be specified in url for certain cases (reports).
     } else {
