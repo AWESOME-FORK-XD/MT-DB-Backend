@@ -2,7 +2,8 @@
   Adds customer branding tables to the database.
   
   Created: 10/18/2022 by Derek Gau
-  Deployed:
+  Deployed to TEST: 11/30/2022 by Derek Gau
+  Deployed to PROD:
 */
 
 drop table if exists t_product_customer;
