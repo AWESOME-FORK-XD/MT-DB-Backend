@@ -383,11 +383,18 @@ FROM v_product_catalog pc INNER JOIN v_product p ON p.id=pc.id ${criteria_clause
     // Tally the final results
     if(qresult.products.length === 0){
       if(wordresult.products) qresult.products = wordresult.products;
+      if(wordresult.product_images) qresult.product_images = wordresult.product_images;
     } else {
       //Intersect.
       qresult.products = qresult.products.filter((p1)=>{
         let found = wordresult.products.findIndex((p2)=>{
           return p1.id === p2.id;
+        });
+        return found>=0;
+      });
+      qresult.product_images = qresult.product_images.filter((pimg1)=>{
+        let found = wordresult.product_images.findIndex((pimg2)=>{
+          return pimg1.id === pimg2.id;
         });
         return found>=0;
       });
