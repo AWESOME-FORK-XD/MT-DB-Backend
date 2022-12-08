@@ -237,173 +237,152 @@ router.post('/catalog', async function (req, res, next) {
 router.get('/quicksearch', customerDependent(), async function (req, res, next) {
   let locale = "US";
 
-  let initial_search_term = req.query ? req.query.search_term : "";
-  let words = [];
-  // Initial search term will be broken into words. Each word will be used as a separate query.
-  if(!initial_search_term){
-    initial_search_term = "%";
-    words.push("")
-  } else {
-    //Break search term into parts
-    words = initial_search_term.split(" ");
-  }
+  let search_term = req.query && req.query.search_term ? req.query.search_term : "";
+  
+  let criteria = new CriteriaHelper();
+   
+  let search_term_particles = search_term.split(/\s+/);
 
-  let qresult = { total: 0, products: [] };
+  criteria.andGroup();
+  for(let word of search_term_particles){
+    word = `%${word.trim()}%`;
 
-  for(let search_term of words){ 
-    let wordresult = {};
-
-    if(!search_term) search_term = "";
-    
-    search_term = `%${search_term}%`;
-
-    let criteria = new CriteriaHelper();
-    
     // Search term finds anything... (OR)
     criteria.andGroup()
       .or('pc.category_en', '<>', '')
-      .or('pc.category_en', 'LIKE', search_term)
+      .or('pc.category_en', 'LIKE', word)
+      .or('pc.name_en', '<>', '')
+      .or('pc.name_en', 'LIKE', word)
+      .or('pc.description_en', '<>', '')
+      .or('pc.description_en', 'LIKE', word)
       .or('pc.sku', '<>', '')
-      .or('pc.sku', 'LIKE', search_term)
+      .or('pc.sku', 'LIKE', word)
       .or('pc.oem', '<>', '')
-      .or('pc.oem', 'LIKE', search_term)
+      .or('pc.oem', 'LIKE', word)
       .or('pc.oem_brand_en', '<>', '')
-      .or('pc.oem_brand_en', 'LIKE', search_term)
+      .or('pc.oem_brand_en', 'LIKE', word)
       .or('pc.oem_refs', '<>', '')
-      .or('pc.oem_refs', 'LIKE', search_term)
+      .or('pc.oem_refs', 'LIKE', word)
       .groupEnd();
+  }
+  criteria.groupEnd();
 
-    // extended customer product table.
-    let customer_product_clause = '';
-    customer_product_clause = ` LEFT OUTER JOIN t_product_customer pcust ON pcust.product_id=pc.id AND pcust.customer_id=${res.locals.customer_id} `;
-      
-    // published for the locale?
-    let marketing_region_clause = '';
-    if(locale === 'US'){ 
-      criteria.and('pc.publish', '=', true);
-      criteria.and('mr.marketing_region_id', '=', 1);//1=usa 2=EU 3=China 4=Latin America 5=Asia(outside of china)
-      marketing_region_clause = 'INNER JOIN t_product_marketing_region mr on mr.product_id = pc.id'
+  // extended customer product table.
+  let customer_product_clause = '';
+  customer_product_clause = ` LEFT OUTER JOIN t_product_customer pcust ON pcust.product_id=pc.id AND pcust.customer_id=${res.locals.customer_id} `;
+    
+  // published for the locale?
+  let marketing_region_clause = '';
+  if(locale === 'US'){ 
+    criteria.and('pc.publish', '=', true);
+    criteria.and('mr.marketing_region_id', '=', 1);//1=usa 2=EU 3=China 4=Latin America 5=Asia(outside of china)
+    marketing_region_clause = 'INNER JOIN t_product_marketing_region mr on mr.product_id = pc.id'
+  }
+  
+  // Specific values narrow the search... (AND)
+  let equipment_clause = '';//special case
+  if(req.query){
+    if(req.query.product_ids){
+      criteria.and ( 'pc.id', 'IN', req.query.product_ids.split('|') );
     }
     
-    // Specific values narrow the search... (AND)
-    let equipment_clause = '';//special case
-    if(req.query){
-      if(req.query.product_ids){
-        criteria.and ( 'pc.id', 'IN', req.query.product_ids.split('|') );
-      }
-      
-      if(req.query.featured){
-        criteria.and ( 'pc.featured', '=', req.query.featured );
-      }
+    if(req.query.featured){
+      criteria.and ( 'pc.featured', '=', req.query.featured );
+    }
 
-      if(req.query.popular){
-        criteria.and ( 'pc.popular', '=', req.query.popular );
-      }
+    if(req.query.popular){
+      criteria.and ( 'pc.popular', '=', req.query.popular );
+    }
 
-      if(req.query.new_arrival){
-        criteria.and ( 'pc.new_arrival', '=', req.query.new_arrival );
-      }
+    if(req.query.new_arrival){
+      criteria.and ( 'pc.new_arrival', '=', req.query.new_arrival );
+    }
 
-      if(req.query.brand_ids){
-        criteria.and ( 'pc.oem_brand_id', 'IN', req.query.brand_ids.split('|') );
-      }
-    
-      if(req.query.category_ids){
-        criteria.and ( 'pc.category_id', 'IN', req.query.category_ids.split('|') );
-      }
+    if(req.query.brand_ids){
+      criteria.and ( 'pc.oem_brand_id', 'IN', req.query.brand_ids.split('|') );
+    }
+  
+    if(req.query.category_ids){
+      criteria.and ( 'pc.category_id', 'IN', req.query.category_ids.split('|') );
+    }
 
-      if(req.query.family_ids){
-        criteria.and ( 'pc.family_id', 'IN', req.query.family_ids.split('|') );
-      }
+    if(req.query.family_ids){
+      criteria.and ( 'pc.family_id', 'IN', req.query.family_ids.split('|') );
+    }
 
-      if(req.query.created_since){
-        criteria.and ( 'pc.created', '>=', req.query.created_since );
-      }
+    if(req.query.created_since){
+      criteria.and ( 'pc.created', '>=', req.query.created_since );
+    }
 
 
-      // when model is known, find compatible products based on equipment/group/family/product relationship
+    // when model is known, find compatible products based on equipment/group/family/product relationship
 
-      if(req.query.model){
-        const MODEL_COMPATIBILITY_QUERY_SQL = `SELECT DISTINCT(p.id)
+    if(req.query.model){
+      const MODEL_COMPATIBILITY_QUERY_SQL = `SELECT DISTINCT(p.id)
 FROM v_equipment_group eg
 JOIN t_group g on g.id = eg.group_id
 JOIN t_family f on f.group_id = g.id
 JOIN v_product p on p.family_id = f.id
 where model = ?`;
 
-        equipment_clause = ` INNER JOIN( ${MODEL_COMPATIBILITY_QUERY_SQL} ) AS modsearch ON modsearch.id = pc.id `;
-        criteria.parms.splice( 0, 0, req.query.model );
-      }
+      equipment_clause = ` INNER JOIN( ${MODEL_COMPATIBILITY_QUERY_SQL} ) AS modsearch ON modsearch.id = pc.id `;
+      criteria.parms.splice( 0, 0, req.query.model );
     }
+  }
 
-    let criteria_clause = `${customer_product_clause} ${marketing_region_clause} ${equipment_clause} WHERE ${criteria.whereClause}`;
-    
-    let ProductCatalogView = req.app.locals.database.getDao('product_catalog_view');
-    let ProductView = req.app.locals.database.getDao('product_view');
-
-    // get count first
-    let fullCountSql = `SELECT COUNT(pc.id) AS total FROM v_product_catalog pc ${criteria_clause}`;
-    // console.log(`\n\nfull quicksearch count sql: ${fullCountSql}\n\n`);
-    res.startTime('db');
-    // res.startTime('db.count', 'quicksearch count query');
-    let qtotal = await ProductCatalogView.sqlCommand(fullCountSql, criteria.parms);
-    // res.endTime('db.count');
-
-    if(qtotal[0].total){
-      let offset = Number.isFinite( Number.parseInt(req.query.offset) ) ?  Number.parseInt(req.query.offset) : 0;
-      let limit = Number.isFinite( Number.parseInt(req.query.limit) ) ? Number.parseInt(req.query.limit) : 5000;
-    
-      const PRODUCT_FIELDS = ['id','category_id','name_en','description_en','oem','oem_brand_en','oem_brand_id','packaging_factor','product_type_id','product_type_en','price_us','list_price_us','sku','family_id','ad_url','featured','popular','new_arrival'];
-      // customer-specific properties must all begin with 'customer_'...
-      const PRODUCT_CUSTOMER_FIELDS = ['sku as customer_sku'];
+  let criteria_clause = `${customer_product_clause} ${marketing_region_clause} ${equipment_clause} WHERE ${criteria.whereClause}`;
   
-      let fullSql = `SELECT ${PRODUCT_FIELDS.map(x=>`p.${x}`).join(', ')}, 
-pc.stock_usa, pc.stock_eu, pc.stock_zh, pc.models, pc.filter_option_ids, ${PRODUCT_CUSTOMER_FIELDS.map(x=>`pcust.${x}`).join(', ')}
-FROM v_product_catalog pc INNER JOIN v_product p ON p.id=pc.id ${criteria_clause} ORDER BY p.sku ASC LIMIT ${limit} OFFSET ${offset}`;
-      // console.log(`\n\nfull quicksearch sql: ${fullSql}\n\n`);
+  let ProductCatalogView = req.app.locals.database.getDao('product_catalog_view');
+  let ProductView = req.app.locals.database.getDao('product_view');
+  
+  let qresult = { total: 0, products:[]};
 
-      res.startTime('db.query', 'quicksearch query');
-      wordresult.products = await ProductView.sqlCommand(fullSql, criteria.parms);
-      res.endTime('db.query');
-    
-      // additional decoration?
-      if(req.query && req.query.with){
-        if(req.query.with.includes('images')){
+  // get count first
+  let fullCountSql = `SELECT COUNT(pc.id) AS total FROM v_product_catalog pc ${criteria_clause}`;
+  // console.log(`\n\nfull quicksearch count sql: ${fullCountSql}\n\n`);
+  res.startTime('db');
+  res.startTime('db.count', 'quicksearch count query');
+  let qtotal = await ProductCatalogView.sqlCommand(fullCountSql, criteria.parms);
+  res.endTime('db.count');
+  qresult.total = qtotal[0].total;
 
-          const product_image_query = `SELECT pi.* FROM v_product_image pi INNER JOIN ( SELECT pc.id FROM v_product_catalog pc ${criteria_clause}) AS query ON pi.product_id = query.id ORDER BY pi.product_id ASC, pi.priority_order ASC`;
+  if(qresult.total>0){
+    let offset = Number.isFinite( Number.parseInt(req.query.offset) ) ?  Number.parseInt(req.query.offset) : 0;
+    let limit = Number.isFinite( Number.parseInt(req.query.limit) ) ? Number.parseInt(req.query.limit) : 5000;
+  
+    const PRODUCT_FIELDS = ['id','category_id','name_en','description_en','oem','oem_brand_en','oem_brand_id','packaging_factor','product_type_id','product_type_en','price_us','list_price_us','sku','family_id','ad_url','featured','popular','new_arrival'];
+    // customer-specific properties must all begin with 'customer_'...
+    const PRODUCT_CUSTOMER_FIELDS = ['sku as customer_sku'];
+ 
+    let fullSql = `SELECT 
+  ${PRODUCT_FIELDS.map(x=>`p.${x}`).join(', ')}, 
+  pc.stock_usa, pc.stock_eu, pc.stock_zh, pc.models, pc.filter_option_ids,
+  ${PRODUCT_CUSTOMER_FIELDS.map(x=>`pcust.${x}`).join(', ')}
+  FROM v_product_catalog pc 
+  INNER JOIN v_product p ON p.id=pc.id 
+  ${criteria_clause} 
+  ORDER BY p.sku ASC LIMIT ${limit} OFFSET ${offset}`;
+    // console.log(`\n\nfull quicksearch sql: ${fullSql}\n\n`);
 
-          res.startTime('db.images','also retrieve images');
-          wordresult.product_images = await ProductView.sqlCommand(product_image_query, criteria.parms);
-          res.endTime('db.images');
-        }
+    res.startTime('db.query', 'quicksearch query');
+    qresult.products = await ProductView.sqlCommand(fullSql, criteria.parms);
+    res.endTime('db.query');
+  
+    // additional decoration?
+    if(req.query && req.query.with){
+      if(req.query.with.includes('images')){
+
+        const product_image_query = `SELECT pi.* FROM v_product_image pi INNER JOIN ( SELECT pc.id FROM v_product_catalog pc ${criteria_clause}) AS query ON pi.product_id = query.id ORDER BY pi.product_id ASC, pi.priority_order ASC`;
+
+        res.startTime('db.images','also retrieve images');
+        qresult.product_images = await ProductView.sqlCommand(product_image_query, criteria.parms);
+        res.endTime('db.images');
       }
     }
-    res.endTime('db');
-
-    // Tally the final results
-    if(qresult.products.length === 0){
-      if(wordresult.products) qresult.products = wordresult.products;
-      if(wordresult.product_images) qresult.product_images = wordresult.product_images;
-    } else {
-      //Intersect.
-      qresult.products = qresult.products.filter((p1)=>{
-        let found = wordresult.products.findIndex((p2)=>{
-          return p1.id === p2.id;
-        });
-        return found>=0;
-      });
-      qresult.product_images = qresult.product_images.filter((pimg1)=>{
-        let found = wordresult.product_images.findIndex((pimg2)=>{
-          return pimg1.id === pimg2.id;
-        });
-        return found>=0;
-      });
-      qresult.total = qresult.products.length;
-    }
-  }//for each individual search term.
-
+  }
+  res.endTime('db');
   res.endTime('app');
- 
+
   res.status(200).json(qresult);
   
 });

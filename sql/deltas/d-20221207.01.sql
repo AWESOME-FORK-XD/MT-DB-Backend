@@ -1,5 +1,7 @@
 /* 
-  Adds `name_seo` column to database.
+  Adds `name_seo` column to t_product table and related views.
+
+  Adds `description_en` column to the v_product_catalog view
   
   Created: 12/07/2022 by Derek Gau
   Deployed to TEST: 12/07/2022 by Derek Gau
@@ -40,7 +42,7 @@ left outer join t_packaging_factor pf on pf.id = p.packaging_factor_id;
 drop view if exists v_product_catalog;
 
 create view v_product_catalog as
-select p.id, p.name_en, p.name_seo, p.sku, p.category_id, p.category_en, p.oem_brand_id, p.oem_brand_en, p.oem, 
+select p.id, p.name_en, p.description_en, p.name_seo, p.sku, p.category_id, p.category_en, p.oem_brand_id, p.oem_brand_en, p.oem, 
 p.publish, p.stock_usa, p.stock_eu, p.stock_zh, p.popular, p.featured, p.has_components, p.created, p.updated,
 p.outsourced, p.source_region, p.minimum_profit_pct, p.leadtime, p.dealer_price,
 p.ad_url, p.list_price_us, p.new_arrival,
