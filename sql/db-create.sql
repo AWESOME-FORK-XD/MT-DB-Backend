@@ -288,6 +288,7 @@ CREATE TABLE `t_product` (
   `name_zh` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '',
   `name_zh_edit_user_id` int unsigned DEFAULT null,
   `name_zh_edit_timestamp` timestamp DEFAULT null,
+  `name_seo` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '',
   `description_zh` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
   `packaging_factor_id` int(11) unsigned DEFAULT NULL,
   -- `packaging_factor` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '1',

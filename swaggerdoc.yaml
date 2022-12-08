@@ -3596,6 +3596,9 @@ components:
             name_zh:
               type: string
               maxLength: 255
+            name_seo:
+              type: string
+              maxLength: 255
             note_internal:
               type: string
             note_client:
