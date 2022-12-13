@@ -1931,53 +1931,12 @@ paths:
                     type: array
                     items:
                       type: object
-                      properties:
-                        id:
-                          type: integer
-                        category_id:
-                          type: integer
-                        name_en:
-                          type: string
-                        description_en:
-                          type: string
-                        family_id:
-                          type: integer
-                        list_price_us:
-                          type: number
-                        oem:
-                          type: string
-                        oem_brand_en:
-                          type: string
-                        oem_brand_id:
-                          type: integer
-                        packaging_factor:
-                          type: string
-                        product_type_id:
-                          type: integer
-                        product_type_en:
-                          type: string
-                        price_us:
-                          type: number
-                        sku:
-                          type: string
-                        stock_usa:
-                          type: number
-                        stock_eu:
-                          type: number
-                        stock_zh:
-                          type: number
-                        models:
-                          type: string
-                          description: pipe-separated list of models
-                        filter_option_ids:
-                          type: string
-                          description: pipe-separated list of filter option ids
+                      $ref: '#/components/schemas/ProductCatalog'
                   product_images:
                     type: array
                     items:
                       type: object
                       $ref: '#/components/schemas/ProductImage'
-
                     
         400:
           $ref: '#/components/responses/400ClientError'
