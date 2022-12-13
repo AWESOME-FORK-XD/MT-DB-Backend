@@ -25,6 +25,7 @@ class DaoFactory {
       // product data tables
       {table: 't_available_region',            entity: 'available_region',            options: this.standard_opts },
       {table: 't_brand',                       entity: 'brand',                       options: this.standard_opts },
+      {table: 't_buyer_price',                 entity: 'buyer_price',                 options: this.standard_opts },
       {table: 't_category',                    entity: 'category',                    options: this.standard_opts },
       {table: 't_certificate',                 entity: 'certificate',                 options: this.standard_opts },
       {table: 't_custom_attribute',            entity: 'custom_attribute',            options: this.standard_opts },

@@ -83,6 +83,7 @@ app.use(function(req, res, next){
 
 var authRouter = require('./routes/auth');
 
+var pricesApiRouter = require('./routes/api/price-api');
 var productsApiRouter = require('./routes/api/products-api');
 var familiesApiRouter = require('./routes/api/families-api');
 var equipmentApiRouter = require('./routes/api/equipment-api');
@@ -97,6 +98,7 @@ app.use('/auth', authRouter);
 const authenticated = require('./routes/middleware/authenticated');
 
 app.use('/api/v1/products', productsApiRouter);
+app.use('/api/v1/prices', pricesApiRouter);
 app.use('/api/v1/families', familiesApiRouter);
 app.use('/api/v1/equipment', equipmentApiRouter);
 app.use('/api/v1/groups', groupsApiRouter);
