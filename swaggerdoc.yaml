@@ -143,6 +143,18 @@ paths:
       required: false
       schema:
         type: string
+    - name: is_popular
+      in: query
+      description: return popular brands (1=true, 0=false)
+      required: false
+      schema:
+        type: integer
+    - name: is_oem
+      in: query
+      description: return brand marked as oems (1=true, 0=false)
+      required: false
+      schema:
+        type: integer
     get:
       summary: searches for brands
       tags:
@@ -3041,6 +3053,8 @@ components:
               type: integer
             is_oem:
               type: boolean
+            is_popular:
+              type: boolean
         - $ref: '#/components/schemas/Auditable'
     Category:
       type: object
@@ -3658,6 +3672,74 @@ components:
               type: number
               format: double
         - $ref: '#/components/schemas/Auditable'
+    ProductCatalog:
+      type: object
+      description: The public catalog view of a medical product.
+      allOf:
+        - type: object
+          properties:
+            ad_url:
+              type: string
+            category_id:
+              type: integer
+            customer_sku:
+              description: returned when the catalog is viewed through a customer context and a customer-specific sku exists
+              type: string
+            description_en:
+              type: string
+            family_id:
+              type: integer
+            featured:
+              type: boolean
+            filter_option_ids:
+              description: pipe-separated list of filter option ids
+              type: string
+            id:
+              type: integer
+            is_oem:
+              type: boolean
+            list_price_us:
+              type: number
+              format: double
+            models:
+              description: pipe-separated list of models
+              type: string
+            name_en:
+              type: string
+            name_zh:
+              type: string
+            new_arrival:
+              type: boolean
+            oem:
+              type: string
+            oem_brand_id:
+              type: integer
+            oem_brand_en:
+              type: string
+            packaging_factor:
+              type: string
+            popular:
+              type: boolean
+            price_us:
+              type: number
+              format: double
+            product_type_id:
+              type: integer
+            product_type_en:
+              type: string
+            sku:
+              type: string
+            stock_eu:
+              type: number
+              format: integer
+            stock_usa:
+              type: number
+              format: integer
+            stock_zh:
+              type: number
+              format: integer
+            
+        - $ref: '#/components/schemas/Auditable'
     ProductCertificate:
       type: object
       description: An association between a product and a certificate.
@@ -3854,7 +3936,11 @@ components:
           image_type:
             description: name of the image type
             type: string
+          image_type_priority:
+            description: the priority at the image type level
+            type: integer
           priority_order:
+            description: the priority order at the product level
             type: integer
           image_link:
             type: string

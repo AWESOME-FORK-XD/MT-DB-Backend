@@ -1,13 +1,11 @@
 /* 
   Adds `name_seo` column to t_product table and related views.
-
-  Adds `description_en` column to the v_product_catalog view
-  
-  Created: 12/07/2022 by Derek Gau
-  Deployed to TEST: 12/07/2022 by Derek Gau
-  Deployed to PROD:
+  Adds `priority` column to t_image_type table and related views. 
+  Adds `is_popular` column to t_brand table and related views.
 */
 alter table t_product add column `name_seo` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '';
+alter table t_image_type add column `priority` smallint unsigned not null default 0;
+alter table t_brand add column `is_popular` bit not null;
 
 -- main product view
 drop view if exists v_product;
@@ -64,3 +62,13 @@ left outer join (
 left outer join (
   select product_id, GROUP_CONCAT( distinct filter_option_id separator '|' ) as filter_option_ids from t_product_filter_option group by product_id
 ) as pfilo on pfilo.product_id = p.id;
+
+
+-- replace product image view with one containing image_type_priority
+drop view if exists v_product_image;
+
+create view v_product_image as select pi.id, pi.product_id, pi.image_type_id,
+it.name as image_type, it.priority as image_type_priority,
+pi.priority_order, pi.image_link, pi.created, pi.updated, pi.version 
+from t_product_image pi 
+left outer join t_image_type it on it.id = pi.image_type_id;

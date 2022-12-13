@@ -91,6 +91,7 @@ CREATE TABLE `t_brand` (
   `name_zh` varchar(255) NOT NULL DEFAULT '',
   `parent_id` int(11) unsigned DEFAULT NULL,
   `is_oem` tinyint(3) NOT NULL DEFAULT '0',
+  `is_popular` bit not null,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `version` int(11) NOT NULL DEFAULT '0',
@@ -254,6 +255,7 @@ CREATE TABLE `t_group` (
 CREATE TABLE `t_image_type` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL DEFAULT '',
+  `priority` smallint unsigned NOT NULL DEFAULT 0,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `version` int(11) NOT NULL DEFAULT '0',
