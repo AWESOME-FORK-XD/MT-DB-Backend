@@ -480,8 +480,15 @@ router.get('/:product_id/detail', customerDependent(), async function (req, res,
     result.oem_products      = related_results[5].value;
     result.family            = related_results[6].value;
     result.certificates      = related_results[7].value;
-    result.family_connections= related_results[8].value.map(fc=>fc.family_id);
-  
+
+    // case where there are no family connections
+    let tempFamilyConn = related_results[8].value;
+    if(tempFamilyConn && tempFamilyConn.length > 0){
+      result.family_connections = tempFamilyConn.map(fc=>fc.family_id);
+    } else {
+      result.family_connections = [];
+    }
+    
     // redact internal notes, supplier info.
     delete result.note_internal;
     delete result.product_name_formula;
