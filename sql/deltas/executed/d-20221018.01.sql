@@ -3,7 +3,7 @@
   
   Created: 10/18/2022 by Derek Gau
   Deployed to TEST: 11/30/2022 by Derek Gau
-  Deployed to PROD:
+  Deployed to PROD: 12/14/2022 by Derek Gau
 */
 
 drop table if exists t_product_customer;

@@ -2,6 +2,11 @@
   Adds `name_seo` column to t_product table and related views.
   Adds `priority` column to t_image_type table and related views. 
   Adds `is_popular` column to t_brand table and related views.
+
+  Created: 12/07/2022 by Derek Gau
+  Deployed to TEST: 12/07/2022 by Derek Gau
+  Deployed to PROD: 12/14/2022 by Derek Gau
+
 */
 alter table t_product add column `name_seo` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '';
 alter table t_image_type add column `priority` smallint unsigned not null default 0;
