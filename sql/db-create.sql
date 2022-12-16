@@ -92,6 +92,7 @@ CREATE TABLE `t_brand` (
   `parent_id` int(11) unsigned DEFAULT NULL,
   `is_oem` tinyint(3) NOT NULL DEFAULT '0',
   `is_popular` bit not null,
+  `is_popular_branded` bit not null,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `version` int(11) NOT NULL DEFAULT '0',

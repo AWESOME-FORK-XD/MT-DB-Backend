@@ -149,6 +149,12 @@ paths:
       required: false
       schema:
         type: integer
+    - name: is_popular_branded
+      in: query
+      description: return popular brands when viewing from a branded context (1=true, 0=false)
+      required: false
+      schema:
+        type: integer
     - name: is_oem
       in: query
       description: return brand marked as oems (1=true, 0=false)
@@ -3013,6 +3019,8 @@ components:
             is_oem:
               type: boolean
             is_popular:
+              type: boolean
+            is_popular_branded:
               type: boolean
         - $ref: '#/components/schemas/Auditable'
     Category:

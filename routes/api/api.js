@@ -16,7 +16,7 @@ router.get('/available_regions',
   }, fetchMany, resultToJson);
 
 router.get('/brands', 
-  parseQueryOptions(['name_en','name_zh','id','is_popular','is_oem','parent_id'], ['+name_en','+id'], 1000),
+  parseQueryOptions(['name_en','name_zh','id','is_popular','is_popular_branded','is_oem','parent_id'], ['+name_en','+id'], 1000),
   function (req, res, next) {
     res.locals.dbInstructions = {
       dao: req.app.locals.database.getDao('brand'),
