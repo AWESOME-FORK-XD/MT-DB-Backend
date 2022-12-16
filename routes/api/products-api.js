@@ -263,6 +263,8 @@ router.get('/quicksearch', customerDependent(), async function (req, res, next) 
       .or('pc.oem_brand_en', 'LIKE', word)
       .or('pc.oem_refs', '<>', '')
       .or('pc.oem_refs', 'LIKE', word)
+      .or('pc.models', '<>', '')
+      .or('pc.models', 'LIKE', word)
       .groupEnd();
   }
   criteria.groupEnd();
