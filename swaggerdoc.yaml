@@ -3608,13 +3608,13 @@ components:
               maxLength: 100
             packaging_factor_id:
               type: integer
-            price_us:
+            list_price_us:
               type: number
               format: double
-            price_zh:
+            list_price_zh:
               type: number
               format: double
-            price_eu:
+            list_price_eu:
               type: number
               format: double
             product_name_formula:
@@ -3672,6 +3672,12 @@ components:
             is_oem:
               type: boolean
             list_price_us:
+              type: number
+              format: double
+            list_price_eu:
+              type: number
+              format: double
+            list_price_zh:
               type: number
               format: double
             models:
@@ -4038,9 +4044,43 @@ components:
             type: integer
           supplier_id:
             type: integer
+          marketing_region_id:
+            type: integer
           supplier_price:
             type: number
             description: the supplier price for the product
+          purchase_price:
+            type: number
+            format: double
+          minimum_profit:
+            type: integer
+          import_duty_us:
+            type: number
+            format: double
+          import_duty_eu:
+            type: number
+            format: double
+          import_duty_zh:
+            type: number
+            format: double
+          shipping_cost_us:
+            type: number
+            format: double
+          shipping_cost_eu:
+            type: number
+            format: double
+          shipping_cost_zh:
+            type: number
+            format: double
+          dealer_price_us:
+            type: number
+            format: double
+          dealer_price_eu:
+            type: number
+            format: double
+          dealer_price_zh:
+            type: number
+            format: double
       - $ref: '#/components/schemas/Auditable'
     SearchCriteria:
       type: object
