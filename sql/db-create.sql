@@ -317,6 +317,8 @@ CREATE TABLE `t_product` (
   `dealer_price` decimal(9,2) DEFAULT NULL,
   `ad_url` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '',
   `list_price_us` decimal(9,2) DEFAULT NULL,
+  `list_price_eu` decimal(9,2) DEFAULT NULL,
+  `list_price_zh` decimal(9,2) DEFAULT NULL,
   `new_arrival` bit not null,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -503,6 +505,18 @@ CREATE TABLE `t_product_supplier` (
   `product_id` int(11) unsigned DEFAULT NULL,
   `supplier_id` int(11) unsigned DEFAULT NULL,
   `supplier_price` decimal(9,2) DEFAULT NULL,
+   marketing_region_id int unsigned default null,
+   purchase_price decimal(9,2) default null,
+   minimum_profit int default null,
+   import_duty_us decimal(9,2) default null,
+   import_duty_eu decimal(9,2) default null,
+   import_duty_zh decimal(9,2) default null,
+   shipping_cost_us decimal(9,2) default null,
+   shipping_cost_eu decimal(9,2) default null,
+   shipping_cost_zh decimal(9,2) default null,
+   dealer_price_eu decimal(9,2) default null,
+   dealer_price_us decimal(9,2) default null,
+   dealer_price_zh decimal(9,2) default null,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `version` int(11) NOT NULL DEFAULT '0',
@@ -719,6 +733,8 @@ ALTER TABLE `t_product_supplier`
 ALTER TABLE `t_product_supplier` 
   ADD CONSTRAINT `fk_product_supplier_supplier` FOREIGN KEY (`supplier_id`) REFERENCES `t_supplier` (`id`);
 
+alter table `t_product_supplier`
+  add constraint `fk_product_supplier_mktg_region`  FOREIGN KEY (`marketing_region_id`) REFERENCES `t_marketing_region` (`id`);
 
 ALTER TABLE `t_equipment_available_region` 
   ADD CONSTRAINT `fk_equip_avail_region_equipment` FOREIGN KEY (`equipment_id`) REFERENCES `t_equipment` (`id`);
