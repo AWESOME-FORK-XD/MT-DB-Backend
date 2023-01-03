@@ -3354,10 +3354,16 @@ components:
             description: URL to a connector distal image.
             type: string
             maxLength: 255
+          image_type_id:
+            description: Image type for the image link.
+            type: integer
           video_link:
             description: URL to a video for the family.
             type: string
             maxLength: 255
+          image_type_priority:
+            description: References the display priority as determined by the image type.
+            type: integer
       - $ref: '#/components/schemas/Auditable'
     Group:
       type: object
@@ -3905,9 +3911,6 @@ components:
             type: string
           image_type_priority:
             description: the priority at the image type level
-            type: integer
-          priority_order:
-            description: the priority order at the product level
             type: integer
           image_link:
             type: string
