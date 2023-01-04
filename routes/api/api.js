@@ -1,8 +1,9 @@
 var express = require('express');
 var router = express.Router({ mergeParams: true });
-let { fetchMany, parseQueryOptions, fetchById, updateById, resultToJson} = require('@apigrate/dao/lib/express/db-api');
+let { create, fetchMany, parseQueryOptions, fetchById, updateById, resultToJson} = require('@apigrate/dao/lib/express/db-api');
 const { fetchManySqlAnd } = require('./db-api-ext');
 const { CriteriaHelper } = require('@apigrate/dao/lib/criteria-helper');
+const authenticated = require('../middleware/authenticated');
 
 router.get('/available_regions', 
   parseQueryOptions(['name_en','id'], ['+name_en','+id'], 1000),
@@ -270,6 +271,32 @@ router.get('/suppliers', parseQueryOptions(['name_en','name_zh','id'], ['+name_e
     next();
   }, fetchMany, resultToJson);
 
+/** Create a supplier */
+router.post('/suppliers', function (req, res, next) {
+  let entity = req.body;
+  res.locals.dbInstructions = {
+    dao: req.app.locals.database.getDao('supplier'),
+    toSave: entity
+  };
+  next();
+
+}, create, resultToJson);
+
+/** Update a supplier */
+router.put('/suppliers/:supplier_id', function (req, res, next) {
+  if(!req.params.supplier_id || req.params.supplier_id != req.body.id){
+    res.status(400).json({"error":"missing/invalid id"});
+    return;
+  }
+  
+  let entity = req.body;
+  res.locals.dbInstructions = {
+    dao: req.app.locals.database.getDao('supplier'),
+    toUpdate: entity
+  };
+  next();
+
+}, updateById, resultToJson);
 
 //Default error handling
 router.use(function (err, req, res, next) {
