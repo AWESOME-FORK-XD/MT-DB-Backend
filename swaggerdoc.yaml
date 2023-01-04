@@ -517,6 +517,61 @@ paths:
           $ref: '#/components/responses/400ClientError'
         500:
           $ref: '#/components/responses/500ServerError'
+    post:
+      summary: create a supplier
+      tags:
+        - general
+      requestBody:
+        description: >
+          The supplier to create 
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Supplier'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Supplier'
+
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+  /suppliers/${id}:
+    parameters:
+    - name: id
+      in: path
+      description: the supplier id
+      required: true
+      schema:
+        type: integer
+    put:
+      summary: update a supplier by id
+      tags:
+        - general
+      requestBody:
+        description: >
+          The supplier to update 
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Supplier'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Supplier'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
   /dataload/${entity}/metadata:
     get:
       summary: get table metadata (field and data-type information).

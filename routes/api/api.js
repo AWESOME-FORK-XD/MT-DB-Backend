@@ -272,7 +272,7 @@ router.get('/suppliers', parseQueryOptions(['name_en','name_zh','id'], ['+name_e
   }, fetchMany, resultToJson);
 
 /** Create a supplier */
-router.post('/suppliers', function (req, res, next) {
+router.post('/suppliers', authenticated(), function (req, res, next) {
   let entity = req.body;
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('supplier'),
@@ -283,12 +283,12 @@ router.post('/suppliers', function (req, res, next) {
 }, create, resultToJson);
 
 /** Update a supplier */
-router.put('/suppliers/:supplier_id', function (req, res, next) {
+router.put('/suppliers/:supplier_id', authenticated(), function (req, res, next) {
   if(!req.params.supplier_id || req.params.supplier_id != req.body.id){
     res.status(400).json({"error":"missing/invalid id"});
     return;
   }
-  
+
   let entity = req.body;
   res.locals.dbInstructions = {
     dao: req.app.locals.database.getDao('supplier'),
