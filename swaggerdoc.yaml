@@ -3624,6 +3624,19 @@ components:
             family_video_link:
               type: string
               maxLength: 255
+            group_id:
+              description: from associated family
+              type: integer
+            group_code:
+              type: string
+              maxLength: 255
+            image_type_id:
+              description: only the lowest id image from product images is returned
+              type: integer
+            image_link:
+              description: only the lowest id image from product images is returned
+              type: string
+              maxLength: 255
             lifecycle_id:
               type: integer
             lifecyle_en:
