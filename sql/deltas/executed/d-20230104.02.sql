@@ -6,7 +6,7 @@
   
   Created:          01/04/2023 by Derek Gau 
   Deployed to TEST: 01/04/2023 by Derek Gau 
-  Deployed to PROD: 
+  Deployed to PROD: 01/06/2023 by Derek Gau
 
 */
 drop view if exists v_product;
