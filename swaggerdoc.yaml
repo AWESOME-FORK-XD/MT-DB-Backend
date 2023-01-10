@@ -664,6 +664,51 @@ paths:
           $ref: '#/components/responses/400ClientError'
         500:
           $ref: '#/components/responses/500ServerError'
+  /buyer/org/${org_id}/product/${product_id}:
+    get:
+      summary: Gets organization-specific information about a product (if any)
+      tags: 
+        - buyer
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/OrgProduct'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        401:
+          description: Unauthorized. Invalid credentials.
+        500:
+          $ref: '#/components/responses/500ServerError'
+  /buyer/org/${org_id}/prices:
+    post:
+      summary: Gets organization-specific pricing for one or more products.
+      tags: 
+        - buyer
+      requestBody:
+        description: The list of product ids 
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: integer
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/OrgPrice'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        401:
+          description: Unauthorized. Invalid credentials.
+        500:
+          $ref: '#/components/responses/500ServerError'
   /products:
     get:
       summary: Find products using a simple search
@@ -3468,6 +3513,38 @@ components:
             id:
               type: integer
               readOnly: true
+        - $ref: '#/components/schemas/Auditable'
+    OrgPrice:
+      type: object
+      allOf:
+        - type: object
+          properties:
+            product_id:
+              type: integer
+            product_category_id:
+              type: integer
+            list_price:
+              description: the list price, without applying any discounts
+              type: number
+            price_rule_id:
+              type: integer
+            percent_discount:
+              type: integer
+            price:
+              description: the derived price after applying the percent discount to the list price
+              type: number
+    OrgProduct:
+      type: object
+      allOf:
+        - type: object
+          properties:
+            product_id:
+              type: integer
+            org_id:
+              type: integer
+            sku:
+              description: The organization-specific SKU
+              type: string
         - $ref: '#/components/schemas/Auditable'
     Product:
       type: object

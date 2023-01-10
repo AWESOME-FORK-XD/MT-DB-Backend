@@ -45,6 +45,7 @@ class DaoFactory {
       {table: 't_marketing_region',            entity: 'marketing_region',            options: this.standard_opts },
       {table: 't_packaging_factor',            entity: 'packaging_factor',            options: this.standard_opts },
       {table: 't_product',                     entity: 'product',                     options: this.standard_opts },
+      {table: 't_product_buyer',               entity: 'product_buyer',               options: this.standard_opts },
       {table: 't_product_certificate',         entity: 'product_certificate',         options: this.standard_opts },
       {table: 't_product_custom_attribute',    entity: 'product_custom_attribute',    options: this.standard_opts },
       {table: 't_product_customer',            entity: 'product_customer',            options: this.standard_opts },

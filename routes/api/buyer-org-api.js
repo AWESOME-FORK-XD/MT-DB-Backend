@@ -1,10 +1,10 @@
 var express = require('express');
 var router = express.Router({ mergeParams: true });
-let { create, fetchById, fetchMany, parseQueryOptions, resultToJson, saveAll, updateById} = require('@apigrate/dao/lib/express/db-api');
-const authenticated = require('../middleware/authenticated');
+let { fetchMany, fetchOne, resultToJson, } = require('@apigrate/dao/lib/express/db-api');
 const debug = require('debug')('app:routes');
+
 /** Query all prices for an org */
-router.get('/org/:org_id', 
+router.get('/:org_id/prices', 
   function (req, res, next) {
     res.locals.dbInstructions = {
       dao: req.app.locals.database.getDao('buyer_price'),
@@ -18,7 +18,7 @@ router.get('/org/:org_id',
   }, fetchMany, resultToJson);
 
 /** Given an array of products, return prices for each product. */
-router.post('/org/:org_id/lookup', async function(req, res, next){ 
+router.post('/:org_id/prices', async function(req, res, next){ 
   try{
     if(!req.body || !req.body.product_ids || req.body.product_ids.length === 0){ 
       res.status(200).json([]);
@@ -129,6 +129,24 @@ router.post('/org/:org_id/lookup', async function(req, res, next){
     next(err)
   }
 });
+
+/** Get extended buyer-specific data for a product. */
+router.get('/:org_id/product/:product_id', 
+  async function (req, res, next) {
+    try{
+      let pbDao = req.app.locals.database.getDao('product_buyer');
+      let extendedInfo = await pbDao.one({
+        org_id: req.params.org_id,
+        product_id: req.params.product_id
+      });
+      if(!extendedInfo) extendedInfo = {};
+      res.status(200).json(extendedInfo);
+    }catch(err){
+      console.error(err);
+      next(err);
+    }
+    
+  });
 
 //Default error handling
 router.use(function (err, req, res, next) {
