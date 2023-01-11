@@ -16,14 +16,13 @@ const {AuthService} = require('./services/auth-service');
 var app = express();
 console.log("Environment initialized to: " + process.env.NODE_ENV);
 
-
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.text({ limit: "1024kb", defaultCharset: "utf-8" }));
 app.use(cookieParser());
 
-if(['test','production'].includes(process.env.NODE_ENV)){
+if(!['development'].includes(process.env.NODE_ENV)){
   app.use(awsServerlessExpressMiddleware.eventContext());
 }
 app.use(cors());
@@ -104,7 +103,7 @@ app.use('/api/v1/groups', groupsApiRouter);
 app.use('/api/v1/customer-identity', customerIdentityRouter);
 app.use('/api/v1', apiRouter);
 app.use('/api/v1/dataload', authenticated(), dataloadApiRouter);
-app.use('/api/v1/buyer/org', buyerOrgApi);
+app.use('/api/v1/buyer/org', authenticated(), buyerOrgApi);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
