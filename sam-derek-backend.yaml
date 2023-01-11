@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Medten Product DB API Backend (Derek development environment)
+Parameters:
+  # Manually define this in AWS IAM for just the services needed.
+  lambdaExecutionRole:
+    Description: 'Required. The role used for lambda execution.'
+    Type: 'String'
+    Default: 'arn:aws:iam::900914409567:role/LambdaExecutionRole'
+
+Resources:
+  productDbRequest:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: lambda.handler
+      Runtime: nodejs12.x
+      CodeUri: ./
+      Description: Handles inbound API requests. (Derek development environment)
+      MemorySize: 256
+      Timeout: 60
+      Role:
+        Ref: lambdaExecutionRole
+      Events:
+        # Define the API Gateway endpoint here.
+        ProxyApiRoot:
+          Type: Api
+          Properties:
+            Path: '/'
+            Method: ANY
+        ProxyApiGreedy:
+          Type: Api
+          Properties:
+            Path: '/{proxy+}'
+            Method: ANY
+      
+      Tags:
+        environment: development Derek

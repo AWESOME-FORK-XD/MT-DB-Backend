@@ -2,10 +2,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: Medten Product DB Backend Serverless Application
 Parameters:
-  debuggingFor:
-    Description: 'debugging category'
-    Type: 'String'
-    Default: 'medten:services'
   # Manually define this in AWS IAM for just the services needed.
   lambdaExecutionRole:
     Description: 'Required. The role used for lambda execution.'
@@ -37,15 +33,6 @@ Resources:
           Properties:
             Path: '/{proxy+}'
             Method: ANY
-      # Environment:
-      #   Variables:
-      #     DEBUG:
-      #       Ref: debuggingFor
-      #     LOG_LEVEL: info
-      #     DB_HOST: '{{resolve:ssm:DB_HOST:1}}'
-      #     DB_PORT: '{{resolve:ssm:DB_PORT:1}}'
-      #     DB_USER: '{{resolve:ssm:DB_USER:1}}'
-      #     DB_PASSWORD: '{{resolve:ssm:DB_PASSWORD:1}}'
-      #     DB_DATABASE: '{{resolve:ssm:DB_DATABASE:1}}'
+      
       Tags:
         environment: test

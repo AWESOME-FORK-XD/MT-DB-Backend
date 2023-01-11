@@ -51,6 +51,9 @@ typings/
 # Output of 'npm pack'
 *.tgz
 
+# For now, don't add the deployment config file, someone could accidentally put sensitive info in it.
+samconfig.toml
+
 # Yarn Integrity file
 .yarn-integrity
 
