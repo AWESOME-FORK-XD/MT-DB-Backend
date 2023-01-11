@@ -25,6 +25,7 @@ class DaoFactory {
       // product data tables
       {table: 't_available_region',            entity: 'available_region',            options: this.standard_opts },
       {table: 't_brand',                       entity: 'brand',                       options: this.standard_opts },
+      {table: 't_buyer_price',                 entity: 'buyer_price',                 options: this.standard_opts },
       {table: 't_category',                    entity: 'category',                    options: this.standard_opts },
       {table: 't_certificate',                 entity: 'certificate',                 options: this.standard_opts },
       {table: 't_custom_attribute',            entity: 'custom_attribute',            options: this.standard_opts },
@@ -44,6 +45,7 @@ class DaoFactory {
       {table: 't_marketing_region',            entity: 'marketing_region',            options: this.standard_opts },
       {table: 't_packaging_factor',            entity: 'packaging_factor',            options: this.standard_opts },
       {table: 't_product',                     entity: 'product',                     options: this.standard_opts },
+      {table: 't_product_buyer',               entity: 'product_buyer',               options: this.standard_opts },
       {table: 't_product_certificate',         entity: 'product_certificate',         options: this.standard_opts },
       {table: 't_product_custom_attribute',    entity: 'product_custom_attribute',    options: this.standard_opts },
       {table: 't_product_customer',            entity: 'product_customer',            options: this.standard_opts },

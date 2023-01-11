@@ -83,6 +83,7 @@ app.use(function(req, res, next){
 
 var authRouter = require('./routes/auth');
 
+var buyerOrgApi = require('./routes/api/buyer-org-api');
 var productsApiRouter = require('./routes/api/products-api');
 var familiesApiRouter = require('./routes/api/families-api');
 var equipmentApiRouter = require('./routes/api/equipment-api');
@@ -103,6 +104,7 @@ app.use('/api/v1/groups', groupsApiRouter);
 app.use('/api/v1/customer-identity', customerIdentityRouter);
 app.use('/api/v1', apiRouter);
 app.use('/api/v1/dataload', authenticated(), dataloadApiRouter);
+app.use('/api/v1/buyer/org', buyerOrgApi);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
