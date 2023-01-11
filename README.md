@@ -1,4 +1,5 @@
 # Summary
+> Last Revision by Derek Gau on 1/11/2023
 
 This is the API Backend environment used by both Medten Product DB and Medten Product Catalog applications.
 
@@ -7,8 +8,7 @@ It includes:
 * CRUD APIs for virtually all of the database tables in the Medten Product database.
 * Authentication and Authorization to support logins.
 
-
-## AWS Setup
+## AWS Architecture
 
 This application is deployed as a "serverless" application on AWS. Each application has its own AWS template file, as defined in the `sam-backend-[environment].yaml` files in the root folder. The AWS services used are:
 
@@ -16,11 +16,12 @@ This application is deployed as a "serverless" application on AWS. Each applicat
 * Lambda - for NodeJS functions for handling calls received throught API gateway
 * CloudWatch Logs - Lambda functions produce logs in CloudWatch
 
-
-### Prerequisites for AWS Development
+## Prerequisites for Development
 It is highly recommended to use VSCode or an IDE that supports the AWS command line environment.
-1. The AWS CLI must be installed on your machine.
-1. You should run `aws configure` to log in to AWS as the correct IAM user and region before running any AWS CLI operations.
+1. You should have installed a version of NodeJS 14.x (updated January 2023)
+1. The [AWS CLI](https://aws.amazon.com/cli/) must be installed on your machine.
+1. You should run `aws configure` to log in to AWS as the correct IAM user and region before running any AWS CLI operations. (These credentials will be granted by your manager).
+
 
 ## How to Package and Deploy the Application on AWS
 ### Prerequisite: .env files.
