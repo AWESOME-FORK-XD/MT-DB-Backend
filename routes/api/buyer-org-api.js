@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router({ mergeParams: true });
-let { fetchMany, fetchOne, resultToJson, } = require('@apigrate/dao/lib/express/db-api');
+let { fetchMany, resultToJson, } = require('@apigrate/dao/lib/express/db-api');
 const debug = require('debug')('app:routes');
 
 /** Query all prices for an org */
