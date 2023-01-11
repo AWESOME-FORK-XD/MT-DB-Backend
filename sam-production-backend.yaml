@@ -22,7 +22,7 @@ Resources:
     Properties:
       FunctionName: handleBackendRequest
       Handler: lambda.handler
-      Runtime: nodejs12.x
+      Runtime: nodejs14.x
       CodeUri: ./
       Description: Handles inbound requests for the backend AWS serverless express webapp.
       MemorySize: 256
