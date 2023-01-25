@@ -50,7 +50,7 @@ router.get('/', parseQueryOptions(ALLOWED_SEARCH_PARAMETERS, ['+model', '+id'], 
 
 router.get('/all', async function (req, res, next) {
 
-  const EQUIPMENT_VIEW_SQL = `select * from v_equipment order by model asc`;
+  const EQUIPMENT_VIEW_SQL = `select id, brand_id, brand_en, brand_zh, model, equipment_type_id from v_equipment order by brand_en asc, model asc`;
   let eqViewDao = req.app.locals.database.getDao('equipment_view');
   res.locals.result = await eqViewDao.sqlCommand(EQUIPMENT_VIEW_SQL);
 
@@ -58,12 +58,16 @@ router.get('/all', async function (req, res, next) {
   
 }, resultToJson);
 
-/** Gets all the distinct model-brand combinations in the database. */
+/** 
+ * Gets all the distinct model-brand combinations in the database. 
+ * @deprecated use /all instead. model+brand is now globally unique in t_Equipment, so getting all the equipment accomplishes the same objective.
+ */
 router.get('/models', async function (req, res, next) {
 
+  const EQUIPMENT_VIEW_SQL = `select id, brand_id, brand_en, brand_zh, model, equipment_type_id from v_equipment order by brand_en asc, model asc`;
   let eqViewDao = req.app.locals.database.getDao('equipment_view');
-  res.locals.result = await eqViewDao.sqlCommand(`select model, brand_id, brand_en from v_equipment group by model, brand_id, brand_en order by model asc`);
-
+  res.locals.result = await eqViewDao.sqlCommand(EQUIPMENT_VIEW_SQL);
+  
   next();
   
 }, resultToJson); 

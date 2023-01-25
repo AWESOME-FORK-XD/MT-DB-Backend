@@ -2294,9 +2294,9 @@ paths:
           $ref: '#/components/responses/400ClientError'
         500:
           $ref: '#/components/responses/500ServerError'
-  /equipment/models:
+  /equipment/all:
     get:
-      summary: lists all distinct equipment model and brand combinations in the DB
+      summary: lists all equipment in the database.
       tags:
         - equipment
       responses:
@@ -2309,12 +2309,19 @@ paths:
                 items:
                   type: object
                   properties:
-                    model:
-                      type: string
+                    id:
+                      type: integer
+                      description: the equipment id
                     brand_id:
                       type: integer
                     brand_en:
                       type: string
+                    brand_zh:
+                      type: string
+                    model:
+                      type: string
+                    equipment_type_id:
+                      type: integer
         400:
           $ref: '#/components/responses/400ClientError'
         500:
