@@ -3,7 +3,8 @@
 create view v_product as select 
 p.id, p.sku, p.oem, p.is_oem, p.name_en, p.name_seo, p.description_en, p.name_zh, p.description_zh, 
 p.product_type_id, t.name_en as product_type_en, t.name_zh as product_type_zh, 
-p.family_id, f.family_code, f.family_connector_code, f.name_en as family_name_en, f.video_link as family_video_link,
+p.family_id, f.family_code, f.family_connector_code, f.name_en as family_name_en, f.video_link as family_video_link, 
+f.image_link_connector_distal as family_image_link, f.image_type_id as family_image_type_id,
 f.group_id, g.group_code,
 p.oem_brand_id, b.name_en as oem_brand_en, b.name_zh as oem_brand_zh,
 p.category_id, c.name_en as category_en, c.name_zh as category_zh,
@@ -164,6 +165,7 @@ select p.id, p.name_en, p.description_en, p.name_seo, p.sku, p.category_id, p.ca
 p.publish, p.stock_usa, p.stock_eu, p.stock_zh, p.popular, p.featured, p.has_components, p.created, p.updated,
 p.outsourced, p.source_region, p.minimum_profit_pct, p.leadtime, p.dealer_price,
 p.ad_url, p.list_price_us, p.list_price_eu, p.list_price_zh, p.new_arrival,
+p.family_image_link, p.family_image_type_id,
 mods.models, 
 oref.oem_refs, p.family_id,
 pfilo.filter_option_ids

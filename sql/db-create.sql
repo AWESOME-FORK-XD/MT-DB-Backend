@@ -739,6 +739,9 @@ ALTER TABLE `t_product_oem_reference`
 ALTER TABLE `t_product_oem_reference` 
   ADD CONSTRAINT `fk_product_oem_reference_brand` FOREIGN KEY (`brand_id`) REFERENCES `t_brand` (`id`);
 
+ALTER TABLE `t_product_oem_reference`
+  ADD CONSTRAINT `product_oem_brand_name_UNIQUE` UNIQUE(product_id, brand_id, name);
+
 
 ALTER TABLE `t_product_filter_option` 
   ADD CONSTRAINT `fk_product_option_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`) ON DELETE CASCADE;

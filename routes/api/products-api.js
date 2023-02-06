@@ -352,7 +352,28 @@ where model = ?`;
     let offset = Number.isFinite( Number.parseInt(req.query.offset) ) ?  Number.parseInt(req.query.offset) : 0;
     let limit = Number.isFinite( Number.parseInt(req.query.limit) ) ? Number.parseInt(req.query.limit) : 5000;
   
-    const PRODUCT_FIELDS = ['id','category_id','name_en','description_en','oem','oem_brand_en','oem_brand_id','packaging_factor','product_type_id','product_type_en','price_us','list_price_us','sku','family_id','ad_url','featured','popular','new_arrival'];
+    const PRODUCT_FIELDS = [
+      'ad_url',
+      'category_id',
+      'description_en',
+      'family_id',
+      'family_image_link',
+      'family_image_type_id',
+      'featured',
+      'id',
+      'list_price_us',
+      'name_en',
+      'new_arrival',
+      'oem',
+      'oem_brand_en',
+      'oem_brand_id',
+      'packaging_factor',
+      'price_us',
+      'product_type_id',
+      'product_type_en',
+      'popular',
+      'sku',
+    ];
     // customer-specific properties must all begin with 'customer_'...
     const PRODUCT_CUSTOMER_FIELDS = ['sku as customer_sku'];
  
