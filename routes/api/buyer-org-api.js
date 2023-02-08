@@ -50,7 +50,10 @@ router.post('/:org_id/prices', async function(req, res, next){
       let categories = []; //if needed.
       let categoryDao = req.app.locals.database.getDao('category');
       for(let p of products){
+        // The result of a price rule lookup will either be a discount (percentage) OR a discount_price. 
+        // In the event that both are returned, the discount_price takes priority over the discount.
         let discount = null;
+        let discount_price = null;
         let price = p.list_price_us; // default is the list price.
 
         // Product id match?
@@ -65,7 +68,15 @@ router.post('/:org_id/prices', async function(req, res, next){
               categories = await categoryDao.sqlCommand(`select id, parent_id from t_category order by id asc`);
             }
 
-            let searchPriceRulesByCategory = ( category_id, lifecycle_id ) => {
+            /**
+             * Recursive function that looks up price rules by category.
+             * @param {integer} category_id 
+             * @param {integer} lifecycle_id 
+             * @returns 
+             */
+            let MAX_RECURSION = 10;
+            let searchPriceRulesByCategory = ( category_id, lifecycle_id, iterations ) => {
+              if(!iterations) iterations = 1;
               debug(`search for price rule match on category_id ${category_id}...`)
               let matches = price_rules.filter(pr => pr.category_id == category_id);
               if(matches.length > 0){ 
@@ -90,9 +101,12 @@ router.post('/:org_id/prices', async function(req, res, next){
               // No match. Get parent and iterate...
               let category = categories.find(c=>c.id==category_id);
               if(!category || !category.parent_id) return null;
-              return searchPriceRulesByCategory(category.parent_id);
               
-            };
+              if(++iterations > MAX_RECURSION) return null;// prevent infinite recursion in case of data misconfiguration
+
+              return searchPriceRulesByCategory(category.parent_id, ++iterations);
+              
+            };// end of function
 
             // Category match?
             rule_match = searchPriceRulesByCategory(p.category_id, p.lifecycle_id);
@@ -102,10 +116,12 @@ router.post('/:org_id/prices', async function(req, res, next){
         }
 
         if(rule_match){
+          discount_price = rule_match.discount_price;
           discount = rule_match.discount;
-        } 
-
-        if(discount){
+        }
+        if(discount_price){
+          price = discount_price;
+        } else if (discount){
           price = price - ( (discount / 100.0000) * price );
         }
         results.push({
@@ -114,6 +130,7 @@ router.post('/:org_id/prices', async function(req, res, next){
           list_price:           p.list_price_us, 
           price_rule_id:        rule_match?.id, 
           percent_discount:     rule_match?.discount, 
+          discount_price:       rule_match?.discount_price, 
           price 
         });
 

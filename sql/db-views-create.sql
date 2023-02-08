@@ -1,7 +1,7 @@
 
 -- main product view
 create view v_product as select 
-p.id, p.sku, p.oem, p.is_oem, p.name_en, p.name_seo, p.description_en, p.name_zh, p.description_zh, 
+p.id, p.sku, p.oem, p.is_oem, p.name_en, p.name_en_customized, p.name_seo, p.description_en, p.description_en_customized, p.name_zh, p.name_zh_customized, p.description_zh, p.description_zh_customized,
 p.product_type_id, t.name_en as product_type_en, t.name_zh as product_type_zh, 
 p.family_id, f.family_code, f.family_connector_code, f.name_en as family_name_en, f.video_link as family_video_link, 
 f.image_link_connector_distal as family_image_link, f.image_type_id as family_image_type_id,
