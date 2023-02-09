@@ -3577,7 +3577,7 @@ components:
               type: number
             price_rule_id:
               type: integer
-            percent_discount:
+            discount_percentage:
               description: the discount percentage for the price rule 
               type: integer
             discount_price:

@@ -50,9 +50,9 @@ router.post('/:org_id/prices', async function(req, res, next){
       let categories = []; //if needed.
       let categoryDao = req.app.locals.database.getDao('category');
       for(let p of products){
-        // The result of a price rule lookup will either be a discount (percentage) OR a discount_price. 
-        // In the event that both are returned, the discount_price takes priority over the discount.
-        let discount = null;
+        // The result of a price rule lookup will either be a discount_percentage (percentage) OR a discount_price. 
+        // In the event that both are returned, the discount_price takes priority over the discount_percentage.
+        let discount_percentage = null;
         let discount_price = null;
         let price = p.list_price_us; // default is the list price.
 
@@ -117,19 +117,19 @@ router.post('/:org_id/prices', async function(req, res, next){
 
         if(rule_match){
           discount_price = rule_match.discount_price;
-          discount = rule_match.discount;
+          discount_percentage = rule_match.discount_percentage;
         }
         if(discount_price){
           price = discount_price;
-        } else if (discount){
-          price = price - ( (discount / 100.0000) * price );
+        } else if (discount_percentage){
+          price = price - ( (discount_percentage / 100.0000) * price );
         }
         results.push({
           product_id:           p.id, 
           product_category_id:  p.category_id, 
           list_price:           p.list_price_us, 
           price_rule_id:        rule_match?.id, 
-          percent_discount:     rule_match?.discount, 
+          discount_percentage:  rule_match?.discount_percentage, 
           discount_price:       rule_match?.discount_price, 
           price 
         });

@@ -619,7 +619,7 @@ CREATE TABLE `t_buyer_price` (
   `product_id` int(11) unsigned DEFAULT NULL,
   `category_id` int(11) unsigned DEFAULT NULL,
   `lifecycle_id` int(11) unsigned DEFAULT NULL,
-  `discount` smallint unsigned DEFAULT NULL,
+  `discount_percentage` smallint unsigned DEFAULT NULL,
   `discount_price` decimal(9,2) DEFAULT NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -1,5 +1,5 @@
 /* 
-  Adjust buyer price table to include negotiated price, remove decimal precision from discount.
+  Adjust buyer price table to include negotiated price, remove decimal precision from discount and rename it to discount_percentage.
   Reference: https://trello.com/c/QOjrc42o/197-backend-197-tbuyerprice-additions
   
   Add "manually created" checkboxes on t_product for title and description fields.
@@ -13,6 +13,7 @@
 
 -- buyer price
 ALTER TABLE t_buyer_price MODIFY COLUMN `discount` SMALLINT unsigned DEFAULT NULL;
+ALTER TABLE t_buyer_price RENAME COLUMN  `discount` TO  `discount_percentage`;
 ALTER TABLE t_buyer_price ADD COLUMN `discount_price` DECIMAL(9,2) DEFAULT NULL;
 
 -- product and product view
