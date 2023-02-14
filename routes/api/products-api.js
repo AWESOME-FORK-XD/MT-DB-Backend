@@ -352,6 +352,7 @@ where model = ?`;
     let offset = Number.isFinite( Number.parseInt(req.query.offset) ) ?  Number.parseInt(req.query.offset) : 0;
     let limit = Number.isFinite( Number.parseInt(req.query.limit) ) ? Number.parseInt(req.query.limit) : 5000;
   
+    // These v_product fields are output in the quicksearch results.
     const PRODUCT_FIELDS = [
       'ad_url',
       'category_id',
@@ -360,6 +361,8 @@ where model = ?`;
       'family_image_link',
       'family_image_type_id',
       'featured',
+      'group_id',
+      'group_code',
       'id',
       'list_price_us',
       'name_en',

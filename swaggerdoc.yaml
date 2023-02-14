@@ -775,7 +775,7 @@ paths:
           content:
             application/json:
               schema: 
-                $ref: '#/components/schemas/OrgPrice'
+                $ref: '#/components/schemas/OrgPriceResult'
         400:
           $ref: '#/components/responses/400ClientError'
         401:
@@ -3563,7 +3563,7 @@ components:
               type: integer
               readOnly: true
         - $ref: '#/components/schemas/Auditable'
-    OrgPrice:
+    OrgPriceResult:
       type: object
       allOf:
         - type: object
@@ -3577,8 +3577,12 @@ components:
               type: number
             price_rule_id:
               type: integer
-            percent_discount:
+            discount_percentage:
+              description: the discount percentage for the price rule 
               type: integer
+            discount_price:
+              description: the discount price for the price rule. This takes precedence over percent_discount when both are present.
+              type: number
             price:
               description: the derived price after applying the percent discount to the list price
               type: number
@@ -3691,9 +3695,15 @@ components:
             description_en:
               type: string
               maxLength: 500
+            description_en_customized:
+              description: whether the description_en field was manually customized instead of using a formula to generate it
+              type: boolean
             description_zh:
               type: string
               maxLength: 500
+            description_zh_customized:
+              description: whether the description_zh field was manually customized instead of using a formula to generate it
+              type: boolean
             family_code:
               type: string
               maxLength: 255
@@ -3737,9 +3747,15 @@ components:
             name_en:
               type: string
               maxLength: 255
+            name_en_customized:
+              description: whether the name_en field was manually customized instead of using a formula to generate it
+              type: boolean
             name_zh:
               type: string
               maxLength: 255
+            name_zh_customized:
+              description: whether the name_zh field was manually customized instead of using a formula to generate it
+              type: boolean
             name_seo:
               type: string
               maxLength: 255
