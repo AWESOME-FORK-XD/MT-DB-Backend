@@ -37,7 +37,7 @@ router.post('/', async function(req, res, next){
 
     // Issue a JWT
     let token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: '365 days', 
+      expiresIn: '1 days', 
       issuer: req.hostname,
       audience: req.hostname,
     });
