@@ -5,7 +5,7 @@
   
   Created:          2/1/2023 by Derek Gau
   Deployed to TEST: 2/1/2023 by Derek Gau
-  Deployed to PROD: MM/DD/YYYY by (author)
+  Deployed to PROD: 2/15/2023 by Derek Gau
 
   Note: please keep any data load scripts in a separate file. Structural changes should generally not be mixed with data additions.
 */
