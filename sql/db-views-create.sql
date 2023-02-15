@@ -165,7 +165,7 @@ select p.id, p.name_en, p.description_en, p.name_seo, p.sku, p.category_id, p.ca
 p.publish, p.stock_usa, p.stock_eu, p.stock_zh, p.popular, p.featured, p.has_components, p.created, p.updated,
 p.outsourced, p.source_region, p.minimum_profit_pct, p.leadtime, p.dealer_price,
 p.ad_url, p.list_price_us, p.list_price_eu, p.list_price_zh, p.new_arrival,
-p.family_image_link, p.family_image_type_id,
+p.family_image_link, p.family_image_type_id, p.lifecycle_id,
 mods.models, 
 oref.oem_refs, p.family_id,
 pfilo.filter_option_ids

@@ -25,6 +25,7 @@ const ALLOWED_SEARCH_PARAMETERS = [
   'family_code',
   'family_name_en',
   'featured',
+  'lifecycle_id',
   'category_id',
   'category_en',
   'category_zh',
@@ -316,6 +317,9 @@ router.get('/quicksearch', customerDependent(), async function (req, res, next) 
       criteria.and ( 'pc.created', '>=', req.query.created_since );
     }
 
+    if(req.query.lifecycle_id){
+      criteria.and ( 'pc.lifecycle_id', '=', req.query.lifecycle_id );
+    }
 
     // when model is known, find compatible products based on equipment/group/family/product relationship
 
@@ -365,6 +369,7 @@ where model = ?`;
       'group_code',
       'id',
       'list_price_us',
+      'lifecycle_id',
       'name_en',
       'new_arrival',
       'oem',

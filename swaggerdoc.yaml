@@ -3858,6 +3858,9 @@ components:
             list_price_zh:
               type: number
               format: double
+            lifecycle_id:
+              description: represents whether product is reusable, disposable
+              type: number
             models:
               description: pipe-separated list of models
               type: string
